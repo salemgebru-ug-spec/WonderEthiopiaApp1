@@ -4,6 +4,7 @@ import "./globals.css";
 import SessionProvider from "@/components/providers/SessionProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PortalWrapper from "@/components/layout/PortalWrapper";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,13 +40,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable}`}>
+    <html lang="en" className={`${inter.variable}`}>
       <head>
         <meta name="theme-color" content="#050505" />
       </head>
       <body className={`${inter.className} antialiased font-sans`}>
         <SessionProvider>
-          {children}
+          <PortalWrapper>
+            {children}
+          </PortalWrapper>
           <ToastContainer
             theme="dark"
             position="bottom-right"

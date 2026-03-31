@@ -22,6 +22,8 @@ export interface IBusiness extends Document {
   decisionNote: string;
   contactPhone: string;
   contactEmail: string;
+  isActive: boolean;
+  profilePicture: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -103,6 +105,14 @@ const BusinessSchema = new Schema<IBusiness>(
       default: "",
     },
     contactEmail: {
+      type: String,
+      default: "",
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+    profilePicture: {
       type: String,
       default: "",
     },

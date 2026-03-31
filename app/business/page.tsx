@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { ArrowLeft, Building2, Globe, FileText, Phone, Mail, Upload, CheckCircle2, Loader2, MapPin } from "lucide-react";
 
 export default function BusinessPortalPage() {
   const [formData, setFormData] = useState({
@@ -63,10 +64,8 @@ export default function BusinessPortalPage() {
       formDataToSend.append("contactPhone", formData.contactPhone);
       formDataToSend.append("contactEmail", formData.contactEmail);
       
-      // Serialize industryDetails as a string (it contains metadata)
       formDataToSend.append("industryDetails", JSON.stringify(formData.industryDetails));
 
-      // Append actual files
       Object.entries(formData.industryFiles).forEach(([key, file]) => {
         if (file) {
           formDataToSend.append(`file_${key}`, file);
@@ -75,7 +74,7 @@ export default function BusinessPortalPage() {
 
       const res = await fetch("/api/businesses/apply", {
         method: "POST",
-        body: formDataToSend, // Send as form data, no headers needed for boundary
+        body: formDataToSend,
       });
 
       const data = await res.json();
@@ -84,7 +83,7 @@ export default function BusinessPortalPage() {
         setError(data.error || "Registration failed");
       } else {
         setSuccess(
-          "Business registration submitted successfully! It will be reviewed by a Tourism Admin. You will receive an email once approved."
+          "Application submitted! Our Tourism Admin will review your details. You'll receive login credentials via email once approved."
         );
         setFormData({
           applicantName: "",
@@ -100,7 +99,6 @@ export default function BusinessPortalPage() {
           industryDetails: {},
           industryFiles: {},
         });
-        // Reset file inputs because browser doesn't clear them automatically on state reset
         const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
         fileInputs.forEach(input => { input.value = ''; });
       }
@@ -112,320 +110,192 @@ export default function BusinessPortalPage() {
   };
 
   const inputClass =
-    "w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white text-[14px] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 transition-all duration-300";
+    "w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-foreground text-[14px] font-medium placeholder:text-foreground/20 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/20 transition-all duration-300";
 
   return (
-    <div className="min-h-screen bg-[#050505]">
-      {/* Ambient */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[300px] left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-amber-500/[0.03] rounded-full blur-[120px]" />
-      </div>
-
-      {/* Header */}
-      <header className="relative z-50 border-b border-white/[0.06]">
-        <div className="glass">
-          <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="text-lg font-extrabold tracking-tight gradient-text">
-                WONDAR ETHIOPIA
-              </Link>
-              <span className="text-gray-800">|</span>
-              <span className="text-[12px] font-bold text-gray-600 uppercase tracking-wider">
-                Business Portal
-              </span>
-            </div>
-            <Link
-              href="/"
-              className="px-3 py-1.5 text-[13px] font-medium text-gray-500 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all"
-            >
-              ← Home
-            </Link>
-          </div>
+    <div className="min-h-screen bg-background text-foreground font-sans">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full z-50 glass border-b border-foreground/[0.03]">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="text-lg font-bold tracking-tighter text-primary flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-black">W</div>
+            BUSINESS PORTAL
+          </Link>
+          <Link href="/" className="text-[11px] font-extrabold text-foreground/40 hover:text-primary transition-all flex items-center gap-2 uppercase tracking-widest">
+            <ArrowLeft className="w-4 h-4" /> Exit Portal
+          </Link>
         </div>
-      </header>
+      </nav>
 
-      <main className="relative z-10 max-w-3xl mx-auto px-6 py-10">
-        {/* Header */}
-        <div className="animate-fade-in mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 animate-pulse" />
-            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-gray-600">
-              Business Application
-            </span>
+      <main className="pt-32 pb-24 max-w-4xl mx-auto px-6">
+        {/* Header Hero */}
+        <div className="mb-16 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-[10px] font-bold tracking-[0.2em] text-primary uppercase bg-primary/5 rounded-full border border-primary/10">
+            Partner Program 2026
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">
-            Register Your Business
-          </h1>
-          <p className="text-[15px] text-gray-600">
-            Submit your details for review. A Tourism Admin will evaluate your registration
-            and you&apos;ll receive login credentials via email upon approval.
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Partner with <span className="text-primary italic">Wonder Ethiopia</span></h1>
+          <p className="text-lg text-foreground/50 font-medium leading-relaxed max-w-2xl">
+            Join the national platform for certified tourism operators. Reach thousands of international travelers and manage your business presence with ease.
           </p>
-        </div>
-
-        {/* Progress Steps */}
-        <div className="mb-8 p-5 rounded-xl border border-white/[0.06]">
-          <div className="flex items-center justify-between text-center">
-            {[
-              { step: "1", label: "Submit Application", active: true },
-              { step: "2", label: "Tourism Admin Review", active: false },
-              { step: "3", label: "Super Admin Approval", active: false },
-              { step: "4", label: "Get Credentials", active: false },
-            ].map((s, i) => (
-              <div key={s.step} className="flex items-center gap-3 flex-1">
-                <div className="flex flex-col items-center gap-1.5 flex-1">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold ${
-                      s.active
-                        ? "bg-gradient-to-r from-amber-500 to-orange-600 text-black"
-                        : "border border-white/[0.08] text-gray-600"
-                    }`}
-                  >
-                    {s.step}
-                  </div>
-                  <span
-                    className={`text-[11px] font-medium ${
-                      s.active ? "text-amber-400" : "text-gray-700"
-                    }`}
-                  >
-                    {s.label}
-                  </span>
-                </div>
-                {i < 3 && (
-                  <div className="h-px w-full bg-white/[0.04] hidden sm:block" />
-                )}
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Form Card */}
-        <div className="glass-elevated rounded-2xl p-8 shadow-2xl shadow-black/50 animate-slide-up" style={{ opacity: 0, animationDelay: "0.1s" }}>
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="glass-elevated rounded-[40px] p-8 md:p-12 shadow-2xl shadow-foreground/5 border border-foreground/[0.03] animate-slide-up">
+          <form onSubmit={handleSubmit} className="space-y-10">
             {error && (
-              <div className="bg-red-500/[0.08] border border-red-500/20 rounded-xl p-3.5 text-red-400 text-[13px] font-medium">
+              <div className="bg-red-50 border border-red-100 rounded-2xl p-4 text-red-500 text-[13px] text-center font-bold">
                 {error}
               </div>
             )}
-            {success && (
-              <div className="bg-green-500/[0.08] border border-green-500/20 rounded-xl p-4 text-green-400 text-[13px] font-medium">
-                <span className="text-lg block mb-1">🎉</span>
-                {success}
-              </div>
-            )}
-
-            {/* Applicant Name */}
-            <div>
-              <label htmlFor="applicantName" className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Your Full Name *
-              </label>
-              <input
-                id="applicantName" name="applicantName" type="text"
-                value={formData.applicantName} onChange={handleChange} required
-                className={inputClass} placeholder="John Doe"
-              />
-            </div>
-
-            {/* Business Name + Category */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="name" className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                  Business Name *
-                </label>
-                <input
-                  id="name" name="name" type="text"
-                  value={formData.name} onChange={handleChange} required
-                  className={inputClass} placeholder="Ethiopian Adventures"
-                />
-              </div>
-              <div>
-                <label htmlFor="category" className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                  Category *
-                </label>
-                <select
-                  id="category" name="category"
-                  value={formData.category} onChange={handleChange}
-                  className={inputClass}
+            
+            {success ? (
+              <div className="text-center py-12 space-y-6">
+                <div className="w-20 h-20 bg-green-500/10 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle2 className="w-10 h-10" />
+                </div>
+                <h3 className="text-2xl font-bold">Application Received!</h3>
+                <p className="text-foreground/50 font-medium max-w-md mx-auto">{success}</p>
+                <button 
+                  type="button" 
+                  onClick={() => setSuccess("")}
+                  className="px-8 py-3 bg-primary text-white rounded-full font-bold shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all"
                 >
-                  <option value="hotel">Hotel</option>
-                  <option value="tour_operator">Tour Operator</option>
-                  <option value="car_rental">Car Rental</option>
-                  <option value="event_organizer">Event Organizer</option>
-                  <option value="restaurant">Restaurant</option>
-                  <option value="other">Other</option>
-                </select>
+                  Apply for Another Business
+                </button>
               </div>
-            </div>
-
-            {/* Description */}
-            <div>
-              <label htmlFor="description" className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Description *
-              </label>
-              <textarea
-                id="description" name="description"
-                value={formData.description} onChange={handleChange}
-                required rows={3} className={inputClass}
-                placeholder="Describe your business, services, and what makes it unique..."
-              />
-            </div>
-
-            {/* Location */}
-            <div>
-              <span className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                📍 Location
-              </span>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input
-                  name="region" type="text" value={formData.region}
-                  onChange={handleChange} required className={inputClass}
-                  placeholder="Region (e.g. Amhara)"
-                />
-                <input
-                  name="city" type="text" value={formData.city}
-                  onChange={handleChange} required className={inputClass}
-                  placeholder="City (e.g. Gondar)"
-                />
-                <input
-                  name="address" type="text" value={formData.address}
-                  onChange={handleChange} required className={inputClass}
-                  placeholder="Address"
-                />
-              </div>
-            </div>
-
-            {/* Permit + Phone */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="permitNumber" className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                  Permit Number *
-                </label>
-                <input
-                  id="permitNumber" name="permitNumber" type="text"
-                  value={formData.permitNumber} onChange={handleChange} required
-                  className={inputClass} placeholder="BIZ-2024-001"
-                />
-              </div>
-              <div>
-                <label htmlFor="contactPhone" className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                  Contact Phone *
-                </label>
-                <input
-                  id="contactPhone" name="contactPhone" type="text"
-                  value={formData.contactPhone} onChange={handleChange} required
-                  className={inputClass} placeholder="+251 9xx xxx xxx"
-                />
-              </div>
-            </div>
-
-            {/* Dynamic Industry Questions */}
-            <div className="py-2">
-              <span className="block text-[12px] font-semibold text-amber-500/80 uppercase tracking-widest mb-4">
-               Industry Related Information ({formData.category.replace("_", " ")})
-              </span>
-              <div className="space-y-4">
-                {formData.category === "hotel" && (
-                  <>
-                    <div className="grid grid-cols-2 gap-4">
-                      <select name="stars" onChange={handleIndustryChange} className={inputClass}>
-                        <option value="">Select Stars</option>
-                        <option value="1">1 Star</option>
-                        <option value="2">2 Stars</option>
-                        <option value="3">3 Stars</option>
-                        <option value="4">4 Stars</option>
-                        <option value="5">5 Stars</option>
-                      </select>
-                      <input name="website" type="text" placeholder="Hotel Website" onChange={handleIndustryChange} className={inputClass} />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-bold text-gray-700 uppercase mb-2">Upload Hotel License (PDF/Image)</label>
-                      <input name="hotelLicense" type="file" onChange={handleFileChange} className={inputClass} accept=".pdf,image/*" />
-                    </div>
-                  </>
-                )}
-                {formData.category === "car_rental" && (
-                  <>
-                    <input name="insurance" type="text" placeholder="Insurance Provider Name" onChange={handleIndustryChange} className={inputClass} />
-                    <div>
-                      <label className="block text-[10px] font-bold text-gray-700 uppercase mb-2">Upload Fleet Management License</label>
-                      <input name="rentalLicense" type="file" onChange={handleFileChange} className={inputClass} accept=".pdf,image/*" />
-                    </div>
-                  </>
-                )}
-                {formData.category === "tour_operator" && (
-                  <>
-                    <input name="languages" type="text" placeholder="Languages Supported" onChange={handleIndustryChange} className={inputClass} />
-                    <input name="specialization" type="text" placeholder="Specialization (e.g. Hiking, Cultural)" onChange={handleIndustryChange} className={inputClass} />
-                    <div>
-                      <label className="block text-[10px] font-bold text-gray-700 uppercase mb-2">Upload Tour Operator Certificate</label>
-                      <input name="tourCert" type="file" onChange={handleFileChange} className={inputClass} accept=".pdf,image/*" />
-                    </div>
-                  </>
-                )}
-                {formData.category === "restaurant" && (
-                  <>
-                    <input name="cuisine" type="text" placeholder="Cuisine Type" onChange={handleIndustryChange} className={inputClass} />
-                    <input name="capacity" type="number" placeholder="Seating Capacity" onChange={handleIndustryChange} className={inputClass} />
-                    <div>
-                      <label className="block text-[10px] font-bold text-gray-700 uppercase mb-2">Upload Health & Safety Permit</label>
-                      <input name="healthPermit" type="file" onChange={handleFileChange} className={inputClass} accept=".pdf,image/*" />
-                    </div>
-                  </>
-                )}
-                {formData.category === "event_organizer" && (
-                  <>
-                    <input name="eventTypes" type="text" placeholder="Types of Events (Wedding, Corporate, etc.)" onChange={handleIndustryChange} className={inputClass} />
-                    <div>
-                      <label className="block text-[10px] font-bold text-gray-700 uppercase mb-2">Upload Event Planning Permit</label>
-                      <input name="eventPermit" type="file" onChange={handleFileChange} className={inputClass} accept=".pdf,image/*" />
-                    </div>
-                  </>
-                )}
-                {formData.category === "other" && (
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-700 uppercase mb-2">Upload Your Business License / Permit</label>
-                    <input name="otherLicense" type="file" onChange={handleFileChange} className={inputClass} accept=".pdf,image/*" />
+            ) : (
+              <>
+                <div className="space-y-8">
+                  <div className="flex items-center gap-4 text-primary">
+                    <Building2 className="w-5 h-5" />
+                    <h3 className="text-sm font-black uppercase tracking-widest">Core Information</h3>
                   </div>
-                )}
-              </div>
-            </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">Applicant Name</label>
+                      <input name="applicantName" type="text" value={formData.applicantName} onChange={handleChange} required className={inputClass} placeholder="Your full name" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">Business Name</label>
+                      <input name="name" type="text" value={formData.name} onChange={handleChange} required className={inputClass} placeholder="Legal business title" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">Business Category</label>
+                       <select name="category" value={formData.category} onChange={handleChange} className={inputClass}>
+                        <option value="hotel">Hotels & Lodging</option>
+                        <option value="tour_operator">Tour Operator</option>
+                        <option value="car_rental">Car Rental</option>
+                        <option value="event_organizer">Event Management</option>
+                        <option value="restaurant">Dining & Cuisine</option>
+                        <option value="other">Other Tourism Service</option>
+                      </select>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">License/Permit ID</label>
+                      <input name="permitNumber" type="text" value={formData.permitNumber} onChange={handleChange} required className={inputClass} placeholder="ET-2024-XXXX" />
+                    </div>
+                  </div>
 
-            {/* Contact Email */}
-            <div>
-              <label htmlFor="contactEmail" className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                Contact Email * <span className="text-[10px] text-gray-700 normal-case tracking-normal">(login credentials will be sent here)</span>
-              </label>
-              <input
-                id="contactEmail" name="contactEmail" type="email"
-                value={formData.contactEmail} onChange={handleChange} required
-                className={inputClass} placeholder="info@yourbusiness.com"
-              />
-            </div>
+                  <div className="space-y-2">
+                    <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">Business Overview</label>
+                    <textarea name="description" value={formData.description} onChange={handleChange} required rows={4} className={inputClass} placeholder="Briefly describe your services and history..." />
+                  </div>
+                </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-black text-[14px] font-bold rounded-xl hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                  Submitting...
-                </span>
-              ) : (
-                "Submit Application"
-              )}
-            </button>
+                <div className="space-y-8">
+                  <div className="flex items-center gap-4 text-primary">
+                    <MapPin className="w-5 h-5" />
+                    <h3 className="text-sm font-black uppercase tracking-widest">Global Location</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <input name="region" type="text" value={formData.region} onChange={handleChange} required className={inputClass} placeholder="Region" />
+                    <input name="city" type="text" value={formData.city} onChange={handleChange} required className={inputClass} placeholder="City / Town" />
+                    <input name="address" type="text" value={formData.address} onChange={handleChange} required className={inputClass} placeholder="Full Address" />
+                  </div>
+                </div>
+
+                <div className="space-y-8 bg-foreground/[0.01] p-8 md:p-10 rounded-[32px] border border-foreground/[0.03]">
+                  <div className="flex items-center gap-4 text-primary">
+                    <Upload className="w-5 h-5" />
+                    <h3 className="text-sm font-black uppercase tracking-widest">Industry Documents</h3>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-8">
+                    {/* Specific Industry Fields */}
+                    {formData.category === "hotel" && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <select name="stars" onChange={handleIndustryChange} className={inputClass}>
+                          <option value="">Hotel Star Rating</option>
+                          <option value="1">1 Star</option><option value="2">2 Stars</option><option value="3">3 Stars</option><option value="4">4 Stars</option><option value="5">5 Stars</option>
+                        </select>
+                        <input name="website" type="text" placeholder="Official Website" onChange={handleIndustryChange} className={inputClass} />
+                        <div className="md:col-span-2 space-y-2">
+                          <label className="text-[11px] font-bold tracking-widest uppercase text-foreground/30">Upload Hospitality License</label>
+                          <input name="hotelLicense" type="file" onChange={handleFileChange} className={inputClass} accept=".pdf,image/*" />
+                        </div>
+                      </div>
+                    )}
+                    {formData.category === "tour_operator" && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <input name="languages" type="text" placeholder="Supported Languages" onChange={handleIndustryChange} className={inputClass} />
+                        <input name="specialization" type="text" placeholder="Expedition Focus" onChange={handleIndustryChange} className={inputClass} />
+                        <div className="md:col-span-2 space-y-2">
+                          <label className="text-[11px] font-bold tracking-widest uppercase text-foreground/30">Tour Certificate</label>
+                          <input name="tourCert" type="file" onChange={handleFileChange} className={inputClass} accept=".pdf,image/*" />
+                        </div>
+                      </div>
+                    )}
+                    {/* Placeholder for other categories same as previous but styled */}
+                    {["car_rental", "restaurant", "event_organizer", "extra"].includes(formData.category) || (formData.category === "other") && (
+                       <div className="space-y-2">
+                        <label className="text-[11px] font-bold tracking-widest uppercase text-foreground/30">Verification Document</label>
+                        <input name="generalLicense" type="file" onChange={handleFileChange} className={inputClass} accept=".pdf,image/*" />
+                       </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-8">
+                  <div className="flex items-center gap-4 text-primary">
+                    <Mail className="w-5 h-5" />
+                    <h3 className="text-sm font-black uppercase tracking-widest">Contact Point</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="relative group">
+                       <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
+                       <input name="contactPhone" type="text" value={formData.contactPhone} onChange={handleChange} required className="w-full pl-14 pr-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl" placeholder="+251 ..." />
+                    </div>
+                    <div className="relative group">
+                       <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
+                       <input name="contactEmail" type="email" value={formData.contactEmail} onChange={handleChange} required className="w-full pl-14 pr-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl" placeholder="info@business.com" />
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-5 bg-primary text-white text-base font-black rounded-3xl hover:bg-primary-hover shadow-2xl shadow-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Processing Application...
+                    </>
+                  ) : (
+                    "Submit Official Registration"
+                  )}
+                </button>
+              </>
+            )}
           </form>
         </div>
 
-        {/* Help text */}
-        <div className="mt-6 text-center">
-          <p className="text-[13px] text-gray-700">
-            Already have an account?{" "}
-            <Link href="/login" className="text-amber-400 hover:text-amber-300 font-semibold transition-colors">
-              Sign in here
-            </Link>
-          </p>
+        {/* Footer Help */}
+        <div className="mt-16 bg-surface p-10 rounded-[40px] border border-foreground/[0.03] text-center">
+          <p className="text-foreground/40 font-medium italic mb-2">Need assistance with your registration?</p>
+          <p className="font-bold text-sm">support@wonderethiopia.gov.et</p>
         </div>
       </main>
     </div>

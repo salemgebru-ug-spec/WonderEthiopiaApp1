@@ -5,6 +5,15 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: "tourist" | "business_owner" | "tourism_admin" | "super_admin";
+  phoneNumber?: string;
+  bio?: string;
+  profileImage?: string;
+  preferences?: {
+    categories?: string[]; // e.g. ["adventure", "culture", "religious"]
+    regions?: string[]; // e.g. ["amhara", "tigray"]
+    budget?: "low" | "mid" | "high";
+    language?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +41,18 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: ["tourist", "business_owner", "tourism_admin", "super_admin"],
       default: "tourist",
+    },
+    phoneNumber: { type: String, default: "" },
+    bio: { type: String, default: "" },
+    profileImage: { type: String, default: "" },
+    preferences: {
+      type: Schema.Types.Mixed,
+      default: {
+        categories: [],
+        regions: [],
+        budget: "mid",
+        language: "english",
+      },
     },
   },
   {

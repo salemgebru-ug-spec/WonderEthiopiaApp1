@@ -3,8 +3,24 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { 
+  Users, 
+  User, 
+  Mail, 
+  Calendar, 
+  ArrowRight, 
+  ChevronRight, 
+  Settings, 
+  Trash2, 
+  ShieldCheck, 
+  Lock, 
+  Building2, 
+  Compass,
+  LayoutDashboard
+} from "lucide-react";
+import { toast } from "react-toastify";
 
-interface User {
+interface UserData {
   _id: string;
   name: string;
   email: string;
@@ -12,15 +28,23 @@ interface User {
   createdAt: string;
 }
 
+const roleConfig: Record<string, { label: string; color: string; bg: string; icon: any }> = {
+  super_admin: { label: "Super Admin", color: "text-primary", bg: "bg-primary/5 border-primary/10", icon: <Lock className="w-3.5 h-3.5" /> },
+  tourism_admin: { label: "Tourism Admin", color: "text-blue-600", bg: "bg-blue-50 border-blue-100", icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+  business_owner: { label: "Business Owner", color: "text-amber-600", bg: "bg-amber-50 border-amber-100", icon: <Building2 className="w-3.5 h-3.5" /> },
+  tourist: { label: "Explorer", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-100", icon: <Compass className="w-3.5 h-3.5" /> },
+};
+
 export default function AdminUsersPage() {
   const { data: session } = useSession();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("business_owner"); // Locked to business_owner
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const url = filter === "all" ? "/api/users" : `/api/users?role=${filter}`;
       const res = await fetch(url);
       const data = await res.json();
@@ -46,10 +70,11 @@ export default function AdminUsersPage() {
         body: JSON.stringify({ role: newRole }),
       });
       if (res.ok) {
+        toast.success("Identity updated successfully");
         fetchUsers();
       } else {
         const error = await res.json();
-        alert(error.error || "Failed to update role");
+        toast.error(error.error || "Quality control failure");
       }
     } catch (error) {
       console.error("Update failed:", error);
@@ -60,131 +85,148 @@ export default function AdminUsersPage() {
 
   const handleDelete = async (userId: string) => {
     if (userId === session?.user?.id) {
-      alert("You cannot delete yourself!");
+      toast.error("Self-purge prevention active!");
       return;
     }
-    if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+    if (!confirm("Are you sure you want to remove this entity from the registry?")) return;
     
     try {
       const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
       if (res.ok) {
+        toast.success("Entity removed from master registry");
         fetchUsers();
       } else {
         const error = await res.json();
-        alert(error.error || "Failed to delete user");
+        toast.error(error.error || "Failed to delete user");
       }
     } catch (error) {
       console.error("Delete failed:", error);
     }
   };
 
-  const roleColors: Record<string, string> = {
-    super_admin: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    tourism_admin: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    business_owner: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    tourist: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
-      <header className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-xl sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-xl font-bold bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-              WondarEthiopia
-            </Link>
-            <span className="text-gray-600">|</span>
-            <span className="text-gray-400 text-sm font-medium">User Management</span>
+    <div className="bg-background text-foreground font-sans">
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-10 lg:py-20 text-center lg:text-left">
+        {/* Title & Filters */}
+        <div className="animate-fade-in mb-16 px-4">
+          <div className="max-w-4xl mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
+              <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">
+                Institutional User Registry
+              </span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-foreground mb-6 leading-[0.9]">
+              Authentication <br /> Authority Hub
+            </h1>
+            <p className="text-foreground/40 text-lg font-medium italic">
+              Manage entity identities, access levels, and institutional roles across the platform.
+            </p>
           </div>
-          <Link href="/admin" className="text-gray-400 hover:text-white text-sm transition-colors">
-            ← Back to Dashboard
-          </Link>
-        </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-white">Manage System Users</h2>
-          <div className="flex gap-2">
-            {["all", "super_admin", "tourism_admin", "business_owner", "tourist"].map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all duration-300 capitalize ${
-                  filter === f
-                    ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                    : "text-gray-400 border-gray-700 hover:border-gray-600"
-                }`}
-              >
-                {f.replace("_", " ")}
-              </button>
-            ))}
-          </div>
+          {/* Filter logic locked for Super Admin */}
+          {session?.user?.role !== "super_admin" && (
+            <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
+              {["all", "super_admin", "tourism_admin", "business_owner", "tourist"].map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-8 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 ${
+                    filter === f
+                      ? "bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-105"
+                      : "bg-white text-foreground/30 border-foreground/5 hover:border-primary/20 hover:text-primary"
+                  }`}
+                >
+                  {f.replace("_", " ")}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
+        {/* Content */}
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+          <div className="flex flex-col items-center justify-center py-40 gap-6">
+            <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
+            <span className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Syncing Master Identities...</span>
           </div>
         ) : users.length === 0 ? (
-          <div className="text-center py-20 text-gray-500">No users found for this filter.</div>
+          <div className="text-center py-48 bg-white/50 rounded-[60px] border-4 border-dashed border-foreground/5 mx-4">
+            <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-8 text-primary/20">
+              <User className="w-10 h-10" />
+            </div>
+            <h3 className="text-3xl font-bold text-foreground/40 mb-2">No Entities Found</h3>
+            <p className="text-foreground/20 font-medium italic">The master registry contains no records matching your criteria.</p>
+          </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-gray-800 text-gray-400 text-sm uppercase tracking-wider">
-                  <th className="px-6 py-4 font-medium">User</th>
-                  <th className="px-6 py-4 font-medium">Role</th>
-                  <th className="px-6 py-4 font-medium">Joined</th>
-                  <th className="px-6 py-4 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800">
-                {users.map((user) => (
-                  <tr key={user._id} className="group hover:bg-gray-900/40 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-white font-medium">{user.name}</span>
-                        <span className="text-gray-500 text-sm">{user.email}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+            {users.map((user, i) => {
+              const rc = roleConfig[user.role] || roleConfig.tourist;
+              const initials = user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+              const isSelf = user._id === session?.user?.id;
+              
+              return (
+                <div
+                  key={user._id}
+                  className="bg-white rounded-[50px] p-10 shadow-2xl shadow-foreground/5 border border-foreground/[0.03] animate-slide-up hover:ring-2 hover:ring-primary/5 transition-all"
+                  style={{ animationDelay: `${i * 0.05}s`, opacity: 0 }}
+                >
+                  <div className="flex items-center justify-between mb-10">
+                    <div className="w-16 h-16 rounded-[24px] bg-primary/5 flex items-center justify-center text-primary font-black text-xl shadow-inner border border-primary/5">
+                      {initials}
+                    </div>
+                    <div className={`px-5 py-2 rounded-full border ${rc.bg} ${rc.color} flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] shadow-sm`}>
+                      {rc.icon}
+                      {rc.label}
+                    </div>
+                  </div>
+
+                  <div className="space-y-6 mb-12">
+                    <div>
+                      <h3 className="text-2xl font-bold text-foreground tracking-tight mb-1 truncate">{user.name}</h3>
+                      <div className="flex items-center gap-2 text-foreground/30 text-[13px] font-medium">
+                        <Mail className="w-3.5 h-3.5" />
+                        {user.email}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 text-xs font-medium rounded-full border capitalize ${roleColors[user.role] || ""}`}>
-                        {user.role.replace("_", " ")}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-400 text-sm">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <select
-                          disabled={updatingId === user._id || user._id === session?.user?.id}
-                          value={user.role}
-                          onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                          className="bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded-lg focus:ring-amber-500 focus:border-amber-500 p-1.5 transition-all disabled:opacity-50"
-                        >
-                          <option value="tourist">Tourist</option>
-                          <option value="business_owner">Business Owner</option>
-                          <option value="tourism_admin">Tourism Admin</option>
-                          <option value="super_admin">Super Admin</option>
-                        </select>
-                        <button
-                          onClick={() => handleDelete(user._id)}
-                          disabled={user._id === session?.user?.id}
-                          className="text-gray-500 hover:text-red-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                          title="Delete User"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-foreground/20">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5" />
+                        Joined {new Date(user.createdAt).toLocaleDateString()}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  </div>
+
+                  <div className="pt-8 border-t border-foreground/[0.03] flex items-center justify-between gap-4">
+                    <div className="relative flex-1 group/select opacity-30 cursor-not-allowed">
+                      <select
+                        disabled={true}
+                        value={user.role}
+                        className="w-full bg-foreground/[0.01] border border-foreground/[0.03] text-[11px] font-black uppercase tracking-widest rounded-2xl px-6 py-4 appearance-none focus:outline-none transition-all cursor-not-allowed"
+                      >
+                        <option value="tourist">Explorer</option>
+                        <option value="business_owner">Business Owner</option>
+                        <option value="tourism_admin">Tourism Admin</option>
+                        <option value="super_admin">Super Admin</option>
+                      </select>
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-foreground/10">
+                        <Lock className="w-4 h-4" />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {}}
+                      disabled={true}
+                      className="w-14 h-14 rounded-2xl bg-white border border-foreground/[0.03] text-foreground/10 flex items-center justify-center transition-all opacity-20 cursor-not-allowed"
+                      title="Purge Restricted"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </main>

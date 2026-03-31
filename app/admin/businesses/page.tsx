@@ -3,6 +3,25 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { 
+  Building2, 
+  MapPin, 
+  CheckCircle2, 
+  XCircle, 
+  ChevronRight, 
+  ArrowLeft, 
+  Clock, 
+  FileText, 
+  AlertCircle,
+  ShieldCheck,
+  Briefcase,
+  Phone,
+  Mail,
+  User,
+  LayoutDashboard,
+  Trash2,
+  Lock
+} from "lucide-react";
 
 interface Business {
   _id: string;
@@ -23,12 +42,12 @@ interface Business {
   createdAt: string;
 }
 
-const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
-  pending: { label: "Pending", color: "text-yellow-400", bg: "bg-yellow-500/[0.08] border-yellow-500/20" },
-  recommended_approve: { label: "Recommended ✅", color: "text-emerald-400", bg: "bg-emerald-500/[0.08] border-emerald-500/20" },
-  recommended_reject: { label: "Recommended ❌", color: "text-rose-400", bg: "bg-rose-500/[0.08] border-rose-500/20" },
-  approved: { label: "Approved", color: "text-green-400", bg: "bg-green-500/[0.08] border-green-500/20" },
-  rejected: { label: "Rejected", color: "text-red-400", bg: "bg-red-500/[0.08] border-red-500/20" },
+const statusConfig: Record<string, { label: string; color: string; bg: string; icon: any }> = {
+  pending: { label: "Pending Review", color: "text-amber-600", bg: "bg-amber-50 border-amber-100", icon: <Clock className="w-3.5 h-3.5" /> },
+  recommended_approve: { label: "Approval Recommended", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-100", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
+  recommended_reject: { label: "Rejection Recommended", color: "text-rose-600", bg: "bg-rose-50 border-rose-100", icon: <XCircle className="w-3.5 h-3.5" /> },
+  approved: { label: "Live / Approved", color: "text-primary", bg: "bg-primary/5 border-primary/10", icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+  rejected: { label: "Denied", color: "text-red-600", bg: "bg-red-50 border-red-100", icon: <Lock className="w-3.5 h-3.5" /> },
 };
 
 export default function AdminBusinessesPage() {
@@ -87,7 +106,7 @@ export default function AdminBusinessesPage() {
     try {
       const res = await fetch(`/api/businesses/${id}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("Business deleted");
+        toast.success("Business removed from registry");
         fetchBusinesses();
       }
     } catch (error) {
@@ -98,47 +117,34 @@ export default function AdminBusinessesPage() {
   const filters = ["all", "recommended_approve", "recommended_reject", "approved", "rejected"];
 
   return (
-    <div className="min-h-screen bg-[#050505]">
-      {/* Header */}
-      <header className="relative z-50 border-b border-white/[0.06]">
-        <div className="glass">
-          <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Link href="/admin" className="text-lg font-extrabold tracking-tight gradient-text">
-                WONDAR ETHIOPIA
-              </Link>
-              <span className="text-gray-800">|</span>
-              <span className="text-[12px] font-bold text-gray-600 uppercase tracking-wider">Business Mgmt</span>
-            </div>
-            <Link href="/admin" className="px-3 py-1.5 text-[13px] font-medium text-gray-500 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all">
-              ← Dashboard
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-6 py-10">
+    <div className="bg-background text-foreground font-sans">
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-10 lg:py-20">
         {/* Title & Filters */}
-        <div className="animate-fade-in mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-rose-500 to-amber-500 animate-pulse" />
-            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-gray-600">
-              Super Admin
-            </span>
+        <div className="animate-fade-in mb-16">
+          <div className="max-w-4xl mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
+              <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">
+                Registry Master Access
+              </span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-foreground mb-6 leading-[0.9]">
+              Institutional <br /> Final Determinations
+            </h1>
+            <p className="text-foreground/40 text-lg font-medium italic">
+              Super Admin terminal for finalizing Tourist Office recommendations.
+            </p>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-6">
-            Manage Businesses
-          </h1>
 
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
             {filters.map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-3.5 py-1.5 text-[12px] font-semibold rounded-lg border whitespace-nowrap transition-all duration-300 capitalize ${
+                className={`px-8 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 ${
                   filter === f
-                    ? "bg-amber-500/[0.1] text-amber-400 border-amber-500/30"
-                    : "text-gray-600 border-white/[0.06] hover:border-white/[0.12] hover:text-gray-400"
+                    ? "bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-105"
+                    : "bg-white text-foreground/30 border-foreground/5 hover:border-primary/20 hover:text-primary"
                 }`}
               >
                 {f.replace(/_/g, " ")}
@@ -149,154 +155,178 @@ export default function AdminBusinessesPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+          <div className="flex flex-col items-center justify-center py-40 gap-6">
+            <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
+            <span className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Syncing Master Registry...</span>
           </div>
         ) : businesses.length === 0 ? (
-          <div className="text-center py-20 rounded-2xl border border-white/[0.06]">
-            <span className="text-4xl mb-4 block">📭</span>
-            <p className="text-gray-600 font-medium">No businesses found for this filter.</p>
+          <div className="text-center py-48 bg-white/50 rounded-[60px] border-4 border-dashed border-foreground/5">
+            <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-8 text-primary/20">
+              <ShieldCheck className="w-10 h-10" />
+            </div>
+            <h3 className="text-3xl font-bold text-foreground/40 mb-2">No Determinations Needed</h3>
+            <p className="text-foreground/20 font-medium italic">All institutional recommendations have been resolved.</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-12">
             {businesses.map((biz, i) => {
               const sc = statusConfig[biz.status] || statusConfig.pending;
               return (
                 <div
                   key={biz._id}
-                  className="rounded-xl border border-white/[0.06] p-6 card-hover animate-slide-up"
-                  style={{ animationDelay: `${i * 0.05}s`, opacity: 0 }}
+                  className="bg-white rounded-[60px] p-10 md:p-14 shadow-2xl shadow-foreground/5 border border-foreground/[0.03] animate-slide-up group"
+                  style={{ animationDelay: `${i * 0.08}s`, opacity: 0 }}
                 >
-                  {/* Header row */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-[16px] font-bold text-white mb-1">{biz.name}</h3>
-                      <p className="text-[12px] text-gray-600 capitalize">
-                        {biz.category.replace(/_/g, " ")} • {biz.location.city}, {biz.location.region}
-                      </p>
-                      <p className="text-[12px] text-gray-700 mt-1">
-                        Applicant: {biz.applicantName || biz.ownerId?.name || "N/A"} • Contact: {biz.contactEmail} • Permit: {biz.permitNumber}
-                      </p>
-                    </div>
-                    <span className={`shrink-0 px-3 py-1 text-[11px] font-bold rounded-full border ${sc.bg} ${sc.color}`}>
-                      {sc.label}
-                    </span>
-                  </div>
+                  <div className="flex flex-col lg:flex-row items-start justify-between gap-12">
+                    <div className="flex-1 w-full">
+                      {/* Identity Row */}
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
+                        <div className="flex items-center gap-6">
+                           <div className="w-20 h-20 rounded-[32px] bg-primary/5 flex items-center justify-center text-primary shadow-inner group-hover:scale-105 transition-transform">
+                              <Building2 className="w-10 h-10" />
+                           </div>
+                           <div>
+                              <h3 className="text-4xl font-bold text-foreground tracking-tighter mb-1 leading-none">{biz.name}</h3>
+                              <div className="flex flex-wrap items-center gap-4">
+                                 <span className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/30">{biz.category.replace(/_/g, " ")}</span>
+                                 <div className="w-1 h-1 rounded-full bg-foreground/10" />
+                                 <span className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/30 flex items-center gap-2">
+                                    <MapPin className="w-3.5 h-3.5 text-primary/40" />
+                                    {biz.location.city}, {biz.location.region}
+                                 </span>
+                              </div>
+                           </div>
+                        </div>
+                        <div className={`px-8 py-3 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm`}>
+                          {sc.icon}
+                          {sc.label}
+                        </div>
+                      </div>
 
-                  {/* Industry Details */}
-                  {biz.industryDetails && Object.keys(biz.industryDetails).length > 0 && (
-                    <div className="mb-4 p-4 rounded-lg border border-white/[0.04] bg-white/[0.01]">
-                      <span className="text-[11px] font-bold text-amber-500/80 uppercase tracking-widest block mb-2">
-                        Industry Specific Information
-                      </span>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {Object.entries(biz.industryDetails).map(([key, value]) => (
-                          <div key={key}>
-                            <span className="text-[10px] text-gray-700 font-bold uppercase block mb-0.5">{key.replace(/([A-Z])/g, ' $1')}</span>
-                            {key === "documents" && Array.isArray(value) ? (
-                              <div className="flex flex-col gap-1.5 mt-1">
-                                {value.map((v: any, idx: number) => (
-                                  <a
-                                    key={idx}
-                                    href={v.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 text-[10px] bg-amber-500/[0.08] px-2 py-1 rounded border border-amber-500/20 text-amber-400 hover:bg-amber-500/[0.15] transition-all"
-                                  >
-                                    📄 {v.fileName || "View Document"}
-                                  </a>
-                                ))}
-                              </div>
-                            ) : Array.isArray(value) ? (
-                              <div className="flex flex-wrap gap-1">
-                                {value.map((v: any, idx: number) => (
-                                  <span key={idx} className="text-[10px] bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06] text-gray-500">
-                                    {v.fileName || String(v)}
-                                  </span>
-                                ))}
-                              </div>
-                            ) : (
-                              <span className="text-[12px] text-gray-500 font-medium">{String(value)}</span>
-                            )}
+                      {/* Info Cards Matrix */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                        {[
+                          { label: "Permit ID", value: biz.permitNumber, icon: <FileText className="w-5 h-5" /> },
+                          { label: "Lead Partner", value: biz.applicantName || "Institutional", icon: <User className="w-5 h-5" /> },
+                          { label: "Channel", value: biz.contactEmail, icon: <Mail className="w-5 h-5" /> },
+                          { label: "Hotline", value: biz.contactPhone || "Pending", icon: <Phone className="w-5 h-5" /> },
+                        ].map((item, idx) => (
+                          <div key={idx} className="p-6 rounded-[32px] bg-foreground/[0.01] border border-foreground/[0.02] flex flex-col gap-3">
+                             <div className="flex items-center gap-2 text-primary/40">
+                                {item.icon}
+                                <span className="text-[9px] font-black tracking-widest uppercase">{item.label}</span>
+                             </div>
+                             <p className="text-[14px] font-bold text-foreground truncate">{item.value}</p>
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
 
-                  {/* Recommendation info */}
-                  {(biz.status === "recommended_approve" || biz.status === "recommended_reject") && (
-                    <div className="mb-4 p-4 rounded-lg border border-white/[0.04] bg-white/[0.02]">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[11px] font-bold tracking-wider uppercase text-amber-400">
-                          Tourism Admin Recommendation
-                        </span>
-                      </div>
-                      <p className="text-[13px] text-gray-400">
-                        {biz.status === "recommended_approve" ? "✅ Recommended for Approval" : "❌ Recommended for Rejection"}
-                      </p>
-                      {biz.recommendationNote && (
-                        <p className="text-[13px] text-gray-600 mt-1 italic">&quot;{biz.recommendationNote}&quot;</p>
+                       {/* Recommendation Block */}
+                       {(biz.status === "recommended_approve" || biz.status === "recommended_reject") && (
+                        <div className="mb-12 p-12 rounded-[50px] border border-amber-100 bg-amber-50/30 relative overflow-hidden">
+                          <div className="absolute top-0 right-0 p-12 opacity-[0.05]">
+                             <ShieldCheck className="w-24 h-24" />
+                          </div>
+                          <div className="flex items-center gap-4 mb-8">
+                            <Clock className="w-5 h-5 text-amber-600" />
+                            <span className="text-[11px] font-black text-amber-600 uppercase tracking-[0.3em]">
+                              Tourist Office Recommendation
+                            </span>
+                          </div>
+                          <div className="space-y-6 max-w-3xl">
+                             <div className="flex items-center gap-3">
+                                {biz.status === "recommended_approve" ? <CheckCircle2 className="w-6 h-6 text-emerald-500" /> : <XCircle className="w-6 h-6 text-rose-500" />}
+                                <h4 className="text-2xl font-bold tracking-tight text-foreground">
+                                   Recommend for {biz.status === "recommended_approve" ? "Registry Admission" : "Registry Denial"}
+                                </h4>
+                             </div>
+                            
+                            {biz.recommendationNote && (
+                              <p className="text-lg text-foreground/60 italic font-medium leading-relaxed bg-white/40 p-8 rounded-[32px] border border-amber-200/50">
+                                "{biz.recommendationNote}"
+                              </p>
+                            )}
+                            
+                            {biz.recommendedBy && (
+                              <div className="flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-foreground/30">
+                                <div className="w-6 h-6 rounded-lg bg-amber-200 flex items-center justify-center text-amber-700 text-[10px]">
+                                   {biz.recommendedBy.name[0]}
+                                </div>
+                                Initiated by {biz.recommendedBy.name}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       )}
-                      {biz.recommendedBy && (
-                        <p className="text-[11px] text-gray-700 mt-1">By: {biz.recommendedBy.name}</p>
-                      )}
-                    </div>
-                  )}
 
-                  {/* Action Panel */}
-                  {actingOn === biz._id ? (
-                    <div className="p-4 rounded-lg border border-white/[0.06] bg-white/[0.02] space-y-3">
-                      <textarea
-                        value={actionNote}
-                        onChange={(e) => setActionNote(e.target.value)}
-                        placeholder="Add a note (optional)..."
-                        className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white text-[13px] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition-all"
-                        rows={2}
-                      />
-                      <div className="flex gap-2 flex-wrap">
-                        {biz.status === "recommended_approve" && (
-                          <button
-                            onClick={() => handleAction(biz._id, "approved")}
-                            className="px-4 py-2 text-[13px] font-semibold bg-green-500/[0.08] text-green-400 border border-green-500/20 rounded-lg hover:bg-green-500/[0.15] transition-all"
-                          >
-                            ✅ Approve (As Recommended)
-                          </button>
-                        )}
-                        {biz.status === "recommended_reject" && (
-                          <button
-                            onClick={() => handleAction(biz._id, "rejected")}
-                            className="px-4 py-2 text-[13px] font-semibold bg-red-500/[0.08] text-red-400 border border-red-500/20 rounded-lg hover:bg-red-500/[0.15] transition-all"
-                          >
-                            ❌ Reject (As Recommended)
-                          </button>
-                        )}
-                        <button
-                          onClick={() => { setActingOn(null); setActionNote(""); }}
-                          className="px-4 py-2 text-[13px] font-medium text-gray-500 border border-white/[0.06] rounded-lg hover:border-white/[0.12] transition-all"
-                        >
-                          Cancel
-                        </button>
+                      {/* Final Determinative Panel */}
+                      <div className="flex flex-col lg:flex-row items-center justify-between gap-10 pt-12 border-t border-foreground/[0.03]">
+                          <div className="flex items-center gap-6">
+                            <div className="flex flex-col">
+                               <span className="text-[9px] font-black text-foreground/20 uppercase tracking-[0.2em] mb-1">Created Path</span>
+                               <span className="text-[12px] font-bold text-foreground/40">{new Date(biz.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <button
+                              onClick={() => handleDelete(biz._id)}
+                              className="flex items-center gap-3 px-6 py-3 border border-red-100 text-red-500 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-red-50 transition-all opacity-40 hover:opacity-100"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Purge Record
+                            </button>
+                          </div>
+
+                          {actingOn === biz._id ? (
+                            <div className="w-full lg:max-w-2xl space-y-6 animate-fade-in">
+                              <textarea
+                                value={actionNote}
+                                onChange={(e) => setActionNote(e.target.value)}
+                                placeholder="Enter the final institutional decision note..."
+                                className="w-full px-8 py-6 bg-foreground/[0.02] border border-foreground/[0.05] rounded-[32px] text-foreground text-sm font-bold placeholder-foreground/20 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none shadow-inner"
+                                rows={3}
+                              />
+                              <div className="flex gap-4 flex-wrap">
+                                {biz.status === "recommended_approve" && (
+                                  <button
+                                    onClick={() => handleAction(biz._id, "approved")}
+                                    className="flex-1 px-10 py-5 bg-primary text-white text-[11px] font-black rounded-2xl hover:bg-primary-hover transition-all active:scale-95 shadow-xl shadow-primary/20 flex items-center justify-center gap-3 uppercase tracking-[0.2em]"
+                                  >
+                                    <ShieldCheck className="w-5 h-5" />
+                                    Final Admission
+                                  </button>
+                                )}
+                                {biz.status === "recommended_reject" && (
+                                  <button
+                                    onClick={() => handleAction(biz._id, "rejected")}
+                                    className="flex-1 px-10 py-5 bg-white border border-red-100 text-red-600 text-[11px] font-black rounded-2xl hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-3 uppercase tracking-[0.2em]"
+                                  >
+                                    <Lock className="w-5 h-5" />
+                                    Final Denial
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => { setActingOn(null); setActionNote(""); }}
+                                  className="px-8 py-5 text-[11px] font-black text-foreground/30 hover:text-foreground uppercase tracking-widest"
+                                >
+                                  Suspend Decision
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-4">
+                              {(biz.status === "recommended_approve" || biz.status === "recommended_reject") && (
+                                <button
+                                  onClick={() => setActingOn(biz._id)}
+                                  className="px-12 py-5 bg-primary text-white text-[11px] font-black rounded-2xl hover:bg-primary-hover shadow-2xl shadow-primary/20 transition-all active:scale-95 uppercase tracking-[0.2em] flex items-center gap-4"
+                                >
+                                  Execute Master Decision
+                                  <ChevronRight className="w-5 h-5" />
+                                </button>
+                              )}
+                            </div>
+                          )}
                       </div>
                     </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      {(biz.status === "recommended_approve" || biz.status === "recommended_reject") && (
-                        <button
-                          onClick={() => setActingOn(biz._id)}
-                          className="px-4 py-2 text-[13px] font-semibold bg-amber-500/[0.08] text-amber-400 border border-amber-500/20 rounded-lg hover:bg-amber-500/[0.15] transition-all"
-                        >
-                          Take Action
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(biz._id)}
-                        className="px-4 py-2 text-[13px] font-medium text-gray-600 border border-white/[0.06] rounded-lg hover:text-red-400 hover:border-red-500/20 transition-all"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
+                  </div>
                 </div>
               );
             })}

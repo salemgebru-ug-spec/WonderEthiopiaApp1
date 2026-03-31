@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signInWithPopup, auth, googleProvider } from "@/lib/firebase";
+import { ArrowLeft, Mail, Lock, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -64,97 +65,109 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#050505] px-4">
-      {/* Ambient glow */}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 py-12">
+      {/* Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[300px] -right-[300px] w-[600px] h-[600px] bg-amber-500/[0.04] rounded-full blur-[120px]" />
-        <div className="absolute -bottom-[300px] -left-[300px] w-[600px] h-[600px] bg-orange-500/[0.04] rounded-full blur-[120px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-primary/[0.03] rounded-full blur-[120px]" />
       </div>
 
-      <div className="relative w-full max-w-[420px] animate-fade-in">
+      <div className="relative w-full max-w-[440px] animate-fade-in">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 text-[13px] font-bold text-foreground/40 hover:text-primary transition-colors mb-12 group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          Back to Explorations
+        </Link>
+
         {/* Brand */}
-        <div className="text-center mb-8">
-          <Link href="/" className="text-lg font-extrabold tracking-tight gradient-text">
-            WONDAR ETHIOPIA
-          </Link>
-          <p className="text-gray-600 text-[13px] mt-2 font-medium">
-            Sign in to your account
+        <div className="text-center mb-10">
+          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white font-black text-xl mx-auto mb-6 shadow-lg shadow-primary/20">W</div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">Welcome Back</h1>
+          <p className="text-foreground/40 text-[14px] font-medium italic">
+            Continue your journey through the Land of Origins
           </p>
         </div>
 
         {/* Card */}
-        <div className="glass-elevated rounded-2xl p-8 shadow-2xl shadow-black/50">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="glass-elevated rounded-[32px] p-8 md:p-10 shadow-2xl shadow-foreground/5 border border-foreground/[0.03]">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-500/[0.08] border border-red-500/20 rounded-xl p-3.5 text-red-400 text-[13px] text-center font-medium">
+              <div className="bg-red-50 border border-red-100 rounded-2xl p-4 text-red-500 text-[13px] text-center font-bold animate-shake">
                 {error}
               </div>
             )}
 
-            <div>
+            <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2"
+                className="block text-[11px] font-black text-foreground/30 uppercase tracking-[0.1em]"
               >
-                Email
+                Email Address
               </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white text-[14px] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 transition-all duration-300"
-                placeholder="you@example.com"
-                required
-              />
+              <div className="relative group">
+                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
+                 <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-foreground text-[14px] font-medium placeholder:text-foreground/20 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/20 transition-all duration-300"
+                  placeholder="name@example.com"
+                  required
+                />
+              </div>
             </div>
 
-            <div>
+            <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="block text-[12px] font-semibold text-gray-500 uppercase tracking-wider mb-2"
+                className="block text-[11px] font-black text-foreground/30 uppercase tracking-[0.1em]"
               >
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white text-[14px] placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500/50 transition-all duration-300"
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-foreground text-[14px] font-medium placeholder:text-foreground/20 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/20 transition-all duration-300"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-black text-[14px] font-bold rounded-xl hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-primary text-white text-[14px] font-bold rounded-2xl hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center gap-2"
             >
               {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                  Signing in...
-                </span>
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Authenticating...
+                </>
               ) : (
-                "Sign In"
+                "Sign Into Account"
               )}
             </button>
           </form>
 
-          <div className="my-6 flex items-center gap-4">
-            <div className="h-px bg-white/[0.06] flex-1" />
-            <span className="text-gray-600 text-[11px] font-bold uppercase tracking-widest">
-              or
+          <div className="my-8 flex items-center gap-4">
+            <div className="h-px bg-foreground/[0.05] flex-1" />
+            <span className="text-foreground/20 text-[10px] font-black uppercase tracking-widest">
+              Secure Login
             </span>
-            <div className="h-px bg-white/[0.06] flex-1" />
+            <div className="h-px bg-foreground/[0.05] flex-1" />
           </div>
 
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full py-3.5 bg-white text-gray-900 font-bold text-[14px] rounded-xl hover:bg-gray-100 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 glass text-foreground font-bold text-[14px] rounded-2xl border-foreground/5 hover:bg-foreground/[0.02] transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98]"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -176,18 +189,18 @@ export default function LoginPage() {
             </svg>
             Sign in with Google
           </button>
+        </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 text-[13px]">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                className="text-amber-400 hover:text-amber-300 font-semibold transition-colors"
-              >
-                Register here
-              </Link>
-            </p>
-          </div>
+        <div className="mt-10 text-center">
+          <p className="text-foreground/40 text-[14px] font-medium">
+            New to the platform?{" "}
+            <Link
+              href="/register"
+              className="text-primary hover:text-primary-hover font-bold transition-all border-b border-primary/20 hover:border-primary pb-0.5"
+            >
+              Begin Registration
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -10,6 +10,33 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { Types } from "mongoose";
 import { sendApprovalEmail, sendRejectionEmail } from "@/lib/email";
+import Service from "@/models/Service";
+
+// GET - Fetch a single business details (Public Access for Discovery)
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    await dbConnect();
+    
+    const business = await Business.findById(id)
+      .select("name description category location contactPhone contactEmail updatedAt status profilePicture");
+    
+    if (!business) {
+      return NextResponse.json({ error: "Business not found" }, { status: 404 });
+    }
+
+    // Fetch services registered by this business
+    const services = await Service.find({ businessId: business._id }).sort({ createdAt: -1 });
+    
+    return NextResponse.json({ data: business, services, success: true });
+  } catch (error) {
+    console.error("Single Business Fetch Error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
 
 // PATCH - Update business status (FR-04: Tourism Admin recommends, FR-05: Super Admin decides)
 export async function PATCH(

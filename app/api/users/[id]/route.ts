@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
 
-// PATCH - Update user role (Super Admin only)
+// PATCH - Update user profile/identity (Super Admin only)
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -19,18 +19,18 @@ export async function PATCH(
     const body = await request.json();
     const { role } = body;
 
-    if (!role || !["tourist", "business_owner", "tourism_admin", "super_admin"].includes(role)) {
-      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
-    }
-
     await dbConnect();
 
-    // Prevent Super Admin from demoting themselves or changing other Super Admins without caution?
-    // For now, allow it, but in a real app, you might want to prevent the last super admin from being demoted.
+    const updateData: any = {};
+    if (role) updateData.role = role;
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: "No update data provided" }, { status: 400 });
+    }
 
     const user = await User.findByIdAndUpdate(
       id,
-      { role },
+      updateData,
       { new: true, runValidators: true }
     ).select("-password");
 
@@ -38,7 +38,7 @@ export async function PATCH(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "User updated successfully", user });
+    return NextResponse.json({ message: "Identity updated successfully", user });
   } catch (error: unknown) {
     console.error("Error updating user:", error);
     return NextResponse.json(
