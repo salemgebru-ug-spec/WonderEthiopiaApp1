@@ -54,6 +54,7 @@ export default function DiscoverBusinesses() {
         console.log("Fetching from:", url); // Debug help
         
         const res = await fetch(url);
+       
         
         if (!res.ok) {
            const text = await res.text();
@@ -62,6 +63,7 @@ export default function DiscoverBusinesses() {
         }
         
         const data = await res.json();
+        console.log(data);
         setBusinesses(data.businesses || []);
       } catch (error) {
         console.error("Failed to fetch businesses:", error);

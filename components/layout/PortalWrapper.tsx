@@ -20,7 +20,8 @@ import {
   X,
   User,
   ChevronRight,
-  Bell
+  Bell,
+  Ticket
 } from "lucide-react";
 
 export default function PortalWrapper({ children }: { children: React.ReactNode }) {
@@ -94,6 +95,7 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
         return [
           { label: "Browse Services", href: "/discover/businesses", icon: <Globe className="w-5 h-5" />, count: 0 },
           { label: "My Destinations", href: "/discover/destinations", icon: <Compass className="w-5 h-5" />, count: 0 },
+          {label:"My Reservations",href:"/mybookings",icon:<Ticket className="w-5 h-5"/> ,count:0}
         ];
     }
   };

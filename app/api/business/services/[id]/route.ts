@@ -57,3 +57,32 @@ export async function DELETE(
     return NextResponse.json({ error: "Deletion failed" }, { status: 500 });
   }
 }
+
+export async function GET(request: Request,
+  { params }: { params: { serviceId: string } }){
+    try{
+        await dbConnect();
+        const {serviceId}=params;
+
+    const payment = await Service.findOne({_id: serviceId});
+     return NextResponse.json(
+              {
+                message: "Service retrieved successfully",
+                data: payment
+              },
+              { status: 200 });
+   
+    }catch(error:any){
+        const status = error.status || 500;
+
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: error.message || "Something went wrong",
+            },
+            { status: status || 500 } 
+        );
+    }
+    
+}

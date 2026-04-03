@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
     await dbConnect();
 
-    const query: any = { status: "approved", isActive: true };
+    const query: any = { status: "approved", /*isActive: true*/ }; 
 
     if (search) {
       // Escape regex special characters to prevent errors

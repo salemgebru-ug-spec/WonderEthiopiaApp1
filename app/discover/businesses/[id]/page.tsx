@@ -382,7 +382,26 @@ export default function BusinessDetail() {
                                      </div>
                                   </div>
 
-                                  <button className="w-full py-6 bg-foreground text-background text-sm font-black rounded-3xl hover:bg-primary transition-all shadow-xl flex items-center justify-center gap-4 group">
+                                  <button 
+                                  onClick={() => {
+                switch (business?.category) {
+                  case "car_rental":
+                    router.push(`/booking/car_booking?id=${id}&price=${service.price}&name=${service.name}`)
+                    break
+                  case "hotel":
+                    router.push(`/booking/room_booking?id=${id}&price=${service.price}&name=${service.name}`)
+                    break
+                  case "event":
+                    router.push(`/booking/event_booking?id=${id}&price=${service.price}&name=${service.name}`)
+                    break
+                  case "tour":
+                    router.push(`/booking/tour_booking?id=${id}&price=${service.price}&name=${service.name}`)
+                    break
+                  default:
+                    router.push("/404")
+                }
+              }}
+                                  className="w-full py-6 bg-foreground text-background text-sm font-black rounded-3xl hover:bg-primary transition-all shadow-xl flex items-center justify-center gap-4 group">
                                      Initiate Booking Request <Send className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                                   </button>
                                </div>

@@ -231,7 +231,16 @@ export default function LandingPage() {
               destinations.map((dest: any) => (
                 <div key={dest._id} className="group relative h-[450px] rounded-[40px] overflow-hidden shadow-2xl shadow-primary/5 cursor-pointer">
                    <Image 
-                     src={dest.images?.[0] || "/lalibela.png"}
+                    src={
+  (() => {
+    const img = dest.images?.[0];
+    // Must exist, not be empty, and either start with / or http
+    if (img && img.trim() !== "" && (img.startsWith('/') || img.startsWith('http'))) {
+      return img;
+    }
+    return "/lalibela.png";
+  })()
+}
                      alt={dest.name}
                      fill
                      className="object-cover group-hover:scale-110 transition-all duration-700"
