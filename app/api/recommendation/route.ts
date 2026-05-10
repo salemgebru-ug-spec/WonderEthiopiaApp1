@@ -3,38 +3,66 @@ import { NextResponse } from "next/server";
 import hf from '@/lib/huggingface'; 
 
 const CATEGORY_NORMALIZER: Record<string, string> = {
-  "Cultural/Religious": "cultural",
-  "Religious": "cultural",
-  "Cultural": "cultural",
+  // Culture
+  "Cultural": "culture",
+  "Cultural/Religious": "culture",
+  "Urban": "culture",
+  "City": "culture",
 
-  "Archaeological": "historical",
-  "Historical": "historical",
-
+  // Nature
   "Natural": "nature",
   "Nature": "nature",
-
   "National Park": "nature",
   "Park": "nature",
+  "Landscape": "nature",
 
-  "Urban": "urban",
-  "City": "urban",
+  // Adventure
+  "Adventure": "adventure",
+  "Trekking": "adventure",
+  "Hiking": "adventure",
+  "Sport": "adventure",
+
+  // Religious
+  "Religious": "religious",
+  "Spiritual": "religious",
+  "Pilgrimage": "religious",
+
+  // Coffee
+  "Coffee": "coffee",
+  "Coffee Farm": "coffee",
+  "Plantation": "coffee",
+
+  // Modern
+  "Modern": "modern",
+  "Contemporary": "modern",
+  "Archaeological": "modern", // or remap to a more fitting key
+  "Historical": "modern",     // remove if you want a separate historical bucket
 };
 
 const USER_PREF_MAP: Record<string, Record<string, number>> = {
-  landscape: {
-    nature: 0.2,
-    cultural: -0.05,
-    historical: -0.05,
+  culture: {
+    culture: 0.25,
+    modern: 0.1,
   },
-  parks: {
+  nature: {
     nature: 0.25,
+    adventure: 0.1,
   },
-  history: {
-    historical: 0.25,
-    cultural: 0.1,
+  adventure: {
+    adventure: 0.25,
+    nature: 0.1,
   },
-  religion: {
-    cultural: 0.2,
+  religious: {
+    religious: 0.25,
+    culture: 0.1,
+  },
+  coffee: {
+    coffee: 0.25,
+    nature: 0.05,
+  },
+  modern: {
+    modern: 0.25,
+    culture: 0.05,
   },
 };
 
