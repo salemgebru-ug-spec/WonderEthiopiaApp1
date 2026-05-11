@@ -44,7 +44,10 @@ export default function RootLayout({
       <head>
         <meta name="theme-color" content="#050505" />
       </head>
-      <body className={`${inter.className} antialiased font-sans`}>
+      <body className={`${inter.className} antialiased font-sans`}
+      suppressHydrationWarning={true}
+      >
+        
         <SessionProvider>
           <PortalWrapper>
             {children}

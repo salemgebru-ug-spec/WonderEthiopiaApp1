@@ -65,6 +65,7 @@ export default function DiscoverBusinesses() {
         console.log("Fetching from:", url);
         
         const res = await fetch(url);
+       
         
         if (!res.ok) {
            throw new Error(`Server returned ${res.status}`);

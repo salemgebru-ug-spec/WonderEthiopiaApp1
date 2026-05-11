@@ -22,7 +22,10 @@ import {
   ChevronRight,
   Calendar,
   MessageSquare,
-  Loader2
+  Loader2,
+  Bell,
+  Ticket,
+  Landmark
 } from "lucide-react";
 import { pusherClient } from "@/lib/pusher-client";
 import { toast } from "react-toastify";
@@ -191,6 +194,7 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
           { label: "Browse Services", href: "/discover/businesses", icon: <Globe className="w-5 h-5" />, count: 0 },
           { label: "My Destinations", href: "/discover/destinations", icon: <Compass className="w-5 h-5" />, count: 0 },
           { label: "My Bookings", href: "/dashboard/bookings", icon: <Calendar className="w-5 h-5" />, count: 0 },
+          { label: "Landmark Lens", href: "/landmarks", icon: <Landmark className="w-5 h-5" />, count: 0 }
         ];
     }
   };

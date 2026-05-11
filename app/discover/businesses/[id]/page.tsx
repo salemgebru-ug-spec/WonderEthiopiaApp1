@@ -128,7 +128,12 @@ export default function BusinessDetail() {
         // Note: we might need a dedicated public detail route if this one is protected
         const res = await fetch(`/api/businesses/${id}`);
         const json = await res.json();
+<<<<<<< HEAD
 
+=======
+        console.log(json);
+        
+>>>>>>> origin/salem-branch
         if (json.data) {
           setBusiness(json.data);
           if (json.services) setServices(json.services);
@@ -706,8 +711,27 @@ export default function BusinessDetail() {
                                 <div className="pt-6 mt-4 border-t border-foreground/10 shrink-0 sticky bottom-0 bg-background/80 backdrop-blur-xl pb-4">
                                   <button
                                     onClick={() => {
-                                      if (!session) router.push("/login");
-                                      else setBookingModal(service);
+                                      if (!session) {
+                                        router.push("/login");
+                                        return;
+                                      }
+                                      const bizCat = Array.isArray(business?.category) ? business.category[0] : business?.category;
+                                      switch (bizCat) {
+                                        case "car_rental":
+                                          router.push(`/booking/car_booking?id=${id}&price=${service.price}&name=${service.name}&serviceId=${service._id}`)
+                                          break
+                                        case "hotel":
+                                          router.push(`/booking/room_booking?id=${id}&price=${service.price}&name=${service.name}&serviceId=${service._id}`)
+                                          break
+                                        case "event_organizer":
+                                          router.push(`/booking/event_booking?id=${id}&price=${service.price}&name=${service.name}&serviceId=${service._id}`)
+                                          break
+                                        case "tour_operator":
+                                          router.push(`/booking/tour_booking?id=${id}&price=${service.price}&name=${service.name}&serviceId=${service._id}`)
+                                          break
+                                        default:
+                                          setBookingModal(service);
+                                      }
                                     }}
                                     className="w-full py-6 bg-foreground text-background text-sm font-black rounded-3xl hover:bg-primary transition-all shadow-xl flex items-center justify-center gap-4 group"
                                   >

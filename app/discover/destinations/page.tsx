@@ -21,15 +21,39 @@ export default function DiscoverDestinations() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [region, setRegion] = useState("all");
+  const [preferences, setPreferences] = useState<any>();
+
+  useEffect(() => {
+    async function fetchUserPreferences() {
+      try {
+        const res = await fetch('/api/user/profile');
+        if (res.ok) {
+          const data = await res.json();
+          setPreferences(data.user?.preferences);
+        }
+      } catch (error) {
+        console.error("Failed to fetch preferences:", error);
+      }
+    }
+    if (session) fetchUserPreferences();
+  }, [session]);
 
   useEffect(() => {
     async function fetchDestinations() {
       try {
         setLoading(true);
-        let url = `/api/destinations?search=${searchQuery}`;
-        if (region !== "all") url += `&region=${region}`;
+        let res: Response;
 
-        const res = await fetch(url);
+        if (preferences && preferences.categories) {
+          res = await fetch(`/api/recommendation?preferences=${preferences.categories}`, {
+            method: 'GET'
+          });
+        } else {
+          let url = `/api/destinations?search=${searchQuery}`;
+          if (region !== "all") url += `&region=${region}`;
+          res = await fetch(url);
+        }
+
         if (res.ok) {
           const data = await res.json();
           setDestinations(Array.isArray(data) ? data : []);
@@ -48,7 +72,7 @@ export default function DiscoverDestinations() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, region]);
+  }, [searchQuery, region, preferences]);
 
   const regions = [
     "all",
@@ -128,7 +152,7 @@ export default function DiscoverDestinations() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {destinations.map((dest) => (
+            {destinations?.map((dest) => (
               <div
                 key={dest._id}
                 className="group bg-surface rounded-[40px] p-4 card-hover overflow-hidden shadow-xl shadow-foreground/5 border border-foreground/[0.03]"
