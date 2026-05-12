@@ -97,6 +97,7 @@ export default function DashboardPage() {
       default:
         return {
           actions: [
+            { label: "Refine Identity", href: "/settings", icon: <User className="w-5 h-5" />, desc: "Update your travel intelligence" },
             { label: "Browse Services", href: "/discover/businesses", icon: <Building2 className="w-5 h-5" />, desc: "Find verified hotels and guides" },
           ]
         };

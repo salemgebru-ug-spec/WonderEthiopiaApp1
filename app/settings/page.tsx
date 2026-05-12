@@ -2,17 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { User, Mail, Phone, MapPin, Sparkles, Save, Shield, Camera, Globe } from "lucide-react";
+import { User, Mail, Phone, MapPin, Sparkles, Save, Shield, Camera, Globe, Mountain, Compass, History, Hotel, Timer, Dumbbell, UserCheck, Check, Waves, Utensils, Music, Wifi, Bath, Users } from "lucide-react";
 
 export default function SettingsPage() {
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<any>({
     name: "",
     email: "",
     phoneNumber: "",
-    bio: "",
+    profileImage: "",
     preferences: {
       categories: [],
       regions: [],
@@ -21,37 +23,102 @@ export default function SettingsPage() {
     }
   });
 
+  const [tourismProfile, setTourismProfile] = useState<any>({
+    activity_preferences: [],
+    travel_style: "",
+    interests: [],
+    accommodation_type: "",
+    room_type: "",
+    amenities: [],
+    duration_preference: "",
+    fitness_level: "",
+    group_type: "",
+  });
+
   useEffect(() => {
-    async function fetchProfile() {
+    async function fetchData() {
       try {
-        const res = await fetch("/api/user/profile");
-        const data = await res.json();
-        if (data.user) setProfile(data.user);
-      } catch (e) {} finally {
+        const [profileRes, tourismRes] = await Promise.all([
+          fetch("/api/user/profile"),
+          fetch("/api/tourist/profile")
+        ]);
+
+        const profileData = await profileRes.json();
+        if (profileData.user) setProfile(profileData.user);
+
+        if (tourismRes.ok) {
+          const tourismData = await tourismRes.json();
+          if (tourismData.profile) setTourismProfile(tourismData.profile);
+        }
+      } catch (e) {
+        console.error("Failed to fetch profiles:", e);
+      } finally {
         setLoading(false);
       }
     }
-    fetchProfile();
+    fetchData();
   }, []);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch("/api/user/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profile)
-      });
-      if (res.ok) {
-        await update(); // sync session
-        alert("Institutional profile synchronized successfully.");
+      const promises = [
+        fetch("/api/user/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(profile)
+        })
+      ];
+
+      if (session?.user?.role === "tourist") {
+        promises.push(
+          fetch("/api/tourist/profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(tourismProfile)
+          })
+        );
+      }
+
+      const results = await Promise.all(promises);
+      if (results.every(r => r.ok)) {
+        await update({ image: profile.profileImage }); // sync session with new image
+        alert("Institutional profile and intelligence axis synchronized.");
+      } else {
+        alert("Partial synchronization failure.");
       }
     } catch (e) {
-      alert("Failed to sync profile.");
+      alert("Synchronization interrupted.");
     } finally {
       setSaving(false);
     }
   };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setProfile((prev: any) => ({ ...prev, profileImage: data.url }));
+      }
+    } catch (e) {
+      alert("Asset transmission failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const initials = profile.name?.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2);
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
@@ -71,13 +138,35 @@ export default function SettingsPage() {
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6">Account <br /> Architecture</h1>
           <p className="text-foreground/40 font-medium italic text-lg">Personalize your institutional presence and travel intelligence.</p>
         </div>
-        <button 
-          onClick={handleSave}
-          disabled={saving}
-          className="px-10 py-5 bg-foreground text-background text-[11px] font-black rounded-3xl hover:bg-primary transition-all active:scale-95 flex items-center gap-4 shadow-2xl shadow-foreground/10"
-        >
-          {saving ? "Synchronizing..." : <>Sync Changes <Save className="w-4 h-4" /></>}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4">
+          {!isEditing ? (
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="px-10 py-5 bg-primary text-white text-[11px] font-black rounded-3xl hover:bg-primary-hover transition-all active:scale-95 flex items-center gap-4 shadow-2xl shadow-primary/20"
+            >
+              Edit Intelligence <Sparkles className="w-4 h-4" />
+            </button>
+          ) : (
+            <>
+              <button 
+                onClick={() => setIsEditing(false)}
+                className="px-10 py-5 bg-white border border-foreground/10 text-foreground text-[11px] font-black rounded-3xl hover:bg-foreground hover:text-white transition-all active:scale-95 flex items-center gap-4 shadow-xl shadow-foreground/5"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  await handleSave();
+                  setIsEditing(false);
+                }}
+                disabled={saving}
+                className="px-10 py-5 bg-foreground text-background text-[11px] font-black rounded-3xl hover:bg-primary transition-all active:scale-95 flex items-center gap-4 shadow-2xl shadow-foreground/10"
+              >
+                {saving ? "Synchronizing..." : <>Sync Changes <Save className="w-4 h-4" /></>}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -93,20 +182,12 @@ export default function SettingsPage() {
                 <input 
                   type="text" 
                   value={profile.name}
+                  disabled={!isEditing}
                   onChange={e => setProfile({...profile, name: e.target.value})}
-                  className="w-full px-8 py-5 bg-foreground/[0.02] border border-foreground/[0.05] rounded-3xl text-sm font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all"
+                  className={`w-full px-8 py-5 bg-foreground/[0.02] border border-foreground/[0.05] rounded-3xl text-sm font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                 />
               </div>
-              <div className="space-y-3">
-                <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-2">Institutional Bio</label>
-                <textarea 
-                  value={profile.bio}
-                  onChange={e => setProfile({...profile, bio: e.target.value})}
-                  rows={4}
-                  className="w-full px-8 py-5 bg-foreground/[0.02] border border-foreground/[0.05] rounded-[32px] text-sm font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all resize-none"
-                  placeholder="Share your travel philosophy..."
-                />
-              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-2">Contact Line</label>
@@ -115,8 +196,9 @@ export default function SettingsPage() {
                     <input 
                       type="text" 
                       value={profile.phoneNumber}
+                      disabled={!isEditing}
                       onChange={e => setProfile({...profile, phoneNumber: e.target.value})}
-                      className="w-full pl-14 pr-8 py-5 bg-foreground/[0.02] border border-foreground/[0.05] rounded-3xl text-sm font-bold outline-none"
+                      className={`w-full pl-14 pr-8 py-5 bg-foreground/[0.02] border border-foreground/[0.05] rounded-3xl text-sm font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                       placeholder="+251..."
                     />
                   </div>
@@ -154,12 +236,15 @@ export default function SettingsPage() {
                   {["low", "mid", "high"].map(b => (
                     <button
                       key={b}
-                      onClick={() => setProfile({...profile, preferences: {...profile.preferences, budget: b}})}
+                      onClick={() => {
+                        if (!isEditing) return;
+                        setProfile({...profile, preferences: {...profile.preferences, budget: b}})
+                      }}
                       className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${
                         profile.preferences?.budget === b 
                         ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" 
                         : "bg-white text-foreground/20 border-foreground/5"
-                      }`}
+                      } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       {b}
                     </button>
@@ -177,13 +262,14 @@ export default function SettingsPage() {
                       <button
                         key={cat}
                         onClick={() => {
+                          if (!isEditing) return;
                           const cats = profile.preferences?.categories || [];
                           const next = active ? cats.filter((c:any) => c !== val) : [...cats, val];
                           setProfile({...profile, preferences: {...profile.preferences, categories: next}});
                         }}
                         className={`px-3 md:px-4 lg:px-5 py-2.5 rounded-full text-[10px] font-bold transition-all ${
                           active ? "bg-primary/20 text-primary border border-primary/20" : "bg-white text-foreground/30 border border-foreground/5"
-                        }`}
+                        } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                       >
                         {cat}
                       </button>
@@ -192,35 +278,272 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="space-y-6 pt-6 border-t border-primary/5">
-                <div className="flex items-center gap-4 p-6 bg-white rounded-[32px] border border-primary/5">
-                   <div className="w-10 h-10 rounded-2xl bg-primary/5 flex items-center justify-center text-primary">
-                     <Globe className="w-5 h-5" />
-                   </div>
-                   <div className="flex-1">
-                     <div className="text-[9px] font-black uppercase tracking-widest text-primary/30 mb-0.5">Primary Dialect</div>
-                     <select 
-                       value={profile.preferences?.language}
-                       onChange={e => setProfile({...profile, preferences: {...profile.preferences, language: e.target.value}})}
-                       className="w-full bg-transparent border-none p-0 text-sm font-black text-foreground/60 focus:ring-0 appearance-none outline-none"
-                     >
-                       <option value="english">English (Primary)</option>
-                       <option value="amharic">Amharic (Native)</option>
-                       <option value="french">French</option>
-                       <option value="chinese">Chinese</option>
-                     </select>
-                   </div>
-                </div>
-              </div>
+
             </div>
           </section>
 
-          <div className="bg-surface rounded-[40px] p-10 border border-foreground/[0.03] text-center">
-            <Camera className="w-10 h-10 text-foreground/10 mx-auto mb-6" />
+          <div className="bg-surface rounded-[40px] p-10 border border-foreground/[0.03] text-center mb-12 relative overflow-hidden group">
+            {uploading && (
+              <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-3">
+                 <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                 <span className="text-[8px] font-black tracking-widest uppercase text-primary">Uploading Asset...</span>
+              </div>
+            )}
+            
+            <div className="w-24 h-24 mx-auto mb-8 relative">
+              <div className="w-full h-full rounded-[32px] bg-primary/5 border border-primary/10 flex items-center justify-center overflow-hidden shadow-inner">
+                {profile.profileImage ? (
+                  <img src={profile.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-black text-primary">{initials}</span>
+                )}
+              </div>
+              {isEditing && (
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20 border-4 border-white">
+                  <Camera className="w-3 h-3" />
+                </div>
+              )}
+            </div>
+
             <h4 className="text-lg font-bold mb-2">Visual ID</h4>
             <p className="text-[11px] text-foreground/30 font-medium mb-6">Your profile image helps partners recognize verified explorers.</p>
-            <button className="text-[10px] font-black tracking-widest text-primary uppercase hover:opacity-60 transition-opacity">Upload New Asset</button>
+            
+            <input 
+              type="file" 
+              id="profile-upload" 
+              hidden 
+              accept="image/*"
+              onChange={handleUpload}
+              disabled={!isEditing || uploading}
+            />
+            
+            <button 
+              disabled={!isEditing || uploading}
+              onClick={() => document.getElementById('profile-upload')?.click()}
+              className={`text-[10px] font-black tracking-widest text-primary uppercase hover:opacity-60 transition-opacity ${(!isEditing || uploading) ? "opacity-30 cursor-not-allowed" : ""}`}
+            >
+              {uploading ? "Transmitting..." : "Upload New Asset"}
+            </button>
           </div>
+
+          {session?.user?.role === "tourist" && (
+            <section className="space-y-12 animate-slide-up">
+              {/* Tourist Specific: Adventure Protocol */}
+              <div className="bg-white rounded-[50px] p-10 border border-foreground/[0.03] shadow-3xl shadow-foreground/[0.02]">
+                <h3 className="text-xl font-black tracking-widest uppercase text-primary/40 mb-10 flex items-center gap-4">
+                  <Mountain className="w-5 h-5" /> Adventure Protocol
+                </h3>
+                
+                <div className="space-y-10">
+                  <div className="space-y-6">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Expedition Style</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        { id: "luxury", label: "Luxury" },
+                        { id: "budget", label: "Budget" },
+                        { id: "backpacking", label: "Backpacking" },
+                        { id: "eco_friendly", label: "Eco-friendly" },
+                      ].map(opt => (
+                        <button 
+                          key={opt.id}
+                        onClick={() => {
+                          if (!isEditing) return;
+                          setTourismProfile({...tourismProfile, travel_style: opt.id})
+                        }}
+                        className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${
+                          tourismProfile.travel_style === opt.id 
+                          ? "bg-foreground text-background border-foreground shadow-lg" 
+                          : "bg-white/40 border-foreground/5"
+                        } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Activity Markers</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { id: "hiking", label: "Hiking", icon: <Mountain className="w-3 h-3" /> },
+                        { id: "safari", label: "Safari", icon: <Compass className="w-3 h-3" /> },
+                        { id: "water_activities", label: "Water", icon: <Waves className="w-3 h-3" /> },
+                      ].map(opt => {
+                        const active = tourismProfile.activity_preferences?.includes(opt.id);
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => {
+                              if (!isEditing) return;
+                              const current = tourismProfile.activity_preferences || [];
+                              const next = active ? current.filter((a:any) => a !== opt.id) : [...current, opt.id];
+                              setTourismProfile({...tourismProfile, activity_preferences: next});
+                            }}
+                            className={`px-5 py-3 rounded-xl text-[10px] font-bold flex items-center gap-3 transition-all ${
+                              active ? "bg-primary/10 text-primary border border-primary/20" : "bg-white/40 border border-foreground/5 text-foreground/30"
+                            } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                          >
+                            {opt.icon} {opt.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Heritage Interests</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { id: "history", label: "History", icon: <History className="w-3 h-3" /> },
+                        { id: "culture", label: "Tradition", icon: <Users className="w-3 h-3" /> },
+                        { id: "festivals", label: "Festivals", icon: <Music className="w-3 h-3" /> },
+                        { id: "food", label: "Cuisine", icon: <Utensils className="w-3 h-3" /> },
+                      ].map(opt => {
+                        const active = tourismProfile.interests?.includes(opt.id);
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => {
+                              if (!isEditing) return;
+                              const current = tourismProfile.interests || [];
+                              const next = active ? current.filter((a:any) => a !== opt.id) : [...current, opt.id];
+                              setTourismProfile({...tourismProfile, interests: next});
+                            }}
+                            className={`px-5 py-3 rounded-xl text-[10px] font-bold flex items-center gap-3 transition-all ${
+                              active ? "bg-primary/10 text-primary border border-primary/20" : "bg-white/40 border border-foreground/5 text-foreground/30"
+                            } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                          >
+                            {opt.icon} {opt.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stay Configuration */}
+              <div className="bg-white rounded-[50px] p-10 border border-foreground/[0.03] shadow-3xl shadow-foreground/[0.02]">
+                <h3 className="text-xl font-black tracking-widest uppercase text-primary/40 mb-10 flex items-center gap-4">
+                  <Hotel className="w-5 h-5" /> Stay Configuration
+                </h3>
+                
+                <div className="space-y-10">
+                  <div className="grid grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Accommodation</label>
+                      <select 
+                        value={tourismProfile.accommodation_type}
+                        disabled={!isEditing}
+                        onChange={e => setTourismProfile({...tourismProfile, accommodation_type: e.target.value})}
+                        className={`w-full px-6 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-[11px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                      >
+                        <option value="">Select Type</option>
+                        <option value="hotel">Hotel</option>
+                        <option value="lodge">Lodge</option>
+                        <option value="hostel">Hostel</option>
+                      </select>
+                    </div>
+                    <div className="space-y-4">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Room Privacy</label>
+                      <select 
+                        value={tourismProfile.room_type}
+                        disabled={!isEditing}
+                        onChange={e => setTourismProfile({...tourismProfile, room_type: e.target.value})}
+                        className={`w-full px-6 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-[11px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                      >
+                        <option value="">Select Logic</option>
+                        <option value="private">Private</option>
+                        <option value="shared">Shared</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Protocol Amenities</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { id: "wifi", label: "WiFi", icon: <Wifi className="w-3 h-3" /> },
+                        { id: "pool", label: "Pool", icon: <Waves className="w-3 h-3" /> },
+                        { id: "spa", label: "Spa", icon: <Bath className="w-3 h-3" /> },
+                      ].map(opt => {
+                        const active = tourismProfile.amenities?.includes(opt.id);
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => {
+                              if (!isEditing) return;
+                              const current = tourismProfile.amenities || [];
+                              const next = active ? current.filter((a:any) => a !== opt.id) : [...current, opt.id];
+                              setTourismProfile({...tourismProfile, amenities: next});
+                            }}
+                            className={`px-5 py-3 rounded-xl text-[10px] font-bold flex items-center gap-3 transition-all ${
+                              active ? "bg-primary/10 text-primary border border-primary/20" : "bg-white/40 border border-foreground/5 text-foreground/30"
+                            } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                          >
+                            {opt.icon} {opt.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Journey Baseline */}
+              <div className="bg-white rounded-[50px] p-10 border border-foreground/[0.03] shadow-3xl shadow-foreground/[0.02]">
+                <h3 className="text-xl font-black tracking-widest uppercase text-primary/40 mb-10 flex items-center gap-4">
+                  <Timer className="w-5 h-5" /> Journey Baseline
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-4">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Duration</label>
+                    <select 
+                      value={tourismProfile.duration_preference}
+                      disabled={!isEditing}
+                      onChange={e => setTourismProfile({...tourismProfile, duration_preference: e.target.value})}
+                      className={`w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl text-[10px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      <option value="">Select</option>
+                      <option value="short">Short</option>
+                      <option value="medium">Medium</option>
+                      <option value="long">Long</option>
+                    </select>
+                  </div>
+                  <div className="space-y-4">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Fitness</label>
+                    <select 
+                      value={tourismProfile.fitness_level}
+                      disabled={!isEditing}
+                      onChange={e => setTourismProfile({...tourismProfile, fitness_level: e.target.value})}
+                      className={`w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl text-[10px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      <option value="">Select</option>
+                      <option value="easy">Easy</option>
+                      <option value="moderate">Moderate</option>
+                      <option value="hard">Hard</option>
+                    </select>
+                  </div>
+                  <div className="space-y-4">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Group</label>
+                    <select 
+                      value={tourismProfile.group_type}
+                      disabled={!isEditing}
+                      onChange={e => setTourismProfile({...tourismProfile, group_type: e.target.value})}
+                      className={`w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl text-[10px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      <option value="">Select</option>
+                      <option value="solo">Solo</option>
+                      <option value="couple">Couple</option>
+                      <option value="family">Family</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </main>

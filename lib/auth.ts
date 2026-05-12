@@ -42,6 +42,7 @@ export const authOptions: NextAuthOptions = {
               email: user.email,
               role: user.role,
               needsPasswordChange: user.needsPasswordChange,
+              image: user.profileImage,
             };
           } catch (error) {
             console.error("Firebase Auth Error:", error);
@@ -79,6 +80,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           role: user.role,
           needsPasswordChange: user.needsPasswordChange,
+          image: user.profileImage,
         };
       },
     }),
@@ -93,6 +95,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = (user as any).role;
         token.needsPasswordChange = (user as any).needsPasswordChange;
+        token.image = (user as any).image;
       }
       
       // Handle manual session updates (trigger: "update")
@@ -101,6 +104,7 @@ export const authOptions: NextAuthOptions = {
         if (updateSession.needsPasswordChange !== undefined) {
           token.needsPasswordChange = updateSession.needsPasswordChange;
         }
+        if (updateSession.image) token.image = updateSession.image;
       }
       
       return token;
@@ -110,6 +114,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).id = token.id as string;
         (session.user as any).role = token.role as string;
         (session.user as any).needsPasswordChange = token.needsPasswordChange as boolean;
+        (session.user as any).image = token.image as string;
       }
       return session;
     },

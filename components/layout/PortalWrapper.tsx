@@ -25,7 +25,8 @@ import {
   Loader2,
   Bell,
   Ticket,
-  Landmark
+  Landmark,
+  Edit2
 } from "lucide-react";
 import { pusherClient } from "@/lib/pusher-client";
 import { toast } from "react-toastify";
@@ -240,8 +241,8 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
             ))}
             <div className="h-px bg-foreground/[0.03] my-8" />
             <Link href="/settings" onClick={() => window.innerWidth < 1024 && setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-4 rounded-2xl text-[13px] font-black tracking-wide transition-all ${pathname === '/settings' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:text-primary hover:bg-primary/[0.03]'}`}>
-              <Settings className="w-5 h-5" />
-              Settings
+              <User className="w-5 h-5" />
+              Profile
             </Link>
           </nav>
 
@@ -275,9 +276,13 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
                   <span className="text-[14px] font-black text-foreground tracking-tight leading-none mb-1">{session?.user?.name}</span>
                   <span className="text-[10px] font-black text-primary tracking-widest uppercase">{role.replace("_", " ")}</span>
                 </div>
-                <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-white p-1 border border-foreground/[0.05] shadow-sm group-hover:scale-105 transition-transform">
-                   <div className="w-full h-full rounded-[14px] bg-primary text-white flex items-center justify-center text-[10px] md:text-[12px] font-black shadow-inner">
-                     {initials}
+                <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-white p-1 border border-foreground/[0.05] shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
+                   <div className="w-full h-full rounded-[14px] bg-primary text-white flex items-center justify-center text-[10px] md:text-[12px] font-black shadow-inner overflow-hidden">
+                     {session?.user?.image ? (
+                       <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
+                     ) : (
+                       initials
+                     )}
                    </div>
                 </div>
               </button>
@@ -287,7 +292,16 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
                 <div className="absolute top-full right-0 mt-4 w-80 bg-white rounded-[32px] p-8 border border-foreground/[0.05] shadow-2xl shadow-foreground/10 animate-slide-up z-50">
                   <div className="flex items-center justify-between gap-3 mb-8">
                     <span className="text-[10px] font-black tracking-widest uppercase text-foreground/40">Registry Identity</span>
-                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary"><User className="w-4 h-4" /></div>
+                    <div className="flex items-center gap-2">
+                      <Link 
+                        href="/settings" 
+                        onClick={() => setIsProfileOpen(false)}
+                        className="w-8 h-8 rounded-xl bg-primary/5 flex items-center justify-center text-primary/40 hover:bg-primary hover:text-white transition-all shadow-sm"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Link>
+                      <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm"><User className="w-4 h-4" /></div>
+                    </div>
                   </div>
                   <div className="space-y-6">
                     {[
