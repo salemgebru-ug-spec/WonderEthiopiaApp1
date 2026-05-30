@@ -3,6 +3,8 @@ import dbConnect from "@/lib/mongodb";
 import Business from "@/models/Business";
 import Service from "@/models/Service";
 import Review from "@/models/Review";
+import EventBooking from "@/models/EventBooking";
+import TourBooking from "@/models/TourBooking";
 import "@/models/User"; // Ensure User model is registered for refs
 
 // Simple test to see if route is accessible
@@ -96,7 +98,39 @@ export async function GET(request: Request) {
       }
     });
 
-    return NextResponse.json({ services: enriched || [] });
+    // 6. Capacity Filtering
+    // Fetch Event/Tour Bookings for the relevant services
+    const eventBookings = await EventBooking.find({ event_id: { $in: svcIds } }).select("event_id number_of_tickets");
+    const tourBookings = await TourBooking.find({ tour_id: { $in: svcIds } }).select("tour_id number_of_people");
+
+    const capacityStats: Record<string, number> = {};
+    eventBookings.forEach(b => {
+      const id = String(b.event_id);
+      capacityStats[id] = (capacityStats[id] || 0) + (b.number_of_tickets || 0);
+    });
+    tourBookings.forEach(b => {
+      const id = String(b.tour_id);
+      capacityStats[id] = (capacityStats[id] || 0) + (b.number_of_people || 0);
+    });
+
+    const enrichedAndFiltered = enriched.filter((s: any) => {
+      // Check if service is event or tour
+      const isEvent = Array.isArray(s.category) && (s.category.includes("event_organizer") || s.category.includes("venue") || s.category.includes("corporate"));
+      const isTour = Array.isArray(s.category) && (s.category.includes("tour_operator") || s.category.includes("tour") || s.category.includes("expedition") || s.category.includes("culture") || s.category.includes("wildlife") || s.category.includes("hiking"));
+
+      if (isEvent || isTour) {
+        const idStr = String(s._id);
+        const maxCapacity = s.availability?.quantity || s.metadata?.capacity || s.metadata?.maxOccupancy || s.metadata?.eventCapacity || 0;
+        const totalBooked = capacityStats[idStr] || 0;
+        // Exclude if full
+        if (maxCapacity > 0 && totalBooked >= maxCapacity) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    return NextResponse.json({ services: enrichedAndFiltered });
   } catch (error: any) {
     console.error("CRITICAL PUBLIC API ERROR:", error);
     return NextResponse.json(

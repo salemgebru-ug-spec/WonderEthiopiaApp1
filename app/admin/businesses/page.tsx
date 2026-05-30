@@ -22,12 +22,15 @@ import {
   MessageSquare,
   User,
   Mail,
-  BadgeCheck
+  BadgeCheck,
+  Search
 } from "lucide-react";
 import BusinessChat from "@/components/admin/BusinessChat";
 import ChatDrawer from "@/components/admin/ChatDrawer";
 import ExpansionChatDrawer from "@/components/admin/ExpansionChatDrawer";
 import { pusherClient } from "@/lib/pusher-client";
+
+import { showToast, getToastContent } from "@/lib/toast";
 
 interface Business {
   _id: string;
@@ -70,6 +73,34 @@ export default function AdminBusinessesPage() {
   const [expansionRequests, setExpansionRequests] = useState<any[]>([]);
   const [expandActingOn, setExpandActingOn] = useState<string | null>(null);
   const [expandNote, setExpandNote] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredBusinesses = businesses.filter(biz => {
+    const term = searchTerm.toLowerCase();
+    return (
+      biz.name.toLowerCase().includes(term) ||
+      (biz.permitNumber || "").toLowerCase().includes(term) ||
+      (biz.applicantName || "").toLowerCase().includes(term) ||
+      (biz.contactEmail || "").toLowerCase().includes(term) ||
+      (biz.contactPhone || "").toLowerCase().includes(term) ||
+      (Array.isArray(biz.category)
+        ? biz.category.join(" ")
+        : biz.category || ""
+      ).toLowerCase().includes(term) ||
+      (biz.location?.city || "").toLowerCase().includes(term) ||
+      (biz.location?.region || "").toLowerCase().includes(term) ||
+      (biz.location?.address || "").toLowerCase().includes(term)
+    );
+  });
+
+  const filteredExpansionRequests = expansionRequests.filter(req => {
+    const term = searchTerm.toLowerCase();
+    return (
+      (req.message || "").toLowerCase().includes(term) ||
+      (req.relatedId?.name || "Business").toLowerCase().includes(term) ||
+      (req.relatedId?.permitNumber || "").toLowerCase().includes(term)
+    );
+  });
 
   const fetchBusinesses = async () => {
     try {
@@ -108,7 +139,7 @@ export default function AdminBusinessesPage() {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ relatedId: id }),
-              }).catch(() => {});
+              }).catch(() => { });
             } else {
               counts[id] = (counts[id] || 0) + 1;
             }
@@ -135,7 +166,7 @@ export default function AdminBusinessesPage() {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ relatedId: data.businessId }),
-              }).catch(() => {});
+              }).catch(() => { });
             } else {
               setUnreadBizCounts(prev => ({
                 ...prev,
@@ -168,16 +199,16 @@ export default function AdminBusinessesPage() {
       const data = await res.json();
 
       if (res.ok) {
-        toast.update(loadingToast, { render: data.message || "Success!", type: "success", isLoading: false, autoClose: 5000 });
+        toast.update(loadingToast, { render: getToastContent("Success", data.message || "Success!", "success"), type: "success", isLoading: false, autoClose: 8000 });
         setActingOn(null);
         setActionNote("");
         fetchBusinesses();
       } else {
-        toast.update(loadingToast, { render: data.error || "Action failed", type: "error", isLoading: false, autoClose: 5000 });
+        toast.update(loadingToast, { render: getToastContent("System Error", data.error || "Action failed", "error"), type: "error", isLoading: false, autoClose: 8000 });
       }
     } catch (error: any) {
       console.error("Action failed:", error);
-      toast.error(error.message || "An unexpected error occurred");
+      showToast("System Error", error.message || "An unexpected error occurred", "error");
     }
   };
 
@@ -186,7 +217,7 @@ export default function AdminBusinessesPage() {
     try {
       const res = await fetch(`/api/businesses/${id}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("Business removed from registry");
+        showToast("Success", "Business removed from registry", "success");
         fetchBusinesses();
       }
     } catch (error) {
@@ -204,15 +235,15 @@ export default function AdminBusinessesPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        toast.update(loadingToast, { render: data.message || "Success!", type: "success", isLoading: false, autoClose: 5000 });
+        toast.update(loadingToast, { render: getToastContent("Success", data.message || "Success!", "success"), type: "success", isLoading: false, autoClose: 8000 });
         setExpandActingOn(null);
         setExpandNote("");
         fetchBusinesses();
       } else {
-        toast.update(loadingToast, { render: data.error || "Action failed", type: "error", isLoading: false, autoClose: 5000 });
+        toast.update(loadingToast, { render: getToastContent("System Error", data.error || "Action failed", "error"), type: "error", isLoading: false, autoClose: 8000 });
       }
     } catch (error: any) {
-      toast.error(error.message || "An unexpected error occurred");
+      showToast("System Error", error.message || "An unexpected error occurred", "error");
     }
   };
 
@@ -222,11 +253,11 @@ export default function AdminBusinessesPage() {
     <div className="bg-background text-foreground font-sans">
       <main className="relative z-10 max-w-7xl mx-auto px-3 md:px-4 lg:px-5 py-10 lg:py-20">
         {/* Title & Filters */}
-        <div className="animate-fade-in mb-16">
-          <div className="max-w-4xl mb-12">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
+          <div className="max-w-4xl">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">
+              <span className="text-xs font-black tracking-[0.3em] uppercase text-primary">
                 Registry Master Access
               </span>
             </div>
@@ -237,41 +268,63 @@ export default function AdminBusinessesPage() {
               Super Admin terminal for finalizing Tourist Office recommendations.
             </p>
           </div>
-
-          <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
-            {filters.map((f) => (
+          <div className="relative w-full md:w-80 shrink-0">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search registry..."
+              className="w-full pl-12 pr-10 py-3.5 bg-white border border-foreground/5 rounded-2xl text-xs font-bold placeholder-foreground/20 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/20 transition-all shadow-sm"
+            />
+            <Search className="w-4 h-4 text-foreground/20 absolute left-4 top-1/2 -translate-y-1/2" />
+            {searchTerm && (
               <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-8 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 ${filter === f
-                    ? "bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-105"
-                    : "bg-white text-foreground/30 border-foreground/5 hover:border-primary/20 hover:text-primary"
-                  }`}
+                onClick={() => setSearchTerm("")}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-primary transition-colors text-[9px] font-black uppercase tracking-widest"
               >
-                {f.replace(/_/g, " ")}
+                X
               </button>
-            ))}
+            )}
           </div>
+        </div>
+
+        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide border-t border-foreground/[0.03] pt-8">
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-8 py-3.5 text-sm font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 ${filter === f
+                ? "bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-105"
+                : "bg-white text-foreground/30 border-foreground/5 hover:border-primary/20 hover:text-primary"
+                }`}
+            >
+              {f.replace(/_/g, " ")}
+            </button>
+          ))}
         </div>
 
         {/* Content */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-40 gap-6">
             <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
-            <span className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Syncing Master Registry...</span>
+            <span className="text-xs font-black tracking-widest uppercase text-foreground/20">Syncing Master Registry...</span>
           </div>
         ) : filter === "expansion_requests" ? (
-          expansionRequests.length === 0 ? (
+          filteredExpansionRequests.length === 0 ? (
             <div className="text-center py-48 bg-white/50 rounded-[60px] border-4 border-dashed border-foreground/5">
               <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-8 text-primary/20">
                 <Briefcase className="w-10 h-10" />
               </div>
-              <h3 className="text-3xl font-bold text-foreground/40 mb-2">No Expansion Protocols Pending</h3>
-              <p className="text-foreground/20 font-medium italic">All domain expansion requests have been resolved.</p>
+              <h3 className="text-3xl font-bold text-foreground/40 mb-2">
+                {searchTerm ? "No Match Found" : "No Expansion Protocols Pending"}
+              </h3>
+              <p className="text-foreground/20 font-medium italic">
+                {searchTerm ? "Try searching for a different term." : "All domain expansion requests have been resolved."}
+              </p>
             </div>
           ) : (
             <div className="space-y-12">
-              {expansionRequests.map((req, i) => (
+              {filteredExpansionRequests.map((req, i) => (
                 <div key={req._id} className="bg-white rounded-[60px] p-10 md:p-14 shadow-2xl shadow-foreground/5 border border-foreground/[0.03] animate-slide-up" style={{ animationDelay: `${i * 0.08}s`, opacity: 0 }}>
                   <div className="flex items-start gap-8 mb-10">
                     <div className="w-16 h-16 rounded-[28px] bg-primary/5 flex items-center justify-center text-primary shadow-inner shrink-0 mt-2">
@@ -302,8 +355,8 @@ export default function AdminBusinessesPage() {
                             {/* Tourism Admin Recommendation Banner */}
                             {recommendationType && (
                               <div className={`flex items-start gap-4 p-6 rounded-[28px] border ${recommendationType === "approve"
-                                  ? "bg-emerald-50/50 border-emerald-100"
-                                  : "bg-rose-50/50 border-rose-100"
+                                ? "bg-emerald-50/50 border-emerald-100"
+                                : "bg-rose-50/50 border-rose-100"
                                 }`}>
                                 <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${recommendationType === "approve" ? "bg-emerald-100 text-emerald-600" : "bg-rose-100 text-rose-600"
                                   }`}>
@@ -312,11 +365,11 @@ export default function AdminBusinessesPage() {
                                 <div>
                                   <span className={`text-[9px] font-black uppercase tracking-widest block mb-1 ${recommendationType === "approve" ? "text-emerald-600" : "text-rose-600"
                                     }`}>Tourism Admin Recommendation</span>
-                                  <p className="text-[13px] font-bold text-foreground/70">
+                                  <p className="text-base font-bold text-foreground/70">
                                     Recommends <strong>{recommendationType === "approve" ? "Approving" : "Rejecting"}</strong> this expansion request.
                                   </p>
                                   {tourismNote && (
-                                    <p className="text-[12px] font-medium text-foreground/50 italic mt-2">&ldquo;{tourismNote}&rdquo;</p>
+                                    <p className="text-sm font-medium text-foreground/50 italic mt-2">&ldquo;{tourismNote}&rdquo;</p>
                                   )}
                                 </div>
                               </div>
@@ -327,7 +380,7 @@ export default function AdminBusinessesPage() {
                             {justification && (
                               <div className="p-6 rounded-[32px] bg-primary/[0.02] border border-primary/10">
                                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary block mb-2">Business Justification</span>
-                                <p className="text-[13px] font-medium text-foreground/60 italic leading-relaxed">&ldquo;{justification}&rdquo;</p>
+                                <p className="text-base font-medium text-foreground/60 italic leading-relaxed">&ldquo;{justification}&rdquo;</p>
                               </div>
                             )}
 
@@ -336,7 +389,7 @@ export default function AdminBusinessesPage() {
                                 const lines = section.split("\n").filter((l: string) => l.startsWith("- **"));
                                 return (
                                   <div key={idx} className="bg-foreground/[0.01] p-6 lg:p-8 rounded-[32px] border border-foreground/[0.03]">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40 block mb-6">Supplemental Intelligence</span>
+                                    <span className="text-xs font-black uppercase tracking-widest text-foreground/40 block mb-6">Supplemental Intelligence</span>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                       {lines.map((line: string, li: number) => {
                                         const match = line.match(/- \*\*([^*]+)\*\*: (.*)/);
@@ -344,7 +397,7 @@ export default function AdminBusinessesPage() {
                                         return (
                                           <div key={li} className="bg-white p-4 rounded-2xl border border-foreground/[0.03] shadow-sm">
                                             <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/50 block mb-1">{match[1].replace(/([A-Z])/g, " $1").trim()}</span>
-                                            <span className="text-[13px] font-bold text-foreground/80">{match[2]}</span>
+                                            <span className="text-base font-bold text-foreground/80">{match[2]}</span>
                                           </div>
                                         );
                                       })}
@@ -356,7 +409,7 @@ export default function AdminBusinessesPage() {
                                 const lines = section.split("\n").filter((l: string) => l.startsWith("- ["));
                                 return (
                                   <div key={idx} className="bg-primary/[0.01] p-6 lg:p-8 rounded-[32px] border border-primary/10">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary/40 block mb-6">Verification Artifacts</span>
+                                    <span className="text-xs font-black uppercase tracking-widest text-primary/40 block mb-6">Verification Artifacts</span>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                       {lines.map((line: string, li: number) => {
                                         const match = line.match(/- \[([^\]]+)\]\(([^)]+)\) \(([^)]+)\)/);
@@ -368,7 +421,7 @@ export default function AdminBusinessesPage() {
                                             </div>
                                             <div className="flex flex-col min-w-0">
                                               <span className="text-[8px] font-black uppercase text-foreground/20 tracking-widest truncate mb-1">{match[3].replace(/([A-Z])/g, " $1").trim()}</span>
-                                              <span className="text-[11px] font-extrabold text-foreground/60 truncate uppercase">{match[1]}</span>
+                                              <span className="text-sm font-extrabold text-foreground/60 truncate uppercase">{match[1]}</span>
                                             </div>
                                           </a>
                                         );
@@ -392,9 +445,9 @@ export default function AdminBusinessesPage() {
                       className="flex items-center gap-4 px-6 py-4 bg-primary/5 text-primary rounded-xl border border-primary/10 hover:bg-primary hover:text-white transition-all group/chat relative w-fit"
                     >
                       <MessageSquare className="w-5 h-5 group-hover/chat:scale-110 transition-transform" />
-                      <span className="text-[11px] font-black uppercase tracking-[0.3em]">Deliberation</span>
+                      <span className="text-sm font-black uppercase tracking-[0.3em]">Deliberation</span>
                       {unreadBizCounts[req._id] > 0 && (
-                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-xs font-black rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
                           {unreadBizCounts[req._id]}
                         </div>
                       )}
@@ -415,21 +468,21 @@ export default function AdminBusinessesPage() {
                         <div className="flex gap-4 flex-wrap">
                           <button
                             onClick={() => handleExpansionFinalAction(req._id, "approve")}
-                            className="flex-1 px-10 py-5 bg-primary text-white text-[11px] font-black rounded-2xl hover:bg-primary-hover transition-all active:scale-95 shadow-xl shadow-primary/20 flex items-center justify-center gap-3 uppercase tracking-[0.2em]"
+                            className="flex-1 px-10 py-5 bg-primary text-white text-sm font-black rounded-2xl hover:bg-primary-hover transition-all active:scale-95 shadow-xl shadow-primary/20 flex items-center justify-center gap-3 uppercase tracking-[0.2em]"
                           >
                             <BadgeCheck className="w-5 h-5" />
                             Final Admission — Grant Expansion
                           </button>
                           <button
                             onClick={() => handleExpansionFinalAction(req._id, "reject")}
-                            className="flex-1 px-10 py-5 bg-white border border-red-100 text-red-600 text-[11px] font-black rounded-2xl hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-3 uppercase tracking-[0.2em]"
+                            className="flex-1 px-10 py-5 bg-white border border-red-100 text-red-600 text-sm font-black rounded-2xl hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-3 uppercase tracking-[0.2em]"
                           >
                             <Lock className="w-5 h-5" />
                             Final Denial — Reject Expansion
                           </button>
                           <button
                             onClick={() => { setExpandActingOn(null); setExpandNote(""); }}
-                            className="px-8 py-5 text-[11px] font-black text-foreground/30 hover:text-foreground uppercase tracking-widest"
+                            className="px-8 py-5 text-sm font-black text-foreground/30 hover:text-foreground uppercase tracking-widest"
                           >
                             Abandon Action
                           </button>
@@ -438,14 +491,14 @@ export default function AdminBusinessesPage() {
                     ) : (
                       <div className="flex items-center gap-4">
                         {req.recipientRole === "tourism_admin" ? (
-                          <div className="px-10 py-5 bg-amber-50 text-amber-600 border border-amber-100 text-[11px] font-black rounded-2xl uppercase tracking-[0.2em] flex items-center gap-3 opacity-80 shadow-sm cursor-not-allowed">
+                          <div className="px-10 py-5 bg-amber-50 text-amber-600 border border-amber-100 text-sm font-black rounded-2xl uppercase tracking-[0.2em] flex items-center gap-3 opacity-80 shadow-sm cursor-not-allowed">
                             <Clock className="w-5 h-5" />
                             Awaiting Tourism Admin Recommendation
                           </div>
                         ) : (
                           <button
                             onClick={() => setExpandActingOn(req._id)}
-                            className="px-12 py-5 bg-primary text-white text-[11px] font-black rounded-2xl hover:bg-primary-hover shadow-2xl shadow-primary/20 transition-all active:scale-95 uppercase tracking-[0.2em] flex items-center gap-4"
+                            className="px-12 py-5 bg-primary text-white text-sm font-black rounded-2xl hover:bg-primary-hover shadow-2xl shadow-primary/20 transition-all active:scale-95 uppercase tracking-[0.2em] flex items-center gap-4"
                           >
                             Execute Master Decision
                             <ChevronRight className="w-5 h-5" />
@@ -466,17 +519,21 @@ export default function AdminBusinessesPage() {
               ))}
             </div>
           )
-        ) : businesses.length === 0 ? (
+        ) : filteredBusinesses.length === 0 ? (
           <div className="text-center py-48 bg-white/50 rounded-[60px] border-4 border-dashed border-foreground/5">
             <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-8 text-primary/20">
               <ShieldCheck className="w-10 h-10" />
             </div>
-            <h3 className="text-3xl font-bold text-foreground/40 mb-2">No Determinations Needed</h3>
-            <p className="text-foreground/20 font-medium italic">All institutional recommendations have been resolved.</p>
+            <h3 className="text-3xl font-bold text-foreground/40 mb-2">
+              {searchTerm ? "No Match Found" : "No Determinations Needed"}
+            </h3>
+            <p className="text-foreground/20 font-medium italic">
+              {searchTerm ? "Try searching for a different term." : "All institutional recommendations have been resolved."}
+            </p>
           </div>
         ) : (
           <div className="space-y-12">
-            {businesses.map((biz, i) => {
+            {filteredBusinesses.map((biz, i) => {
               const sc = statusConfig[biz.status] || statusConfig.pending;
               return (
                 <div
@@ -494,23 +551,23 @@ export default function AdminBusinessesPage() {
                           </Link>
                           <div>
                             <Link href={`/admin/businesses/${biz._id}`} className="hover:text-primary transition-colors">
-                              <h3 className="text-3xl font-bold text-foreground tracking-tighter mb-1 leading-none group-hover:text-primary transition-colors">{biz.name}</h3>
+                              <h3 className="text-4xl font-bold text-foreground tracking-tighter mb-1 leading-none group-hover:text-primary transition-colors">{biz.name}</h3>
                             </Link>
-                            <div className="flex items-center gap-3">
-                              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/30">
+                            <div className="flex items-center gap-3 mt-2">
+                              <span className="text-sm font-black uppercase tracking-[0.2em] text-foreground/30">
                                 {Array.isArray(biz.category)
                                   ? biz.category.map(c => c.replace(/_/g, " ")).join(", ")
                                   : biz.category.replace(/_/g, " ")}
                               </span>
                               <div className="w-1 h-1 rounded-full bg-foreground/10" />
-                              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/30 flex items-center gap-2">
+                              <span className="text-sm font-black uppercase tracking-[0.2em] text-foreground/30 flex items-center gap-2">
                                 <MapPin className="w-3 h-3 text-primary/40" />
                                 {biz.location.address}, {biz.location.city}, {biz.location.region}
                               </span>
                             </div>
                           </div>
                         </div>
-                        <div className={`px-5 py-2.5 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm`}>
+                        <div className={`px-5 py-2.5 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] shadow-sm`}>
                           {sc.icon}
                           {sc.label}
                         </div>
@@ -525,54 +582,54 @@ export default function AdminBusinessesPage() {
                         <div className="space-y-4">
                           <div>
                             <span className="text-[9px] font-black tracking-widest uppercase text-primary/40 block mb-1">Permit Number</span>
-                            <p className="text-[13px] font-bold text-foreground">{biz.permitNumber}</p>
+                            <p className="text-base font-bold text-foreground">{biz.permitNumber}</p>
                           </div>
                           <div>
                             <span className="text-[9px] font-black tracking-widest uppercase text-primary/40 block mb-1">Applicant Name</span>
-                            <p className="text-[13px] font-bold text-foreground">{biz.applicantName || "Institutional"}</p>
+                            <p className="text-base font-bold text-foreground">{biz.applicantName || "Institutional"}</p>
                           </div>
                         </div>
                         <div className="space-y-4">
                           <div>
                             <span className="text-[9px] font-black tracking-widest uppercase text-primary/40 block mb-1">Official Email</span>
-                            <p className="text-[13px] font-bold text-foreground truncate">{biz.contactEmail}</p>
+                            <p className="text-base font-bold text-foreground truncate">{biz.contactEmail}</p>
                           </div>
                           <div className="flex items-center justify-between">
                             <div>
                               <span className="text-[9px] font-black tracking-widest uppercase text-primary/40 block mb-1">Primary Phone</span>
-                              <p className="text-[13px] font-bold text-foreground">{biz.contactPhone || "None"}</p>
+                              <p className="text-base font-bold text-foreground">{biz.contactPhone || "None"}</p>
                             </div>
                             <div className="text-right">
                               <span className="text-[9px] font-black tracking-widest uppercase text-primary/40 block mb-1">Created Path</span>
-                              <p className="text-[13px] font-bold text-foreground">{new Date(biz.createdAt).toLocaleDateString()}</p>
+                              <p className="text-base font-bold text-foreground">{new Date(biz.createdAt).toLocaleDateString()}</p>
                             </div>
                           </div>
                         </div>
-                        
+
                       </div>
 
                       {/* Administrative Control Bar */}
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-foreground/[0.03]">
                         <div className="flex items-center gap-6">
-                           <button 
-                             onClick={() => setShowChat(biz._id)}
-                             className={`flex items-center gap-3 px-6 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all relative ${showChat === biz._id ? 'bg-primary text-white shadow-lg' : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'}`}>
-                             <MessageSquare className="w-4 h-4" /> Discussion
-                             {unreadBizCounts[biz._id] > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center animate-bounce shadow-lg">{unreadBizCounts[biz._id]}</span>}
-                           </button>
-                           {biz.status !== "pending" && (
-                             <button 
-                                 onClick={() => handleDelete(biz._id)}
-                                 className="flex items-center gap-3 px-6 py-4 bg-rose-50 text-rose-600 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all">
-                                 <Trash2 className="w-4 h-4" /> Purge Record
-                             </button>
-                           )}
+                          <button
+                            onClick={() => setShowChat(biz._id)}
+                            className={`flex items-center gap-3 px-6 py-4 rounded-2xl text-sm font-black uppercase tracking-widest transition-all relative ${showChat === biz._id ? 'bg-primary text-white shadow-lg' : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'}`}>
+                            <MessageSquare className="w-4 h-4" /> Discussion
+                            {unreadBizCounts[biz._id] > 0 && <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center animate-bounce shadow-lg">{unreadBizCounts[biz._id]}</span>}
+                          </button>
+                          {biz.status !== "pending" && (
+                            <button
+                              onClick={() => handleDelete(biz._id)}
+                              className="flex items-center gap-3 px-6 py-4 bg-rose-50 text-rose-600 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all">
+                              <Trash2 className="w-4 h-4" /> Purge Record
+                            </button>
+                          )}
                         </div>
-                        
+
                         {biz.status !== "pending" && (
                           <button
                             onClick={() => setActingOn(biz._id)}
-                            className="px-10 py-5 bg-foreground text-background rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-primary transition-all flex items-center gap-3 active:scale-95 shadow-2xl">
+                            className="px-10 py-5 bg-foreground text-background rounded-2xl text-sm font-black uppercase tracking-[0.2em] hover:bg-primary transition-all flex items-center gap-3 active:scale-95 shadow-2xl">
                             Execute Master Decision
                             <ChevronRight className="w-4 h-4" />
                           </button>
@@ -581,34 +638,34 @@ export default function AdminBusinessesPage() {
 
                       {actingOn === biz._id && (
                         <div className="mt-10 p-10 bg-white border-2 border-primary/20 rounded-[40px] shadow-2xl animate-fade-in">
-                           <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6">Master Action Terminal</h4>
-                           <textarea 
-                             value={actionNote} 
-                             onChange={e => setActionNote(e.target.value)}
-                             placeholder="State the final institutional grounds..."
-                             className="w-full px-8 py-6 bg-foreground/[0.02] border border-foreground/[0.05] rounded-[28px] text-sm font-bold placeholder-foreground/20 outline-none focus:ring-2 focus:ring-primary/20 resize-none mb-6"
-                             rows={3} />
-                           <div className="flex gap-3">
-                             {biz.status === "approved" ? (
-                               <button 
-                                 onClick={() => handleAction(biz._id, "suspended")} 
-                                 className="flex-1 px-8 py-4 bg-amber-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-700 transition-all">
-                                 Suspend Registration
-                               </button>
-                             ) : biz.status === "suspended" || biz.status === "rejected" ? (
-                               <button 
-                                 onClick={() => handleAction(biz._id, "unsuspend")} 
-                                 className="flex-1 px-8 py-4 bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all">
-                                 Restore Admission / Unsuspend
-                               </button>
-                             ) : (
-                               <>
-                                 <button onClick={() => handleAction(biz._id, "approved")} className="flex-1 px-8 py-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary-hover">Final Approval</button>
-                                 <button onClick={() => handleAction(biz._id, "rejected")} className="flex-1 px-8 py-4 bg-rose-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-700">Final Denial</button>
-                               </>
-                             )}
-                             <button onClick={() => setActingOn(null)} className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-foreground/30">Cancel</button>
-                           </div>
+                          <h4 className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-6">Master Action Terminal</h4>
+                          <textarea
+                            value={actionNote}
+                            onChange={e => setActionNote(e.target.value)}
+                            placeholder="State the final institutional grounds..."
+                            className="w-full px-8 py-6 bg-foreground/[0.02] border border-foreground/[0.05] rounded-[28px] text-sm font-bold placeholder-foreground/20 outline-none focus:ring-2 focus:ring-primary/20 resize-none mb-6"
+                            rows={3} />
+                          <div className="flex gap-3">
+                            {biz.status === "approved" ? (
+                              <button
+                                onClick={() => handleAction(biz._id, "suspended")}
+                                className="flex-1 px-8 py-4 bg-amber-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-amber-700 transition-all">
+                                Suspend Registration
+                              </button>
+                            ) : biz.status === "suspended" || biz.status === "rejected" ? (
+                              <button
+                                onClick={() => handleAction(biz._id, "unsuspend")}
+                                className="flex-1 px-8 py-4 bg-emerald-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-emerald-700 transition-all">
+                                Restore Admission / Unsuspend
+                              </button>
+                            ) : (
+                              <>
+                                <button onClick={() => handleAction(biz._id, "approved")} className="flex-1 px-8 py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary-hover">Final Approval</button>
+                                <button onClick={() => handleAction(biz._id, "rejected")} className="flex-1 px-8 py-4 bg-rose-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-rose-700">Final Denial</button>
+                              </>
+                            )}
+                            <button onClick={() => setActingOn(null)} className="px-6 py-4 text-xs font-black uppercase tracking-widest text-foreground/30">Cancel</button>
+                          </div>
                         </div>
                       )}
 

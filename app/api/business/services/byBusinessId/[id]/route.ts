@@ -4,9 +4,11 @@ import Service from "@/models/Service";
 import { NextResponse } from "next/server";
 import Business from "@/models/Business";
 
-export async function GET(request: Request,
-  { params }: { params: { id: string } }){
-    try{
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
 const RegisterBusinessModel = Business.modelName;
         await dbConnect();
         const {id}=await params;

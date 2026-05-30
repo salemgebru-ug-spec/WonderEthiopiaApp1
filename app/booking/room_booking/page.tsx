@@ -233,7 +233,7 @@ export default function RoomBookingPage() {
           <>
             <div className="p-6 md:p-8 bg-primary text-white flex justify-between items-start">
               <div className="space-y-2">
-                <span className="bg-white/20 text-white text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest inline-block">
+                <span className="bg-white/20 text-white text-xs font-black px-2 py-1 rounded uppercase tracking-widest inline-block">
                   Accommodation
                 </span>
                 <h2 className="text-2xl md:text-3xl font-black uppercase leading-tight">{hotelData.name}</h2>

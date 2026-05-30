@@ -38,7 +38,7 @@ export default function DiscoverHub() {
         </div>
 
         <div className="relative z-10 text-center max-w-7xl px-3 md:px-4 lg:px-5">
-          <div className="inline-flex items-center gap-4 px-8 py-3 mb-16 text-[10px] font-black tracking-[0.5em] text-primary uppercase bg-white/10 floating-glass rounded-full">
+          <div className="inline-flex items-center gap-4 px-8 py-3 mb-16 text-xs font-black tracking-[0.5em] text-primary uppercase bg-white/10 floating-glass rounded-full">
             Discovery Hub <Compass className="w-5 h-5 animate-spin-slow" />
           </div>
 
@@ -73,7 +73,7 @@ export default function DiscoverHub() {
                  <div className="w-20 h-20 rounded-[30px] glass flex items-center justify-center text-white scale-125 mb-4">
                   {section.icon}
                 </div>
-                <div className="px-3 md:px-4 lg:px-5 py-2.5 glass rounded-full text-[11px] font-black tracking-[0.2em] text-white uppercase mt-4">
+                <div className="px-3 md:px-4 lg:px-5 py-2.5 glass rounded-full text-sm font-black tracking-[0.2em] text-white uppercase mt-4">
                   {section.tag}
                 </div>
               </div>
@@ -83,7 +83,7 @@ export default function DiscoverHub() {
                 <p className="text-xl opacity-60 mb-12 font-medium max-w-md leading-relaxed italic text-balance">
                   "{section.description}"
                 </p>
-                <div className="flex items-center gap-6 text-[12px] font-black tracking-[0.3em] uppercase group-hover:gap-10 transition-all text-primary">
+                <div className="flex items-center gap-6 text-sm font-black tracking-[0.3em] uppercase group-hover:gap-10 transition-all text-primary">
                   Begin Sequence <ArrowRight className="w-6 h-6" />
                 </div>
               </div>

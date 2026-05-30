@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 
+import { showToast } from "@/lib/toast";
+
 interface UserData {
   _id: string;
   name: string;
@@ -70,11 +72,11 @@ export default function AdminUsersPage() {
         body: JSON.stringify({ role: newRole }),
       });
       if (res.ok) {
-        toast.success("Identity updated successfully");
+        showToast("Success", "Identity updated successfully", "success");
         fetchUsers();
       } else {
         const error = await res.json();
-        toast.error(error.error || "Quality control failure");
+        showToast("System Error", error.error || "Quality control failure", "error");
       }
     } catch (error) {
       console.error("Update failed:", error);
@@ -85,7 +87,7 @@ export default function AdminUsersPage() {
 
   const handleDelete = async (userId: string) => {
     if (userId === session?.user?.id) {
-      toast.error("Self-purge prevention active!");
+      showToast("System Error", "Self-purge prevention active!", "error");
       return;
     }
     if (!confirm("Are you sure you want to remove this entity from the registry?")) return;
@@ -93,11 +95,11 @@ export default function AdminUsersPage() {
     try {
       const res = await fetch(`/api/users/${userId}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("Entity removed from master registry");
+        showToast("Success", "Entity removed from master registry", "success");
         fetchUsers();
       } else {
         const error = await res.json();
-        toast.error(error.error || "Failed to delete user");
+        showToast("System Error", error.error || "Failed to delete user", "error");
       }
     } catch (error) {
       console.error("Delete failed:", error);
@@ -112,7 +114,7 @@ export default function AdminUsersPage() {
           <div className="max-w-4xl mb-12">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">
+              <span className="text-xs font-black tracking-[0.3em] uppercase text-primary">
                 Institutional User Registry
               </span>
             </div>
@@ -131,7 +133,7 @@ export default function AdminUsersPage() {
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-8 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 ${
+                  className={`px-8 py-3.5 text-sm font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 ${
                     filter === f
                       ? "bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-105"
                       : "bg-white text-foreground/30 border-foreground/5 hover:border-primary/20 hover:text-primary"
@@ -148,7 +150,7 @@ export default function AdminUsersPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-40 gap-6">
             <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
-            <span className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Syncing Master Identities...</span>
+            <span className="text-xs font-black tracking-widest uppercase text-foreground/20">Syncing Master Identities...</span>
           </div>
         ) : users.length === 0 ? (
           <div className="text-center py-48 bg-white/50 rounded-[60px] border-4 border-dashed border-foreground/5 mx-4">
@@ -184,13 +186,13 @@ export default function AdminUsersPage() {
                   <div className="space-y-6 mb-12">
                     <div>
                       <h3 className="text-2xl font-bold text-foreground tracking-tight mb-1 truncate">{user.name}</h3>
-                      <div className="flex items-center gap-2 text-foreground/30 text-[13px] font-medium">
+                      <div className="flex items-center gap-2 text-foreground/30 text-base font-medium">
                         <Mail className="w-3.5 h-3.5" />
                         {user.email}
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-foreground/20">
+                    <div className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-foreground/20">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5" />
                         Joined {new Date(user.createdAt).toLocaleDateString()}
@@ -203,7 +205,7 @@ export default function AdminUsersPage() {
                       <select
                         disabled={true}
                         value={user.role}
-                        className="w-full bg-foreground/[0.01] border border-foreground/[0.03] text-[11px] font-black uppercase tracking-widest rounded-2xl px-3 md:px-4 lg:px-5 py-4 appearance-none focus:outline-none transition-all cursor-not-allowed"
+                        className="w-full bg-foreground/[0.01] border border-foreground/[0.03] text-sm font-black uppercase tracking-widest rounded-2xl px-3 md:px-4 lg:px-5 py-4 appearance-none focus:outline-none transition-all cursor-not-allowed"
                       >
                         <option value="tourist">Explorer</option>
                         <option value="business_owner">Business Owner</option>

@@ -186,7 +186,7 @@ export default function DestinationDetail() {
         </div>
 
         <div className="absolute bottom-12 left-6 md:left-12 max-w-4xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 text-[10px] font-bold tracking-widest text-primary uppercase bg-primary/10 backdrop-blur-md rounded-full border border-primary/20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-4 text-xs font-bold tracking-widest text-primary uppercase bg-primary/10 backdrop-blur-md rounded-full border border-primary/20">
             {destination.region}
           </div>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-white mb-6">
@@ -244,7 +244,7 @@ export default function DestinationDetail() {
                         </div>
                         <div>
                           <h4 className="font-bold text-lg">{review.userId?.name || review.userName || "Explorer"}</h4>
-                          <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase tracking-widest">
+                          <div className="flex items-center gap-2 text-xs font-bold text-foreground/40 uppercase tracking-widest">
                             <Calendar className="w-3 h-3" />
                             {new Date(review.createdAt).toLocaleDateString()}
                           </div>

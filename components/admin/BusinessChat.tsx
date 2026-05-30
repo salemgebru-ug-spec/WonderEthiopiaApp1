@@ -107,7 +107,7 @@ export default function BusinessChat({ businessId, currentRole }: { businessId: 
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-foreground/10 py-12">
             <MessageSquare className="w-12 h-12" />
-            <p className="text-[12px] font-bold italic text-center max-w-[200px]">No internal messages yet. Start the conversation with the other office.</p>
+            <p className="text-sm font-bold italic text-center max-w-[200px]">No internal messages yet. Start the conversation with the other office.</p>
           </div>
         ) : (
           messages.map((msg) => {
@@ -145,7 +145,7 @@ export default function BusinessChat({ businessId, currentRole }: { businessId: 
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Write a message..."
-            className="flex-1 px-6 py-4 bg-transparent text-[13px] font-medium focus:outline-none placeholder-foreground/20"
+            className="flex-1 px-6 py-4 bg-transparent text-base font-medium focus:outline-none placeholder-foreground/20"
           />
           <button
             type="submit"

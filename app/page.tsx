@@ -105,7 +105,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-10">
             <Link
               href={status === "authenticated" ? "/discover" : "#"}
-              className="text-[13px] font-bold text-primary transition-all duration-300 relative group"
+              className="text-base font-bold text-primary transition-all duration-300 relative group"
             >
               Discover
               <span className="absolute -bottom-1 left-0 w-full h-[1.5px] bg-primary transition-all duration-300" />
@@ -117,7 +117,7 @@ export default function LandingPage() {
               <Link
                 key={item.name}
                 href={status === "authenticated" ? item.href : item.anchor}
-                className="text-[13px] font-medium text-foreground/70 hover:text-primary transition-all duration-300 relative group"
+                className="text-base font-medium text-foreground/70 hover:text-primary transition-all duration-300 relative group"
               >
                 {item.name}
                 <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-primary group-hover:w-full transition-all duration-300" />
@@ -130,7 +130,7 @@ export default function LandingPage() {
               {session ? (
                 <Link
                   href="/dashboard"
-                  className="px-3 md:px-4 lg:px-5 py-2.5 bg-primary text-white text-[13px] font-semibold rounded-full hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all duration-300 active:scale-95"
+                  className="px-3 md:px-4 lg:px-5 py-2.5 bg-primary text-white text-base font-semibold rounded-full hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all duration-300 active:scale-95"
                 >
                   My Dashboard
                 </Link>
@@ -138,13 +138,13 @@ export default function LandingPage() {
                 <>
                   <Link
                     href="/login"
-                    className="text-[13px] font-semibold text-foreground/80 hover:text-primary transition-colors"
+                    className="text-base font-semibold text-foreground/80 hover:text-primary transition-colors"
                   >
                     Login
                   </Link>
                   <Link
                     href="/register"
-                    className="px-3 md:px-4 lg:px-5 py-2.5 bg-foreground text-background text-[13px] font-semibold rounded-full hover:bg-foreground/90 transition-all duration-300 active:scale-95"
+                    className="px-3 md:px-4 lg:px-5 py-2.5 bg-foreground text-background text-base font-semibold rounded-full hover:bg-foreground/90 transition-all duration-300 active:scale-95"
                   >
                     Join Us
                   </Link>
@@ -178,7 +178,7 @@ export default function LandingPage() {
         </div>
 
         <div className="relative z-10 text-center max-w-6xl px-3 md:px-4 lg:px-5">
-          <div className="inline-flex items-center gap-3 px-3 md:px-4 lg:px-5 py-2 mb-10 text-[10px] font-black tracking-[0.4em] text-primary uppercase bg-white/10 floating-glass rounded-full animate-fade-in">
+          <div className="inline-flex items-center gap-3 px-3 md:px-4 lg:px-5 py-2 mb-10 text-xs font-black tracking-[0.4em] text-primary uppercase bg-white/10 floating-glass rounded-full animate-fade-in">
             Discover the Land of Origins
           </div>
 
@@ -211,7 +211,7 @@ export default function LandingPage() {
                 <option>Afar</option>
               </select>
             </div>
-            <button className="px-12 py-4 bg-primary text-white text-[13px] font-black uppercase tracking-widest rounded-2xl hover:bg-primary-hover transition-all active:scale-95 shadow-premium">
+            <button className="px-12 py-4 bg-primary text-white text-base font-black uppercase tracking-widest rounded-2xl hover:bg-primary-hover transition-all active:scale-95 shadow-premium">
               Begin Discovery
             </button>
           </div>
@@ -223,11 +223,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-5">
           <div className="flex flex-col sm:flex-row items-end justify-between mb-20 gap-8">
             <div className="max-w-xl">
-              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary mb-4 block">Legendary Landmarks</span>
+              <span className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-4 block">Legendary Landmarks</span>
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Imperial Destinations</h2>
               <p className="text-foreground/40 font-medium italic">Discover the ancient soul of Ethiopia through its most iconic heritage sites.</p>
             </div>
-            <Link href="/discover/destinations" className="hidden sm:flex items-center gap-3 px-8 py-4 bg-white rounded-2xl text-[11px] font-black uppercase text-foreground/40 hover:text-primary transition-all shadow-xl shadow-foreground/5 relative group">
+            <Link href="/discover/destinations" className="hidden sm:flex items-center gap-3 px-8 py-4 bg-white rounded-2xl text-sm font-black uppercase text-foreground/40 hover:text-primary transition-all shadow-xl shadow-foreground/5 relative group">
               View Full Atlas <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -252,13 +252,13 @@ export default function LandingPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
                   <div className="absolute bottom-0 left-0 w-full p-12 text-white translate-y-6 group-hover:translate-y-0 transition-transform duration-700">
-                    <div className="flex items-center gap-3 mb-4 text-[10px] font-black tracking-[0.3em] uppercase text-primary">
+                    <div className="flex items-center gap-3 mb-4 text-xs font-black tracking-[0.3em] uppercase text-primary">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                       {dest.region}
                     </div>
                     <h3 className="text-4xl font-black mb-6 tracking-tightest leading-none">{dest.name}</h3>
                     <p className="text-sm font-medium opacity-0 group-hover:opacity-70 transition-opacity duration-700 line-clamp-2 italic mb-10 text-balance">"{dest.description}"</p>
-                    <Link href={status === "authenticated" ? `/discover/destinations/${dest._id}` : "/login"} className="inline-flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] text-white/50 hover:text-primary transition-all group/btn">
+                    <Link href={status === "authenticated" ? `/discover/destinations/${dest._id}` : "/login"} className="inline-flex items-center gap-4 text-sm font-black uppercase tracking-[0.3em] text-white/50 hover:text-primary transition-all group/btn">
                       Explore Artifact <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform" />
                     </Link>
                   </div>
@@ -298,7 +298,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-5">
           <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-16 gap-6">
             <div className="max-w-xl">
-              <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary mb-4 block">Hand-Picked Agencies</span>
+              <span className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-4 block">Hand-Picked Agencies</span>
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight">Best Tour Operators</h2>
             </div>
             <Link href="/discover/businesses" className="text-primary font-bold text-sm flex items-center gap-2 group">
@@ -334,7 +334,7 @@ export default function LandingPage() {
                       fill
                       className="object-cover group-hover:scale-110 transition-transform duration-1000"
                     />
-                    <div className="absolute top-6 right-6 px-5 py-2 glass rounded-full text-[10px] font-black tracking-[0.2em] uppercase text-foreground">
+                    <div className="absolute top-6 right-6 px-5 py-2 glass rounded-full text-xs font-black tracking-[0.2em] uppercase text-foreground">
                       {Array.isArray(biz.category) 
                         ? biz.category[0].replace("_", " ")
                         : biz.category.replace("_", " ")}
@@ -345,7 +345,7 @@ export default function LandingPage() {
                       <h3 className="text-2xl font-black text-foreground group-hover:text-primary transition-colors pr-2 tracking-tightest leading-none">
                         {biz.name}
                       </h3>
-                      <div className="flex items-center gap-1.5 text-[13px] font-black text-primary">
+                      <div className="flex items-center gap-1.5 text-base font-black text-primary">
                         <Star className={`w-4 h-4 ${biz.avgRating ? "fill-current" : "opacity-50"}`} />
                         {biz.avgRating ? biz.avgRating.toFixed(1) : <span className="italic text-foreground/40 font-medium">New</span>}
                       </div>
@@ -354,7 +354,7 @@ export default function LandingPage() {
                       "{biz.description}"
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black text-foreground/20 flex items-center gap-3 uppercase tracking-widest">
+                      <span className="text-xs font-black text-foreground/20 flex items-center gap-3 uppercase tracking-widest">
                         <div className="w-1.5 h-1.5 rounded-full bg-foreground/10" />
                         {biz.location.city}
                       </span>
@@ -413,7 +413,7 @@ export default function LandingPage() {
               </p>
             </div>
             <div>
-              <h4 className="text-[10px] font-black tracking-[0.3em] uppercase text-primary mb-8">Navigation</h4>
+              <h4 className="text-xs font-black tracking-[0.3em] uppercase text-primary mb-8">Navigation</h4>
               <ul className="space-y-4">
                 {["Our Story", "Destinations", "Apply for Partner"].map((item) => (
                   <li key={item}>
@@ -423,7 +423,7 @@ export default function LandingPage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-[10px] font-black tracking-[0.3em] uppercase text-primary mb-8">Connect</h4>
+              <h4 className="text-xs font-black tracking-[0.3em] uppercase text-primary mb-8">Connect</h4>
               <ul className="space-y-4">
                 {["Instagram", "LinkedIn", "Contact Office"].map((item) => (
                   <li key={item}>
@@ -433,7 +433,7 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-          <div className="pt-12 border-t border-foreground/[0.03] flex justify-between items-center text-[11px] font-bold tracking-widest text-foreground/30 uppercase">
+          <div className="pt-12 border-t border-foreground/[0.03] flex justify-between items-center text-sm font-bold tracking-widest text-foreground/30 uppercase">
             <p>© {new Date().getFullYear()} Wonder Ethiopia</p>
             <p>Made with heart in Addis Ababa</p>
           </div>

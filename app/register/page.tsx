@@ -100,7 +100,7 @@ export default function RegisterPage() {
       <div className="relative w-full max-w-[460px] animate-fade-in">
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-[13px] font-bold text-foreground/40 hover:text-primary transition-colors mb-12 group"
+          className="inline-flex items-center gap-2 text-base font-bold text-foreground/40 hover:text-primary transition-colors mb-12 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Explorations
@@ -119,7 +119,7 @@ export default function RegisterPage() {
         <div className="glass-elevated rounded-[40px] p-8 md:p-10 shadow-2xl shadow-foreground/5 border border-foreground/[0.03]">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-50 border border-red-100 rounded-2xl p-4 text-red-500 text-[13px] text-center font-bold animate-shake">
+              <div className="bg-red-50 border border-red-100 rounded-2xl p-4 text-red-500 text-base text-center font-bold animate-shake">
                 {error}
               </div>
             )}
@@ -129,7 +129,7 @@ export default function RegisterPage() {
                 <div key={field.id} className="space-y-2">
                   <label
                     htmlFor={field.id}
-                    className="block text-[11px] font-black text-foreground/30 uppercase tracking-[0.1em]"
+                    className="block text-sm font-black text-foreground/30 uppercase tracking-[0.1em]"
                   >
                     {field.label}
                   </label>
@@ -171,7 +171,7 @@ export default function RegisterPage() {
 
           <div className="my-8 flex items-center gap-4">
             <div className="h-px bg-foreground/[0.05] flex-1" />
-            <span className="text-foreground/20 text-[10px] font-black uppercase tracking-widest">
+            <span className="text-foreground/20 text-xs font-black uppercase tracking-widest">
               Social Join
             </span>
             <div className="h-px bg-foreground/[0.05] flex-1" />
@@ -203,7 +203,7 @@ export default function RegisterPage() {
             </Link>
           </p>
           <div className="h-px w-12 bg-foreground/5 mx-auto" />
-          <p className="text-foreground/40 text-[13px] font-medium">
+          <p className="text-foreground/40 text-base font-medium">
             Are you a local business?{" "}
             <Link
               href="/business"

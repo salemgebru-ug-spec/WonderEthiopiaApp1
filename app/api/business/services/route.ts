@@ -111,6 +111,9 @@ export async function POST(request: Request) {
       });
     }
 
+    // Reset inactivity timer for the business
+    await Business.updateOne({ _id: business._id }, { $set: { lastActivityAt: new Date() } });
+
     return NextResponse.json({ service });
   } catch (error: any) {
     console.error("Service Listing Cluster Failure:", error);

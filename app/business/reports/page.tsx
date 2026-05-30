@@ -99,7 +99,7 @@ export default function BusinessReportsPage() {
         <div className="animate-fade-in mb-16">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-red-500">
+            <span className="text-xs font-black tracking-[0.3em] uppercase text-red-500">
               Compliance Tracking
             </span>
           </div>
@@ -115,7 +115,7 @@ export default function BusinessReportsPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-40 gap-6">
             <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
-            <span className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Syncing Registry...</span>
+            <span className="text-xs font-black tracking-widest uppercase text-foreground/20">Syncing Registry...</span>
           </div>
         ) : reports.length === 0 ? (
           <div className="text-center py-48 bg-white/50 rounded-[60px] border-4 border-dashed border-foreground/5">
@@ -152,24 +152,24 @@ export default function BusinessReportsPage() {
                               {report.reason.replace(/_/g, " ")}
                             </h3>
                             <div className="flex flex-wrap items-center gap-4 mt-2">
-                              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/50 flex items-center gap-2">
+                              <span className="text-sm font-black uppercase tracking-[0.2em] text-primary/50 flex items-center gap-2">
                                 <Building2 className="w-3.5 h-3.5" /> {report.businessId?.name}
                               </span>
                               <div className="w-1 h-1 rounded-full bg-foreground/10" />
-                              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/30 flex items-center gap-2">
+                              <span className="text-sm font-black uppercase tracking-[0.2em] text-foreground/30 flex items-center gap-2">
                                 <Calendar className="w-3.5 h-3.5" /> {new Date(report.createdAt).toLocaleDateString()}
                               </span>
                             </div>
                           </div>
                         </div>
-                        <div className={`px-3 md:px-4 lg:px-5 py-2.5 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm shrink-0`}>
+                        <div className={`px-3 md:px-4 lg:px-5 py-2.5 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] shadow-sm shrink-0`}>
                           {sc.icon} {sc.label}
                         </div>
                       </div>
 
                       {/* Description */}
                       <div className="bg-foreground/[0.01] border border-foreground/[0.02] p-8 rounded-[40px] mb-10">
-                        <div className="text-[10px] font-black text-foreground/20 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
+                        <div className="text-xs font-black text-foreground/20 uppercase tracking-[0.2em] mb-4 flex items-center gap-3">
                           <MessageSquare className="w-4 h-4" /> Tourist Grievance Log
                         </div>
                         <p className="text-lg text-foreground/60 font-medium leading-relaxed italic">
@@ -191,7 +191,7 @@ export default function BusinessReportsPage() {
                             <div className={`absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none bg-${theme}-500/5`} />
                             <div className="flex items-center gap-4 mb-6 relative z-10">
                               <Gavel className={`w-6 h-6 text-${theme}-600`} />
-                              <span className={`text-[12px] font-black uppercase tracking-[0.3em] bg-white px-4 py-1.5 rounded-full shadow-sm border text-${theme}-600 border-${theme}-100`}>
+                              <span className={`text-sm font-black uppercase tracking-[0.3em] bg-white px-4 py-1.5 rounded-full shadow-sm border text-${theme}-600 border-${theme}-100`}>
                                 Official Institutional Resolution
                               </span>
                             </div>

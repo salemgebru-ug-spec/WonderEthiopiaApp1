@@ -206,7 +206,7 @@ export default function DiscoverBusinesses() {
         <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-5">
           <div className="flex flex-col md:flex-row items-center justify-between gap-12 mb-16">
             <div className="text-left max-w-2xl animate-fade-in">
-              <span className="text-[10px] font-black tracking-[0.4em] uppercase text-primary mb-6 block">
+              <span className="text-xs font-black tracking-[0.4em] uppercase text-primary mb-6 block">
                 Resource Discovery
               </span>
               <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-[0.9]">
@@ -270,7 +270,7 @@ export default function DiscoverBusinesses() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-40">
             <Loader2 className="w-12 h-12 text-primary/20 animate-spin mb-6" />
-            <span className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Syncing Catalog...</span>
+            <span className="text-xs font-black tracking-widest uppercase text-foreground/20">Syncing Catalog...</span>
           </div>
         ) : filteredBusinesses.length === 0 ? (
           <div className="text-center py-48 rounded-[60px] border-4 border-dashed border-foreground/5 bg-surface-elevated/20">
@@ -297,7 +297,7 @@ export default function DiscoverBusinesses() {
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-1000"
                   />
-                  <div className="absolute top-6 left-6 px-3 md:px-4 lg:px-5 py-2 glass rounded-full text-[10px] font-black tracking-widest uppercase flex items-center gap-3">
+                  <div className="absolute top-6 left-6 px-3 md:px-4 lg:px-5 py-2 glass rounded-full text-xs font-black tracking-widest uppercase flex items-center gap-3">
                     <span className="text-primary">
                        {Array.isArray(svc.category) ? categoryIcons[svc.category[0]] : categoryIcons[svc.category as string]}
                     </span>
@@ -314,13 +314,13 @@ export default function DiscoverBusinesses() {
                       <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors pr-2 tracking-tighter leading-tight mb-2">
                         {svc.name}
                       </h3>
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary/40">
+                      <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary/40">
                          <Building2 className="w-3.5 h-3.5" /> {svc.businessId?.name}
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[12px] font-black text-primary bg-primary/5 px-4 py-2 rounded-2xl border border-primary/10">
+                    <div className="flex items-center gap-1.5 text-sm font-black text-primary bg-primary/5 px-4 py-2 rounded-2xl border border-primary/10">
                       <Star className={`w-4 h-4 ${svc.avgRating ? "fill-current" : "opacity-30"}`} />
-                      {svc.avgRating ? svc.avgRating.toFixed(1) : <span className="italic text-foreground/40 text-[10px] uppercase">New</span>}
+                      {svc.avgRating ? svc.avgRating.toFixed(1) : <span className="italic text-foreground/40 text-xs uppercase">New</span>}
                     </div>
                   </div>
 
@@ -330,7 +330,7 @@ export default function DiscoverBusinesses() {
 
                   <div className="flex items-center justify-between pt-8 border-t border-foreground/5">
                     <div className="flex flex-col gap-1">
-                      <span className="text-[11px] font-black text-foreground/50 flex items-center gap-2">
+                      <span className="text-sm font-black text-foreground/50 flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-primary/40" />
                         {svc.businessId?.location?.city}
                       </span>

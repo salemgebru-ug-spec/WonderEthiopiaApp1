@@ -17,7 +17,7 @@ async function getExtractor() {
   return extractor;
 }
 
-async function getImageEmbedding(image: ArrayBuffer): Promise<number[]> {
+export default async function getImageEmbedding(image: ArrayBuffer): Promise<number[]> {
   const ext = await getExtractor();
   const blob = new Blob([image]);
   const img = await RawImage.fromBlob(blob);

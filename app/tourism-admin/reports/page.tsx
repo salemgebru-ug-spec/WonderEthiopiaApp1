@@ -167,7 +167,7 @@ export default function TourismAdminReportsPage() {
           <div className="max-w-3xl mb-12">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">
+              <span className="text-xs font-black tracking-[0.3em] uppercase text-primary">
                 Institutional Oversight — Stage 1
               </span>
             </div>
@@ -184,7 +184,7 @@ export default function TourismAdminReportsPage() {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-8 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 whitespace-nowrap ${
+                className={`px-8 py-3.5 text-sm font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 whitespace-nowrap ${
                   filter === f
                     ? "bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-105"
                     : "bg-white text-foreground/30 border-foreground/5 hover:border-primary/20 hover:text-primary"
@@ -200,7 +200,7 @@ export default function TourismAdminReportsPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-40 gap-6">
             <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
-            <span className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Syncing Grievance Registry...</span>
+            <span className="text-xs font-black tracking-widest uppercase text-foreground/20">Syncing Grievance Registry...</span>
           </div>
         ) : reports.length === 0 ? (
           <div className="text-center py-48 bg-white/50 rounded-[60px] border-4 border-dashed border-foreground/5">
@@ -228,12 +228,12 @@ export default function TourismAdminReportsPage() {
                   <h2 className="text-3xl font-black tracking-tighter text-foreground capitalize">
                     {business?.name || "Unknown Entity"}
                   </h2>
-                  <div className="px-4 py-1.5 bg-rose-50 text-rose-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-rose-100 shadow-sm flex items-center gap-2">
+                  <div className="px-4 py-1.5 bg-rose-50 text-rose-600 rounded-full text-xs font-black uppercase tracking-widest border border-rose-100 shadow-sm flex items-center gap-2">
                     <AlertOctagon className="w-3 h-3" />
                     {items.length} Active Grievance{items.length !== 1 ? 's' : ''}
                   </div>
                   {uniqueReportersCount > 1 && (
-                    <div className="px-4 py-1.5 bg-amber-50 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-100 shadow-sm flex items-center gap-2">
+                    <div className="px-4 py-1.5 bg-amber-50 text-amber-600 rounded-full text-xs font-black uppercase tracking-widest border border-amber-100 shadow-sm flex items-center gap-2">
                       <User className="w-3 h-3" />
                       {uniqueReportersCount} Unique Reporters (Auto-Escalation Active)
                     </div>
@@ -261,17 +261,17 @@ export default function TourismAdminReportsPage() {
                           {report.reason.replace(/_/g, " ")}
                         </h3>
                         <div className="flex flex-wrap items-center gap-4 mt-2">
-                          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/50 flex items-center gap-2">
+                          <span className="text-sm font-black uppercase tracking-[0.2em] text-primary/50 flex items-center gap-2">
                             <Building2 className="w-3.5 h-3.5" /> {report.businessId?.name}
                           </span>
                           <div className="w-1 h-1 rounded-full bg-foreground/10" />
-                          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/30 flex items-center gap-2">
+                          <span className="text-sm font-black uppercase tracking-[0.2em] text-foreground/30 flex items-center gap-2">
                             <Calendar className="w-3.5 h-3.5" /> {new Date(report.createdAt).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className={`px-5 py-2.5 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm shrink-0`}>
+                    <div className={`px-5 py-2.5 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] shadow-sm shrink-0`}>
                       {sc.icon} {sc.label}
                     </div>
                   </div>
@@ -290,14 +290,14 @@ export default function TourismAdminReportsPage() {
                       className="flex items-center gap-4 px-6 py-4 bg-primary/5 text-primary rounded-xl border border-primary/10 hover:bg-primary hover:text-white transition-all group/chat relative w-fit"
                     >
                       <MessageSquare className="w-5 h-5 group-hover/chat:scale-110 transition-transform" />
-                      <span className="text-[11px] font-black uppercase tracking-[0.3em]">Discussion</span>
+                      <span className="text-sm font-black uppercase tracking-[0.3em]">Discussion</span>
                       {(() => {
                         const unreadCount = report.discussion 
                           ? report.discussion.slice(readReports[report._id] || 0).filter(m => m.senderRole !== "tourism_admin").length 
                           : 0;
                         if (unreadCount > 0) {
                           return (
-                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-xs font-black rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                               {unreadCount}
                             </div>
                           );
@@ -335,25 +335,25 @@ export default function TourismAdminReportsPage() {
                             <>
                               <button
                                 onClick={() => handleAction(report._id, "recommended_under_review")}
-                                className="px-6 py-4 bg-white border border-foreground/10 text-foreground/60 text-[10px] font-black rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition-all uppercase tracking-widest text-center shadow-sm"
+                                className="px-6 py-4 bg-white border border-foreground/10 text-foreground/60 text-xs font-black rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition-all uppercase tracking-widest text-center shadow-sm"
                               >
                                 Rec. Review
                               </button>
                               <button
                                 onClick={() => handleAction(report._id, "recommended_warning")}
-                                className="px-6 py-4 bg-white border border-foreground/10 text-foreground/60 text-[10px] font-black rounded-2xl hover:bg-amber-50 hover:text-amber-600 transition-all uppercase tracking-widest text-center shadow-sm"
+                                className="px-6 py-4 bg-white border border-foreground/10 text-foreground/60 text-xs font-black rounded-2xl hover:bg-amber-50 hover:text-amber-600 transition-all uppercase tracking-widest text-center shadow-sm"
                               >
                                 Rec. Warning
                               </button>
                               <button
                                 onClick={() => handleAction(report._id, "recommended_suspension")}
-                                className="px-6 py-4 bg-primary text-white text-[10px] font-black rounded-2xl hover:bg-red-600 transition-all shadow-xl shadow-primary/20 uppercase tracking-widest text-center"
+                                className="px-6 py-4 bg-primary text-white text-xs font-black rounded-2xl hover:bg-red-600 transition-all shadow-xl shadow-primary/20 uppercase tracking-widest text-center"
                               >
                                 Rec. Suspension
                               </button>
                               <button
                                 onClick={() => handleAction(report._id, "recommended_dismissal")}
-                                className="px-6 py-4 bg-white border border-foreground/10 text-foreground/40 text-[10px] font-black rounded-2xl hover:bg-foreground hover:text-white transition-all uppercase tracking-widest text-center shadow-sm"
+                                className="px-6 py-4 bg-white border border-foreground/10 text-foreground/40 text-xs font-black rounded-2xl hover:bg-foreground hover:text-white transition-all uppercase tracking-widest text-center shadow-sm"
                               >
                                 Rec. Dismissal
                               </button>
@@ -361,7 +361,7 @@ export default function TourismAdminReportsPage() {
                           ) : uniqueReportersCount === 2 ? (
                             <button
                               onClick={() => handleAction(report._id, "recommended_under_review")}
-                              className="col-span-2 px-6 py-4 bg-blue-500 text-white text-[10px] font-black rounded-2xl hover:bg-blue-600 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest text-center flex flex-col items-center justify-center gap-1"
+                              className="col-span-2 px-6 py-4 bg-blue-500 text-white text-xs font-black rounded-2xl hover:bg-blue-600 transition-all shadow-xl shadow-blue-500/20 uppercase tracking-widest text-center flex flex-col items-center justify-center gap-1"
                             >
                               <span>Auto-Enforced: Review</span>
                               <span className="text-[8px] opacity-80">(2 Unique Complaints)</span>
@@ -369,7 +369,7 @@ export default function TourismAdminReportsPage() {
                           ) : uniqueReportersCount === 3 ? (
                             <button
                               onClick={() => handleAction(report._id, "recommended_warning")}
-                              className="col-span-2 px-6 py-4 bg-amber-500 text-white text-[10px] font-black rounded-2xl hover:bg-amber-600 transition-all shadow-xl shadow-amber-500/20 uppercase tracking-widest text-center flex flex-col items-center justify-center gap-1"
+                              className="col-span-2 px-6 py-4 bg-amber-500 text-white text-xs font-black rounded-2xl hover:bg-amber-600 transition-all shadow-xl shadow-amber-500/20 uppercase tracking-widest text-center flex flex-col items-center justify-center gap-1"
                             >
                               <span>Auto-Enforced: Warning</span>
                               <span className="text-[8px] opacity-80">(3 Unique Complaints)</span>
@@ -377,7 +377,7 @@ export default function TourismAdminReportsPage() {
                           ) : (
                             <button
                               onClick={() => handleAction(report._id, "recommended_suspension")}
-                              className="col-span-2 px-6 py-4 bg-red-600 text-white text-[10px] font-black rounded-2xl hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 uppercase tracking-widest text-center flex flex-col items-center justify-center gap-1"
+                              className="col-span-2 px-6 py-4 bg-red-600 text-white text-xs font-black rounded-2xl hover:bg-red-700 transition-all shadow-xl shadow-red-600/20 uppercase tracking-widest text-center flex flex-col items-center justify-center gap-1"
                             >
                               <span>Auto-Enforced: Suspension</span>
                               <span className="text-[8px] opacity-80">(4+ Unique Complaints)</span>
@@ -385,12 +385,12 @@ export default function TourismAdminReportsPage() {
                           )}
                         </div>
                       ) : ["dismissed", "suspended", "warned"].includes(report.status) ? (
-                        <div className="px-6 py-4 bg-primary/5 text-primary text-[10px] font-black rounded-2xl border border-primary/10 uppercase tracking-widest text-center shadow-sm w-full">
+                        <div className="px-6 py-4 bg-primary/5 text-primary text-xs font-black rounded-2xl border border-primary/10 uppercase tracking-widest text-center shadow-sm w-full">
                           Finalized by Super Admin: {report.status.toUpperCase()}
                         </div>
                       ) : (
                         <div className="flex items-center gap-4 w-full">
-                          <div className="flex-1 px-6 py-4 bg-amber-50 text-amber-600 text-[10px] font-black rounded-2xl border border-amber-100 uppercase tracking-widest text-center shadow-sm">
+                          <div className="flex-1 px-6 py-4 bg-amber-50 text-amber-600 text-xs font-black rounded-2xl border border-amber-100 uppercase tracking-widest text-center shadow-sm">
                             Recommendation Sent: {report.status.replace("recommended_", "").toUpperCase()}
                           </div>
                           <button

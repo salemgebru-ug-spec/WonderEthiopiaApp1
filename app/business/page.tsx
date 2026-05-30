@@ -143,7 +143,7 @@ export default function BusinessPortalPage() {
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-black">W</div>
             BUSINESS PORTAL
           </Link>
-          <Link href="/" className="text-[11px] font-extrabold text-foreground/40 hover:text-primary transition-all flex items-center gap-2 uppercase tracking-widest">
+          <Link href="/" className="text-sm font-extrabold text-foreground/40 hover:text-primary transition-all flex items-center gap-2 uppercase tracking-widest">
             <ArrowLeft className="w-4 h-4" /> Exit Portal
           </Link>
         </div>
@@ -152,7 +152,7 @@ export default function BusinessPortalPage() {
       <main className="pt-32 pb-24 max-w-4xl mx-auto px-3 md:px-4 lg:px-5">
         {/* Header Hero */}
         <div className="mb-16 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-[10px] font-bold tracking-[0.2em] text-primary uppercase bg-primary/5 rounded-full border border-primary/10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-bold tracking-[0.2em] text-primary uppercase bg-primary/5 rounded-full border border-primary/10">
             Partner Program 2026
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Partner with <span className="text-primary italic">Wonder Ethiopia</span></h1>
@@ -165,7 +165,7 @@ export default function BusinessPortalPage() {
         <div className="glass-elevated rounded-[40px] p-8 md:p-12 shadow-2xl shadow-foreground/5 border border-foreground/[0.03] animate-slide-up">
           <form onSubmit={handleSubmit} className="space-y-10">
             {error && (
-              <div className="bg-red-50 border border-red-100 rounded-2xl p-4 text-red-500 text-[13px] text-center font-bold">
+              <div className="bg-red-50 border border-red-100 rounded-2xl p-4 text-red-500 text-base text-center font-bold">
                 {error}
               </div>
             )}
@@ -195,15 +195,15 @@ export default function BusinessPortalPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">Applicant Name</label>
+                      <label className="text-sm font-bold text-foreground/30 uppercase tracking-widest">Applicant Name</label>
                       <input name="applicantName" type="text" value={formData.applicantName} onChange={handleChange} required className={inputClass} placeholder="Your full name" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">Business Name</label>
+                      <label className="text-sm font-bold text-foreground/30 uppercase tracking-widest">Business Name</label>
                       <input name="name" type="text" value={formData.name} onChange={handleChange} required className={inputClass} placeholder="Legal business title" />
                     </div>
                     <div className="md:col-span-2 space-y-4">
-                       <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest block">Choose All Applicable Business Categories</label>
+                       <label className="text-sm font-bold text-foreground/30 uppercase tracking-widest block">Choose All Applicable Business Categories</label>
                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           {[
                             { value: "hotel", label: "Hotels & Lodging" },
@@ -225,7 +225,7 @@ export default function BusinessPortalPage() {
                               }`}>
                                 {formData.category.includes(cat.value) && <CheckCircle2 className="w-3 h-3 text-white" />}
                               </div>
-                              <span className={`text-[13px] font-bold ${formData.category.includes(cat.value) ? "text-primary" : "text-foreground/60"}`}>
+                              <span className={`text-base font-bold ${formData.category.includes(cat.value) ? "text-primary" : "text-foreground/60"}`}>
                                 {cat.label}
                               </span>
                             </div>
@@ -233,13 +233,13 @@ export default function BusinessPortalPage() {
                        </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">License/Permit ID</label>
+                      <label className="text-sm font-bold text-foreground/30 uppercase tracking-widest">License/Permit ID</label>
                       <input name="permitNumber" type="text" value={formData.permitNumber} onChange={handleChange} required className={inputClass} placeholder="ET-2024-XXXX" />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[11px] font-bold text-foreground/30 uppercase tracking-widest">Business Overview</label>
+                    <label className="text-sm font-bold text-foreground/30 uppercase tracking-widest">Business Overview</label>
                     <textarea name="description" value={formData.description} onChange={handleChange} required rows={4} className={inputClass} placeholder="Briefly describe your services and history..." />
                   </div>
                 </div>
@@ -272,7 +272,7 @@ export default function BusinessPortalPage() {
 
                     {formData.category.includes("hotel") && (
                       <div className="space-y-6 pt-4 border-t border-foreground/[0.03]">
-                        <h4 className="text-[12px] font-black text-primary uppercase tracking-widest">Hotel Details</h4>
+                        <h4 className="text-sm font-black text-primary uppercase tracking-widest">Hotel Details</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <select name="stars" onChange={handleIndustryChange} required className={inputClass}>
                             <option value="">Hotel Star Rating</option>
@@ -280,7 +280,7 @@ export default function BusinessPortalPage() {
                           </select>
                           <input name="website" type="text" placeholder="Official Website" onChange={handleIndustryChange} required className={inputClass} />
                           <div className="md:col-span-2 space-y-2">
-                            <label className="text-[11px] font-bold tracking-widest uppercase text-foreground/30">Upload Hospitality License</label>
+                            <label className="text-sm font-bold tracking-widest uppercase text-foreground/30">Upload Hospitality License</label>
                             <input name="hotelLicense" type="file" onChange={handleFileChange} required className={inputClass} accept=".pdf,image/*" />
                           </div>
                         </div>
@@ -289,12 +289,12 @@ export default function BusinessPortalPage() {
                     
                     {formData.category.includes("tour_operator") && (
                       <div className="space-y-6 pt-6 border-t border-foreground/[0.03]">
-                        <h4 className="text-[12px] font-black text-primary uppercase tracking-widest">Tour Operator Details</h4>
+                        <h4 className="text-sm font-black text-primary uppercase tracking-widest">Tour Operator Details</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <input name="languages" type="text" placeholder="Supported Languages" onChange={handleIndustryChange} required className={inputClass} />
                           <input name="specialization" type="text" placeholder="Expedition Focus" onChange={handleIndustryChange} required className={inputClass} />
                           <div className="md:col-span-2 space-y-2">
-                            <label className="text-[11px] font-bold tracking-widest uppercase text-foreground/30">Tour Certificate</label>
+                            <label className="text-sm font-bold tracking-widest uppercase text-foreground/30">Tour Certificate</label>
                             <input name="tourCert" type="file" onChange={handleFileChange} required className={inputClass} accept=".pdf,image/*" />
                           </div>
                         </div>
@@ -303,12 +303,12 @@ export default function BusinessPortalPage() {
 
                     {formData.category.includes("car_rental") && (
                        <div className="space-y-6 pt-6 border-t border-foreground/[0.03]">
-                        <h4 className="text-[12px] font-black text-primary uppercase tracking-widest">Car Rental Details</h4>
+                        <h4 className="text-sm font-black text-primary uppercase tracking-widest">Car Rental Details</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <input name="fleetSize" type="number" placeholder="Number of Vehicles" onChange={handleIndustryChange} required className={inputClass} />
                           <input name="vehicleTypes" type="text" placeholder="Vehicle Types (e.g. 4x4, Luxury)" onChange={handleIndustryChange} required className={inputClass} />
                           <div className="md:col-span-2 space-y-2">
-                            <label className="text-[11px] font-bold tracking-widest uppercase text-foreground/30">Transport License</label>
+                            <label className="text-sm font-bold tracking-widest uppercase text-foreground/30">Transport License</label>
                             <input name="carRentalLicense" type="file" onChange={handleFileChange} required className={inputClass} accept=".pdf,image/*" />
                           </div>
                         </div>
@@ -317,12 +317,12 @@ export default function BusinessPortalPage() {
 
                     {formData.category.includes("event_organizer") && (
                        <div className="space-y-6 pt-6 border-t border-foreground/[0.03]">
-                        <h4 className="text-[12px] font-black text-primary uppercase tracking-widest">Event Management Details</h4>
+                        <h4 className="text-sm font-black text-primary uppercase tracking-widest">Event Management Details</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <input name="experienceYears" type="number" placeholder="Years of Experience" onChange={handleIndustryChange} required className={inputClass} />
                           <input name="eventType" type="text" placeholder="Main Event Focus" onChange={handleIndustryChange} required className={inputClass} />
                           <div className="md:col-span-2 space-y-2">
-                            <label className="text-[11px] font-bold tracking-widest uppercase text-foreground/30">Event Organizer Certificate</label>
+                            <label className="text-sm font-bold tracking-widest uppercase text-foreground/30">Event Organizer Certificate</label>
                             <input name="eventCert" type="file" onChange={handleFileChange} required className={inputClass} accept=".pdf,image/*" />
                           </div>
                         </div>

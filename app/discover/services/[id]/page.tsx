@@ -196,7 +196,7 @@ export default function ServiceDetailPage() {
               </div>
 
               <div className="p-10 bg-surface-elevated/20 rounded-[50px] border border-foreground/[0.03]">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-6">Experience Strategy</h3>
+                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-primary mb-6">Experience Strategy</h3>
                 <p className="text-xl text-foreground/60 leading-relaxed font-medium whitespace-pre-line">
                   {service.description}
                 </p>
@@ -234,7 +234,7 @@ export default function ServiceDetailPage() {
 
                         return (
                           <div key={group.id} className="animate-fade-in">
-                            <h4 className="text-[12px] font-black uppercase tracking-[0.3em] text-primary mb-8 pb-3 border-b border-primary/10">
+                            <h4 className="text-sm font-black uppercase tracking-[0.3em] text-primary mb-8 pb-3 border-b border-primary/10">
                               {group.label}
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
@@ -244,7 +244,7 @@ export default function ServiceDetailPage() {
 
                                 return (
                                   <div key={key} className="flex justify-between items-start gap-4 pb-4 border-b border-foreground/[0.03]">
-                                    <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/30 py-1">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-foreground/30 py-1">
                                       {key.replace(/([A-Z])/g, ' $1').trim()}
                                     </span>
                                     <span className="text-sm font-bold text-foreground/80 text-right capitalize">
@@ -261,7 +261,7 @@ export default function ServiceDetailPage() {
                       {/* Itinerary handling */}
                       {isTour && service.metadata.itinerary && service.metadata.itinerary.length > 0 && (
                         <div className="animate-fade-in pt-8">
-                          <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-primary mb-10">Expedition Itinerary</h4>
+                          <h4 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-10">Expedition Itinerary</h4>
                           <div className="space-y-8 pl-4 border-l-2 border-primary/10">
                             {service.metadata.itinerary.map((day: any, idx: number) => (
                               <div key={idx} className="relative pb-10 last:pb-0">
@@ -275,7 +275,7 @@ export default function ServiceDetailPage() {
                                     {day.activities}
                                   </p>
                                   {day.overnightStay && (
-                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-foreground/5 rounded-full text-[10px] font-bold text-foreground/40">
+                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-foreground/5 rounded-full text-xs font-bold text-foreground/40">
                                       <MapPin className="w-3 h-3" /> Stay: {day.overnightStay}
                                     </div>
                                   )}
@@ -300,7 +300,7 @@ export default function ServiceDetailPage() {
               <div className="glass shadow-3xl shadow-primary/10 p-10 rounded-[60px] border border-primary/10 animate-slide-up">
                 <div className="flex items-center justify-between mb-10">
                   <div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30 mb-1">Service Value</div>
+                    <div className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30 mb-1">Service Value</div>
                     <div className="text-3xl font-black text-primary">{service.currency} {service.price.toLocaleString()}</div>
                   </div>
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary border border-primary/10">
@@ -336,7 +336,7 @@ export default function ServiceDetailPage() {
                   <div>
                     <div className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">Partner Entity</div>
                     <div className="font-bold text-foreground/80 group-hover:text-primary transition-colors">{service.businessId.name}</div>
-                    <div className="text-[10px] font-medium text-foreground/40">{service.businessId.location.city}, {service.businessId.location.region}</div>
+                    <div className="text-xs font-medium text-foreground/40">{service.businessId.location.city}, {service.businessId.location.region}</div>
                   </div>
                 </div>
               </Link>
@@ -349,7 +349,7 @@ export default function ServiceDetailPage() {
           <div className="flex items-end justify-between">
             <div className="space-y-4">
               <h2 className="text-4xl font-bold tracking-tight">Public Feedback</h2>
-              <p className="text-foreground/40 font-bold uppercase text-[10px] tracking-[0.3em]">Verified experience reports</p>
+              <p className="text-foreground/40 font-bold uppercase text-xs tracking-[0.3em]">Verified experience reports</p>
             </div>
           </div>
 
@@ -368,7 +368,7 @@ export default function ServiceDetailPage() {
                       </div>
                       <div>
                         <div className="font-bold text-sm">{review.userId.name}</div>
-                        <div className="text-[10px] font-medium text-foreground/30">{new Date(review.createdAt).toLocaleDateString()}</div>
+                        <div className="text-xs font-medium text-foreground/30">{new Date(review.createdAt).toLocaleDateString()}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 text-primary">

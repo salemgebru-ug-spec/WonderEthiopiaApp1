@@ -17,7 +17,6 @@ import {
   ChevronRight,
   Bell
 } from "lucide-react";
-import NotificationCenter from "@/components/admin/NotificationCenter";
 
 interface Stats {
   totalBusinesses: number;
@@ -112,10 +111,10 @@ export default function DashboardPage() {
        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-primary/[0.04] rounded-full blur-[180px] -mr-60 -mt-60 pointer-events-none opacity-50" />
        <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-secondary/[0.03] rounded-full blur-[160px] -ml-40 -mb-40 pointer-events-none opacity-30" />
 
-       <div className="p-6 md:p-14 lg:p-24 relative max-w-screen-2xl mx-auto w-full z-10">
+        <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-5 py-12 lg:py-24 relative w-full z-10">
 
        {/* Breadcrumbs */}
-       <div className="flex items-center gap-3 mb-10 text-[10px] font-black uppercase tracking-widest text-foreground/20 animate-fade-in relative z-10">
+       <div className="flex items-center gap-3 mb-10 text-xs font-black uppercase tracking-widest text-foreground/20 animate-fade-in relative z-10">
           <Link href="/" className="hover:text-primary transition-colors">Origins</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-foreground/40 italic">Hub Overview</span>
@@ -127,7 +126,7 @@ export default function DashboardPage() {
              <div className="max-w-3xl">
                 <div className="flex items-center gap-4 mb-8">
                    <TrendingUp className="w-5 h-5 text-primary" />
-                   <span className="text-[11px] font-black tracking-[0.4em] uppercase text-primary">System Pulse Active</span>
+                   <span className="text-sm font-black tracking-[0.4em] uppercase text-primary">System Pulse Active</span>
                 </div>
                 <h1 className="text-6xl md:text-[84px] font-black text-foreground tracking-tighter mb-8 leading-[0.8]">
                    Command <br /> <span className="italic font-light text-primary/30">Overview</span>
@@ -137,30 +136,14 @@ export default function DashboardPage() {
                 </p>
              </div>
 
-             {isAdmin && !loadingStats && (
-                <div className="bg-white rounded-[32px] p-8 border border-foreground/[0.03] shadow-2xl shadow-foreground/5 min-w-[320px] group hover:border-primary/20 transition-all">
-                   <div className="flex items-center gap-3 mb-4">
-                      <Bell className="w-4 h-4 text-primary animate-pulse" />
-                      <span className="text-[10px] font-black tracking-widest uppercase text-foreground/30">Action Items</span>
-                   </div>
-                   <div className="text-5xl font-black text-primary tracking-tighter mb-3 leading-none">
-                      {stats.pendingBusinesses + stats.pendingReports}
-                   </div>
-                   <Link 
-                     href={role === "tourism_admin" ? "/tourism-admin/businesses" : "/admin/businesses"} 
-                     className="group/link flex items-center gap-3 text-primary text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
-                   >
-                      View Registry <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
-                   </Link>
-                </div>
-             )}
+
           </div>
        </div>
 
        {/* Dashboard Grid */}
        <div className="grid grid-cols-1 xl:grid-cols-12 gap-10 relative z-10">
           {/* Main Actions column */}
-          <div className="xl:col-span-8 space-y-10">
+          <div className={isAdmin ? "xl:col-span-12 space-y-10" : "xl:col-span-8 space-y-10"}>
              {isAdmin && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up delay-1">
                     {[
@@ -174,8 +157,8 @@ export default function DashboardPage() {
                          </div>
                          <div className="text-6xl font-black text-foreground tracking-tightest mb-4 leading-none">{card.value}</div>
                          <div className="flex items-center justify-between">
-                            <p className="text-[11px] font-black text-foreground/20 uppercase tracking-[0.2em]">{card.label}</p>
-                            <span className="text-[10px] font-black text-primary uppercase tracking-widest">{card.trend}</span>
+                            <p className="text-sm font-black text-foreground/20 uppercase tracking-[0.2em]">{card.label}</p>
+                            <span className="text-xs font-black text-primary uppercase tracking-widest">{card.trend}</span>
                          </div>
                       </div>
                     ))}
@@ -201,7 +184,7 @@ export default function DashboardPage() {
                               {action.desc}
                            </p>
                         </div>
-                        <div className="flex items-center gap-6 text-primary font-black text-[11px] uppercase tracking-[0.3em] opacity-40 group-hover:opacity-100 transition-all">
+                        <div className="flex items-center gap-6 text-primary font-black text-sm uppercase tracking-[0.3em] opacity-40 group-hover:opacity-100 transition-all">
                            Synchronize Registry <ArrowRight className="w-5 h-5 group-hover:translate-x-4 transition-transform" />
                         </div>
                      </div>
@@ -217,7 +200,7 @@ export default function DashboardPage() {
                           Need a new institutional module? Command a custom tool.
                        </p>
                     </div>
-                    <div className="relative z-10 flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.2em] group-hover:gap-6 transition-all">
+                    <div className="relative z-10 flex items-center gap-4 text-sm font-black uppercase tracking-[0.2em] group-hover:gap-6 transition-all">
                        Institutional Request <ArrowRight className="w-4 h-4 text-white" />
                     </div>
                 </div>
@@ -225,14 +208,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Sidebar Info column */}
-          <div className="xl:col-span-4 space-y-10">
-             {isAdmin && (
-                <div className="animate-slide-up delay-1">
-                   <NotificationCenter />
-                </div>
-             )}
-
-             {!isAdmin && (
+          {!isAdmin && (
+             <div className="xl:col-span-4 space-y-10">
                 <div className="bg-white rounded-[40px] border border-foreground/[0.03] p-10 shadow-xl shadow-foreground/5 flex flex-col items-center text-center">
                    <div className="w-20 h-20 bg-primary/5 rounded-[32px] flex items-center justify-center text-primary mb-8 shadow-inner">
                       <ShieldCheck className="w-10 h-10" />
@@ -241,12 +218,12 @@ export default function DashboardPage() {
                    <p className="text-[14px] text-foreground/40 font-medium leading-relaxed mb-8 italic">
                       Professional institutional backing for all verified travel entities in the Land of Origins.
                    </p>
-                   <button className="w-full py-4 rounded-2xl bg-foreground text-background text-[11px] font-black uppercase tracking-widest hover:bg-primary transition-all shadow-xl shadow-foreground/5 active:scale-95">
+                   <button className="w-full py-4 rounded-2xl bg-foreground text-background text-sm font-black uppercase tracking-widest hover:bg-primary transition-all shadow-xl shadow-foreground/5 active:scale-95">
                       Contact Office
                    </button>
                 </div>
-             )}
-          </div>
+             </div>
+          )}
        </div>
       </div>
     </main>

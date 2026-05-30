@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { User, Mail, Phone, MapPin, Sparkles, Save, Shield, Camera, Globe, Mountain, Compass, History, Hotel, Timer, Dumbbell, UserCheck, Check, Waves, Utensils, Music, Wifi, Bath, Users } from "lucide-react";
 
+import { showToast } from "@/lib/toast";
+
 export default function SettingsPage() {
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState(true);
@@ -83,12 +85,12 @@ export default function SettingsPage() {
       const results = await Promise.all(promises);
       if (results.every(r => r.ok)) {
         await update({ image: profile.profileImage }); // sync session with new image
-        alert("Institutional profile and intelligence axis synchronized.");
+        showToast("Success", "Institutional profile and intelligence axis synchronized.", "success");
       } else {
-        alert("Partial synchronization failure.");
+        showToast("Error", "Partial synchronization failure.", "error");
       }
     } catch (e) {
-      alert("Synchronization interrupted.");
+      showToast("Error", "Synchronization interrupted.", "error");
     } finally {
       setSaving(false);
     }
@@ -112,7 +114,7 @@ export default function SettingsPage() {
         setProfile((prev: any) => ({ ...prev, profileImage: data.url }));
       }
     } catch (e) {
-      alert("Asset transmission failed.");
+      showToast("Error", "Asset transmission failed.", "error");
     } finally {
       setUploading(false);
     }
@@ -123,7 +125,7 @@ export default function SettingsPage() {
   if (loading) return (
     <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
       <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-      <span className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Accessing Vault...</span>
+      <span className="text-xs font-black tracking-widest uppercase text-foreground/20">Accessing Vault...</span>
     </div>
   );
 
@@ -133,34 +135,34 @@ export default function SettingsPage() {
         <div className="max-w-2xl">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">Identity Hub</span>
+            <span className="text-xs font-black tracking-[0.3em] uppercase text-primary">Identity Hub</span>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6">Account <br /> Architecture</h1>
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6">Tourist Profile</h1>
           <p className="text-foreground/40 font-medium italic text-lg">Personalize your institutional presence and travel intelligence.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
           {!isEditing ? (
-            <button 
+            <button
               onClick={() => setIsEditing(true)}
-              className="px-10 py-5 bg-primary text-white text-[11px] font-black rounded-3xl hover:bg-primary-hover transition-all active:scale-95 flex items-center gap-4 shadow-2xl shadow-primary/20"
+              className="px-10 py-5 bg-primary text-white text-sm font-black rounded-3xl hover:bg-primary-hover transition-all active:scale-95 flex items-center gap-4 shadow-2xl shadow-primary/20"
             >
               Edit Intelligence <Sparkles className="w-4 h-4" />
             </button>
           ) : (
             <>
-              <button 
+              <button
                 onClick={() => setIsEditing(false)}
-                className="px-10 py-5 bg-white border border-foreground/10 text-foreground text-[11px] font-black rounded-3xl hover:bg-foreground hover:text-white transition-all active:scale-95 flex items-center gap-4 shadow-xl shadow-foreground/5"
+                className="px-10 py-5 bg-white border border-foreground/10 text-foreground text-sm font-black rounded-3xl hover:bg-foreground hover:text-white transition-all active:scale-95 flex items-center gap-4 shadow-xl shadow-foreground/5"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={async () => {
                   await handleSave();
                   setIsEditing(false);
                 }}
                 disabled={saving}
-                className="px-10 py-5 bg-foreground text-background text-[11px] font-black rounded-3xl hover:bg-primary transition-all active:scale-95 flex items-center gap-4 shadow-2xl shadow-foreground/10"
+                className="px-10 py-5 bg-foreground text-background text-sm font-black rounded-3xl hover:bg-primary transition-all active:scale-95 flex items-center gap-4 shadow-2xl shadow-foreground/10"
               >
                 {saving ? "Synchronizing..." : <>Sync Changes <Save className="w-4 h-4" /></>}
               </button>
@@ -178,37 +180,37 @@ export default function SettingsPage() {
             </h3>
             <div className="grid gap-8">
               <div className="space-y-3">
-                <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-2">Official Name</label>
-                <input 
-                  type="text" 
+                <label className="text-xs font-black tracking-widest uppercase text-foreground/30 px-2">Official Name</label>
+                <input
+                  type="text"
                   value={profile.name}
                   disabled={!isEditing}
-                  onChange={e => setProfile({...profile, name: e.target.value})}
+                  onChange={e => setProfile({ ...profile, name: e.target.value })}
                   className={`w-full px-8 py-5 bg-foreground/[0.02] border border-foreground/[0.05] rounded-3xl text-sm font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-2">Contact Line</label>
+                  <label className="text-xs font-black tracking-widest uppercase text-foreground/30 px-2">Contact Line</label>
                   <div className="relative">
                     <Phone className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20" />
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       value={profile.phoneNumber}
                       disabled={!isEditing}
-                      onChange={e => setProfile({...profile, phoneNumber: e.target.value})}
+                      onChange={e => setProfile({ ...profile, phoneNumber: e.target.value })}
                       className={`w-full pl-14 pr-8 py-5 bg-foreground/[0.02] border border-foreground/[0.05] rounded-3xl text-sm font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                       placeholder="+251..."
                     />
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-2">Digital Channel</label>
+                  <label className="text-xs font-black tracking-widest uppercase text-foreground/30 px-2">Digital Channel</label>
                   <div className="relative">
                     <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20" />
-                    <input 
-                      type="email" 
+                    <input
+                      type="email"
                       value={profile.email}
                       disabled
                       className="w-full pl-14 pr-8 py-5 bg-foreground/[0.01] border border-foreground/[0.03] rounded-3xl text-sm font-bold text-foreground/30 outline-none"
@@ -228,7 +230,7 @@ export default function SettingsPage() {
             </h3>
             <div className="space-y-10">
               <div className="space-y-6">
-                <label className="text-[10px] font-black tracking-widest uppercase text-primary/40 px-2 flex items-center justify-between">
+                <label className="text-xs font-black tracking-widest uppercase text-primary/40 px-2 flex items-center justify-between">
                   Budget Strategy
                   <Shield className="w-3 h-3" />
                 </label>
@@ -238,13 +240,12 @@ export default function SettingsPage() {
                       key={b}
                       onClick={() => {
                         if (!isEditing) return;
-                        setProfile({...profile, preferences: {...profile.preferences, budget: b}})
+                        setProfile({ ...profile, preferences: { ...profile.preferences, budget: b } })
                       }}
-                      className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                        profile.preferences?.budget === b 
-                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" 
+                      className={`py-4 rounded-2xl text-xs font-black uppercase tracking-widest border transition-all ${profile.preferences?.budget === b
+                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
                         : "bg-white text-foreground/20 border-foreground/5"
-                      } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                        } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       {b}
                     </button>
@@ -253,7 +254,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-6">
-                <label className="text-[10px] font-black tracking-widest uppercase text-primary/40 px-2">Travel Archetypes</label>
+                <label className="text-xs font-black tracking-widest uppercase text-primary/40 px-2">Travel Archetypes</label>
                 <div className="flex flex-wrap gap-2">
                   {["Culture", "Nature", "Adventure", "Religious", "Coffee", "Modern"].map(cat => {
                     const val = cat.toLowerCase();
@@ -264,12 +265,11 @@ export default function SettingsPage() {
                         onClick={() => {
                           if (!isEditing) return;
                           const cats = profile.preferences?.categories || [];
-                          const next = active ? cats.filter((c:any) => c !== val) : [...cats, val];
-                          setProfile({...profile, preferences: {...profile.preferences, categories: next}});
+                          const next = active ? cats.filter((c: any) => c !== val) : [...cats, val];
+                          setProfile({ ...profile, preferences: { ...profile.preferences, categories: next } });
                         }}
-                        className={`px-3 md:px-4 lg:px-5 py-2.5 rounded-full text-[10px] font-bold transition-all ${
-                          active ? "bg-primary/20 text-primary border border-primary/20" : "bg-white text-foreground/30 border border-foreground/5"
-                        } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`px-3 md:px-4 lg:px-5 py-2.5 rounded-full text-xs font-bold transition-all ${active ? "bg-primary/20 text-primary border border-primary/20" : "bg-white text-foreground/30 border border-foreground/5"
+                          } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                       >
                         {cat}
                       </button>
@@ -285,11 +285,11 @@ export default function SettingsPage() {
           <div className="bg-surface rounded-[40px] p-10 border border-foreground/[0.03] text-center mb-12 relative overflow-hidden group">
             {uploading && (
               <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-20 flex flex-col items-center justify-center gap-3">
-                 <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-                 <span className="text-[8px] font-black tracking-widest uppercase text-primary">Uploading Asset...</span>
+                <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                <span className="text-[8px] font-black tracking-widest uppercase text-primary">Uploading Asset...</span>
               </div>
             )}
-            
+
             <div className="w-24 h-24 mx-auto mb-8 relative">
               <div className="w-full h-full rounded-[32px] bg-primary/5 border border-primary/10 flex items-center justify-center overflow-hidden shadow-inner">
                 {profile.profileImage ? (
@@ -306,21 +306,21 @@ export default function SettingsPage() {
             </div>
 
             <h4 className="text-lg font-bold mb-2">Visual ID</h4>
-            <p className="text-[11px] text-foreground/30 font-medium mb-6">Your profile image helps partners recognize verified explorers.</p>
-            
-            <input 
-              type="file" 
-              id="profile-upload" 
-              hidden 
+            <p className="text-sm text-foreground/30 font-medium mb-6">Your profile image helps partners recognize verified explorers.</p>
+
+            <input
+              type="file"
+              id="profile-upload"
+              hidden
               accept="image/*"
               onChange={handleUpload}
               disabled={!isEditing || uploading}
             />
-            
-            <button 
+
+            <button
               disabled={!isEditing || uploading}
               onClick={() => document.getElementById('profile-upload')?.click()}
-              className={`text-[10px] font-black tracking-widest text-primary uppercase hover:opacity-60 transition-opacity ${(!isEditing || uploading) ? "opacity-30 cursor-not-allowed" : ""}`}
+              className={`text-xs font-black tracking-widest text-primary uppercase hover:opacity-60 transition-opacity ${(!isEditing || uploading) ? "opacity-30 cursor-not-allowed" : ""}`}
             >
               {uploading ? "Transmitting..." : "Upload New Asset"}
             </button>
@@ -333,7 +333,7 @@ export default function SettingsPage() {
                 <h3 className="text-xl font-black tracking-widest uppercase text-primary/40 mb-10 flex items-center gap-4">
                   <Mountain className="w-5 h-5" /> Adventure Protocol
                 </h3>
-                
+
                 <div className="space-y-10">
                   <div className="space-y-6">
                     <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Expedition Style</label>
@@ -344,17 +344,16 @@ export default function SettingsPage() {
                         { id: "backpacking", label: "Backpacking" },
                         { id: "eco_friendly", label: "Eco-friendly" },
                       ].map(opt => (
-                        <button 
+                        <button
                           key={opt.id}
-                        onClick={() => {
-                          if (!isEditing) return;
-                          setTourismProfile({...tourismProfile, travel_style: opt.id})
-                        }}
-                        className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${
-                          tourismProfile.travel_style === opt.id 
-                          ? "bg-foreground text-background border-foreground shadow-lg" 
-                          : "bg-white/40 border-foreground/5"
-                        } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                          onClick={() => {
+                            if (!isEditing) return;
+                            setTourismProfile({ ...tourismProfile, travel_style: opt.id })
+                          }}
+                          className={`py-4 rounded-2xl text-xs font-black uppercase tracking-widest border transition-all ${tourismProfile.travel_style === opt.id
+                            ? "bg-foreground text-background border-foreground shadow-lg"
+                            : "bg-white/40 border-foreground/5"
+                            } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
                           {opt.label}
                         </button>
@@ -377,12 +376,11 @@ export default function SettingsPage() {
                             onClick={() => {
                               if (!isEditing) return;
                               const current = tourismProfile.activity_preferences || [];
-                              const next = active ? current.filter((a:any) => a !== opt.id) : [...current, opt.id];
-                              setTourismProfile({...tourismProfile, activity_preferences: next});
+                              const next = active ? current.filter((a: any) => a !== opt.id) : [...current, opt.id];
+                              setTourismProfile({ ...tourismProfile, activity_preferences: next });
                             }}
-                            className={`px-5 py-3 rounded-xl text-[10px] font-bold flex items-center gap-3 transition-all ${
-                              active ? "bg-primary/10 text-primary border border-primary/20" : "bg-white/40 border border-foreground/5 text-foreground/30"
-                            } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-3 transition-all ${active ? "bg-primary/10 text-primary border border-primary/20" : "bg-white/40 border border-foreground/5 text-foreground/30"
+                              } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
                             {opt.icon} {opt.label}
                           </button>
@@ -407,12 +405,11 @@ export default function SettingsPage() {
                             onClick={() => {
                               if (!isEditing) return;
                               const current = tourismProfile.interests || [];
-                              const next = active ? current.filter((a:any) => a !== opt.id) : [...current, opt.id];
-                              setTourismProfile({...tourismProfile, interests: next});
+                              const next = active ? current.filter((a: any) => a !== opt.id) : [...current, opt.id];
+                              setTourismProfile({ ...tourismProfile, interests: next });
                             }}
-                            className={`px-5 py-3 rounded-xl text-[10px] font-bold flex items-center gap-3 transition-all ${
-                              active ? "bg-primary/10 text-primary border border-primary/20" : "bg-white/40 border border-foreground/5 text-foreground/30"
-                            } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-3 transition-all ${active ? "bg-primary/10 text-primary border border-primary/20" : "bg-white/40 border border-foreground/5 text-foreground/30"
+                              } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
                             {opt.icon} {opt.label}
                           </button>
@@ -428,16 +425,16 @@ export default function SettingsPage() {
                 <h3 className="text-xl font-black tracking-widest uppercase text-primary/40 mb-10 flex items-center gap-4">
                   <Hotel className="w-5 h-5" /> Stay Configuration
                 </h3>
-                
+
                 <div className="space-y-10">
                   <div className="grid grid-cols-2 gap-8">
                     <div className="space-y-4">
                       <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Accommodation</label>
-                      <select 
+                      <select
                         value={tourismProfile.accommodation_type}
                         disabled={!isEditing}
-                        onChange={e => setTourismProfile({...tourismProfile, accommodation_type: e.target.value})}
-                        className={`w-full px-6 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-[11px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                        onChange={e => setTourismProfile({ ...tourismProfile, accommodation_type: e.target.value })}
+                        className={`w-full px-6 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-sm font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                       >
                         <option value="">Select Type</option>
                         <option value="hotel">Hotel</option>
@@ -447,11 +444,11 @@ export default function SettingsPage() {
                     </div>
                     <div className="space-y-4">
                       <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Room Privacy</label>
-                      <select 
+                      <select
                         value={tourismProfile.room_type}
                         disabled={!isEditing}
-                        onChange={e => setTourismProfile({...tourismProfile, room_type: e.target.value})}
-                        className={`w-full px-6 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-[11px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                        onChange={e => setTourismProfile({ ...tourismProfile, room_type: e.target.value })}
+                        className={`w-full px-6 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-sm font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                       >
                         <option value="">Select Logic</option>
                         <option value="private">Private</option>
@@ -475,12 +472,11 @@ export default function SettingsPage() {
                             onClick={() => {
                               if (!isEditing) return;
                               const current = tourismProfile.amenities || [];
-                              const next = active ? current.filter((a:any) => a !== opt.id) : [...current, opt.id];
-                              setTourismProfile({...tourismProfile, amenities: next});
+                              const next = active ? current.filter((a: any) => a !== opt.id) : [...current, opt.id];
+                              setTourismProfile({ ...tourismProfile, amenities: next });
                             }}
-                            className={`px-5 py-3 rounded-xl text-[10px] font-bold flex items-center gap-3 transition-all ${
-                              active ? "bg-primary/10 text-primary border border-primary/20" : "bg-white/40 border border-foreground/5 text-foreground/30"
-                            } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`px-5 py-3 rounded-xl text-xs font-bold flex items-center gap-3 transition-all ${active ? "bg-primary/10 text-primary border border-primary/20" : "bg-white/40 border border-foreground/5 text-foreground/30"
+                              } ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
                             {opt.icon} {opt.label}
                           </button>
@@ -496,15 +492,15 @@ export default function SettingsPage() {
                 <h3 className="text-xl font-black tracking-widest uppercase text-primary/40 mb-10 flex items-center gap-4">
                   <Timer className="w-5 h-5" /> Journey Baseline
                 </h3>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-4">
                     <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Duration</label>
-                    <select 
+                    <select
                       value={tourismProfile.duration_preference}
                       disabled={!isEditing}
-                      onChange={e => setTourismProfile({...tourismProfile, duration_preference: e.target.value})}
-                      className={`w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl text-[10px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                      onChange={e => setTourismProfile({ ...tourismProfile, duration_preference: e.target.value })}
+                      className={`w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl text-xs font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <option value="">Select</option>
                       <option value="short">Short</option>
@@ -514,11 +510,11 @@ export default function SettingsPage() {
                   </div>
                   <div className="space-y-4">
                     <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Fitness</label>
-                    <select 
+                    <select
                       value={tourismProfile.fitness_level}
                       disabled={!isEditing}
-                      onChange={e => setTourismProfile({...tourismProfile, fitness_level: e.target.value})}
-                      className={`w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl text-[10px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                      onChange={e => setTourismProfile({ ...tourismProfile, fitness_level: e.target.value })}
+                      className={`w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl text-xs font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <option value="">Select</option>
                       <option value="easy">Easy</option>
@@ -528,11 +524,11 @@ export default function SettingsPage() {
                   </div>
                   <div className="space-y-4">
                     <label className="text-[9px] font-black uppercase tracking-widest text-foreground/20 px-2">Group</label>
-                    <select 
+                    <select
                       value={tourismProfile.group_type}
                       disabled={!isEditing}
-                      onChange={e => setTourismProfile({...tourismProfile, group_type: e.target.value})}
-                      className={`w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl text-[10px] font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
+                      onChange={e => setTourismProfile({ ...tourismProfile, group_type: e.target.value })}
+                      className={`w-full px-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl text-xs font-bold outline-none ${!isEditing ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <option value="">Select</option>
                       <option value="solo">Solo</option>

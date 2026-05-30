@@ -26,7 +26,8 @@ import {
   Bell,
   Ticket,
   Landmark,
-  Edit2
+  Edit2,
+  BarChart2
 } from "lucide-react";
 import { pusherClient } from "@/lib/pusher-client";
 import { toast } from "react-toastify";
@@ -90,8 +91,8 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
           channel.bind("new-internal-message", (data: any) => {
             toast.info(
               <div className="flex flex-col gap-1">
-                <span className="font-black text-[10px] uppercase tracking-widest text-primary">New Notice: {data.senderName}</span>
-                <span className="text-[12px] font-medium text-foreground/60 italic">"{data.message}"</span>
+                <span className="font-black text-xs uppercase tracking-widest text-primary">New Notice: {data.senderName}</span>
+                <span className="text-sm font-medium text-foreground/60 italic">"{data.message}"</span>
               </div>,
               { position: "bottom-right", autoClose: 8000 }
             );
@@ -122,6 +123,11 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (!mounted || isExcluded) return;
+    
+    if (status === "unauthenticated") {
+      window.location.href = "/login";
+      return;
+    }
     
     if (session?.user?.needsPasswordChange && pathname !== "/setup-security") {
       window.location.href = "/setup-security";
@@ -162,7 +168,7 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
         </div>
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/20 italic font-sans">Initializing Explorer Axis...</span>
+          <span className="text-xs font-black uppercase tracking-[0.4em] text-foreground/20 italic font-sans">Initializing Explorer Axis...</span>
         </div>
       </div>
     );
@@ -226,27 +232,35 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
           </div>
 
           <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-2">
-            <Link href="/dashboard" onClick={() => window.innerWidth < 1024 && setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-4 rounded-2xl text-[13px] font-black tracking-wide transition-all ${pathname === '/dashboard' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:text-primary hover:bg-primary/[0.03]'}`}>
+            <Link href="/dashboard" onClick={() => window.innerWidth < 1024 && setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-4 rounded-2xl text-base font-black tracking-wide transition-all ${pathname === '/dashboard' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:text-primary hover:bg-primary/[0.03]'}`}>
               <LayoutDashboard className="w-5 h-5" />
               Overview
             </Link>
             {navActions.map((action) => (
-              <Link key={action.href} href={action.href} onClick={() => window.innerWidth < 1024 && setIsSidebarOpen(false)} className={`flex items-center justify-between px-4 py-4 rounded-2xl text-[13px] font-black tracking-wide transition-all group ${pathname === action.href ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:text-primary hover:bg-primary/[0.03]'}`}>
+              <Link key={action.href} href={action.href} onClick={() => window.innerWidth < 1024 && setIsSidebarOpen(false)} className={`flex items-center justify-between px-4 py-4 rounded-2xl text-base font-black tracking-wide transition-all group ${pathname === action.href ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:text-primary hover:bg-primary/[0.03]'}`}>
                 <div className="flex items-center gap-4">
                   <span className="group-hover:scale-110 transition-transform">{action.icon}</span>
                   {action.label}
                 </div>
-                {action.count > 0 && <span className="w-5 h-5 rounded-full bg-red-100 text-red-600 text-[10px] flex items-center justify-center animate-pulse">{action.count}</span>}
+                {action.count > 0 && <span className="w-5 h-5 rounded-full bg-red-100 text-red-600 text-xs flex items-center justify-center animate-pulse">{action.count}</span>}
               </Link>
             ))}
             <div className="h-px bg-foreground/[0.03] my-8" />
-            <Link href="/settings" onClick={() => window.innerWidth < 1024 && setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-4 rounded-2xl text-[13px] font-black tracking-wide transition-all ${pathname === '/settings' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:text-primary hover:bg-primary/[0.03]'}`}>
-              <User className="w-5 h-5" />
-              Profile
-            </Link>
+            {role === "tourism_admin" && (
+              <Link href="/tourism-admin/analytics" onClick={() => window.innerWidth < 1024 && setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-4 rounded-2xl text-base font-black tracking-wide transition-all ${pathname === '/tourism-admin/analytics' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:text-primary hover:bg-primary/[0.03]'}`}>
+                <BarChart2 className="w-5 h-5" />
+                Analytics
+              </Link>
+            )}
+            {role === "tourist" && (
+              <Link href="/settings" onClick={() => window.innerWidth < 1024 && setIsSidebarOpen(false)} className={`flex items-center gap-4 px-4 py-4 rounded-2xl text-base font-black tracking-wide transition-all ${pathname === '/settings' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'text-foreground/40 hover:text-primary hover:bg-primary/[0.03]'}`}>
+                <User className="w-5 h-5" />
+                Profile
+              </Link>
+            )}
           </nav>
 
-          <button onClick={() => signOut({ callbackUrl: "/login" })} className="flex items-center gap-4 px-4 py-4 rounded-2xl text-red-400 hover:bg-red-50 text-[13px] font-black tracking-wide transition-all mt-auto pt-8 border-t border-foreground/[0.03]">
+          <button onClick={() => signOut({ callbackUrl: "/login" })} className="flex items-center gap-4 px-4 py-4 rounded-2xl text-red-400 hover:bg-red-50 text-base font-black tracking-wide transition-all mt-auto pt-8 border-t border-foreground/[0.03]">
             <LogOut className="w-5 h-5" />
             Logout
           </button>
@@ -274,10 +288,10 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
               >
                 <div className="hidden md:flex flex-col items-end">
                   <span className="text-[14px] font-black text-foreground tracking-tight leading-none mb-1">{session?.user?.name}</span>
-                  <span className="text-[10px] font-black text-primary tracking-widest uppercase">{role.replace("_", " ")}</span>
+                  <span className="text-xs font-black text-primary tracking-widest uppercase">{role.replace("_", " ")}</span>
                 </div>
                 <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-white p-1 border border-foreground/[0.05] shadow-sm group-hover:scale-105 transition-transform overflow-hidden">
-                   <div className="w-full h-full rounded-[14px] bg-primary text-white flex items-center justify-center text-[10px] md:text-[12px] font-black shadow-inner overflow-hidden">
+                   <div className="w-full h-full rounded-[14px] bg-primary text-white flex items-center justify-center text-xs md:text-sm font-black shadow-inner overflow-hidden">
                      {session?.user?.image ? (
                        <img src={session.user.image} alt="Profile" className="w-full h-full object-cover" />
                      ) : (
@@ -291,7 +305,7 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
               {isProfileOpen && (
                 <div className="absolute top-full right-0 mt-4 w-80 bg-white rounded-[32px] p-8 border border-foreground/[0.05] shadow-2xl shadow-foreground/10 animate-slide-up z-50">
                   <div className="flex items-center justify-between gap-3 mb-8">
-                    <span className="text-[10px] font-black tracking-widest uppercase text-foreground/40">Registry Identity</span>
+                    <span className="text-xs font-black tracking-widest uppercase text-foreground/40">Registry Identity</span>
                     <div className="flex items-center gap-2">
                       <Link 
                         href="/settings" 
@@ -314,7 +328,7 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
                           <span className="text-primary/40">{item.icon}</span>
                           <span className="text-[8px] font-black uppercase tracking-widest">{item.label}</span>
                         </div>
-                        <span className={`text-[11px] font-bold text-right truncate max-w-[150px] ${item.isRole ? 'text-primary' : 'text-foreground/60'}`}>{item.value}</span>
+                        <span className={`text-sm font-bold text-right truncate max-w-[150px] ${item.isRole ? 'text-primary' : 'text-foreground/60'}`}>{item.value}</span>
                       </div>
                     ))}
                   </div>

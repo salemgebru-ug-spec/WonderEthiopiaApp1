@@ -140,7 +140,7 @@ export default function DiscoverDestinations() {
       <section className="pt-32 pb-16 bg-surface-elevated/30">
         <div className="max-w-7xl mx-auto px-3 md:px-4 lg:px-5">
           <div className="text-center mb-12">
-            <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-primary mb-4 block">
+            <span className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-4 block">
               Discover Ethiopia
             </span>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
@@ -227,7 +227,7 @@ export default function DiscoverDestinations() {
                       <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors pr-2">
                         {dest.name}
                       </h3>
-                      <div className="flex items-center gap-1 text-[12px] font-bold text-primary bg-primary/5 px-2 py-1 rounded-full">
+                      <div className="flex items-center gap-1 text-sm font-bold text-primary bg-primary/5 px-2 py-1 rounded-full">
                         <Star className="w-3.5 h-3.5 fill-current" />
                         {dest.rating ? dest.rating.toFixed(1) : "New"}
                       </div>
@@ -238,7 +238,7 @@ export default function DiscoverDestinations() {
                     </p>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-foreground/30 flex items-center gap-2 uppercase tracking-wider">
+                      <span className="text-sm font-bold text-foreground/30 flex items-center gap-2 uppercase tracking-wider">
                         <MapPin className="w-3 h-3" />
                         {dest.city}, {dest.region}
                       </span>

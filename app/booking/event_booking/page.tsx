@@ -253,7 +253,7 @@ export default function EventBookingPage() {
                       />
                     </div>
                     <div className="mt-2 flex items-center justify-between">
-                      <p className="text-[11px] text-gray-500 uppercase font-medium">
+                      <p className="text-sm text-gray-500 uppercase font-medium">
                         {eventData.slots_available} slots remaining
                       </p>
                     </div>
@@ -285,7 +285,7 @@ export default function EventBookingPage() {
                           <span className="font-bold text-[#1B263B]">Total</span>
                           <div className="text-right">
                             <span className="text-2xl font-bold text-primary">{totalPrice.toLocaleString()} ETB</span>
-                            <p className="text-[10px] text-gray-400 uppercase">Secure Checkout</p>
+                            <p className="text-xs text-gray-400 uppercase">Secure Checkout</p>
                           </div>
                         </div>
                       </div>
@@ -311,7 +311,7 @@ export default function EventBookingPage() {
                     )}
                   </button>
 
-                  <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest text-gray-400">
+                  <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-widest text-gray-400">
                     <CreditCard className="w-3 h-3" />
                     <span>Secure Chapa Gateway</span>
                   </div>

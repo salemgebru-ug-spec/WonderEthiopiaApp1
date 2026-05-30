@@ -7,10 +7,12 @@ import {
   Building2, Plus, Edit2, Trash2, Bed, Compass, Calendar, Car,
   MapPin, Phone, Mail, FileText, CheckCircle2, TrendingUp, Users, User,
   Save, X, Camera, Globe, Box, MoreVertical, Loader2, ArrowRight, ShieldCheck,
-  ChevronLeft, Check, Layout, Utensils, Sparkles, Waves, Briefcase, Upload, ChevronDown, Star
+  ChevronLeft, Check, Layout, Utensils, Sparkles, Waves, Briefcase, Upload, ChevronDown, Star, Monitor, GlassWater
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+
+import { showToast } from "@/lib/toast";
 
 export default function BusinessDashboardPage() {
   const { data: session, status } = useSession();
@@ -219,7 +221,7 @@ export default function BusinessDashboardPage() {
         console.error("Service Inventory:", svcRes.status, svcRes.statusText);
         console.error("Mission Registry:", bookRes.status, bookRes.statusText);
         console.groupEnd();
-        
+
         // If profile fails, we can't proceed with dashboard loading
         if (!bizRes.ok) return;
       }
@@ -444,7 +446,7 @@ export default function BusinessDashboardPage() {
   const submitRevokeCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!revokeForm.category || !revokeForm.reason) {
-      toast.error("Both a designated category and a justification must be provided to proceed with revocation.");
+      showToast("System Error", "Both a designated category and a justification must be provided to proceed with revocation.", "error");
       return;
     }
     try {
@@ -462,16 +464,16 @@ export default function BusinessDashboardPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        toast.success(data.message || "Domain credential successfully revoked.");
+        showToast("Success", data.message || "Domain credential successfully revoked.", "success");
         setRevokeForm({ category: "", reason: "", document: null });
         setIsRevokingCategory(false);
         fetchData();
       } else {
-        toast.error(data.error || "The revocation process encountered a denial anomaly.");
+        showToast("System Error", data.error || "The revocation process encountered a denial anomaly.", "error");
       }
     } catch (error) {
       console.error("Revocation submission error:", error);
-      toast.error("An internal error interrupted the transmission process.");
+      showToast("System Error", "An internal error interrupted the transmission process.", "error");
     } finally {
       setIsSubmittingRevoke(false);
     }
@@ -492,12 +494,16 @@ export default function BusinessDashboardPage() {
       document.documentElement.style.overflow = 'unset';
       document.body.style.overscrollBehavior = 'auto';
     };
+
+
+
+
   }, [fullSvcGallery]);
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
       <Loader2 className="w-12 h-12 text-primary/20 animate-spin" />
-      <span className="text-[10px] font-black uppercase tracking-widest text-foreground/20 italic">Authorizing Partner Credentials...</span>
+      <span className="text-xs font-black uppercase tracking-widest text-foreground/20 italic">Authorizing Partner Credentials...</span>
     </div>
   );
 
@@ -512,7 +518,7 @@ export default function BusinessDashboardPage() {
           <div className="flex flex-col lg:flex-row items-start justify-between gap-12 mb-20 relative z-10">
             <div className="max-w-3xl">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-16 h-16 rounded-[28px] bg-primary/10 flex items-center justify-center text-primary shadow-inner overflow-hidden">
+                <div className="w-20 h-16 rounded-[28px] bg-primary/10 flex items-center justify-center text-primary shadow-inner overflow-hidden">
                   {business?.profilePicture ? (
                     <img src={business?.profilePicture} alt={business?.name} className="w-full h-full object-cover" />
                   ) : (
@@ -524,7 +530,7 @@ export default function BusinessDashboardPage() {
                     <ShieldCheck className="w-3 h-3 text-primary" />
                     <span className="text-[9px] font-black uppercase tracking-widest text-primary">Verified Partner Registry</span>
                   </div>
-                  <h1 className="text-6xl md:text-8xl font-black tracking-tightest text-foreground leading-[0.85]">
+                  <h1 className="text-4xl md:text-6xl font-black tracking-tightest text-foreground leading-[0.85]">
                     {business?.name || "Initializing..."}
                   </h1>
                   {business?.avgRating !== undefined && (
@@ -535,7 +541,7 @@ export default function BusinessDashboardPage() {
                           {business?.avgRating ? Number(business?.avgRating).toFixed(1) : "New Registry"}
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest italic">Global Partner Rating</span>
+                      <span className="text-xs font-bold text-foreground/30 uppercase tracking-widest italic">Global Partner Rating</span>
                     </div>
                   )}
                 </div>
@@ -550,7 +556,7 @@ export default function BusinessDashboardPage() {
                 <button
                   onClick={handleToggleActive}
                   disabled={business?.status === "suspended" || business?.status === "rejected"}
-                  className={`flex items-center gap-4 px-10 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 shadow-2xl ${business?.status === 'suspended' || business?.status === 'rejected'
+                  className={`flex items-center gap-4 px-10 py-5 rounded-2xl text-sm font-black uppercase tracking-[0.2em] transition-all duration-500 shadow-2xl ${business?.status === 'suspended' || business?.status === 'rejected'
                     ? 'bg-red-950 text-secondary cursor-not-allowed border border-primary/20 shadow-none'
                     : business?.isActive ? 'bg-emerald-500 text-white shadow-emerald-500/20 hover:scale-105 hover:bg-emerald-400' : 'bg-red-500 text-white shadow-red-500/20 hover:scale-105 hover:bg-red-400'
                     }`}
@@ -584,7 +590,7 @@ export default function BusinessDashboardPage() {
                     }
                     setIsAddingService(true);
                   }}
-                  className="flex items-center gap-4 px-10 py-5 bg-primary text-white rounded-2xl border border-primary/10 text-[11px] font-black hover:bg-primary-hover transition-all shadow-2xl shadow-primary/20"
+                  className="flex items-center gap-4 px-10 py-5 bg-primary text-white rounded-2xl border border-primary/10 text-sm font-black hover:bg-primary-hover transition-all shadow-2xl shadow-primary/20"
                 >
                   <Plus className="w-4 h-4" /> Expand Inventory
                 </button>
@@ -592,7 +598,7 @@ export default function BusinessDashboardPage() {
                 {!isEditingProfile && (
                   <button
                     onClick={() => setIsEditingProfile(true)}
-                    className="flex items-center gap-4 px-8 py-5 bg-white border border-foreground/[0.05] rounded-2xl text-[11px] font-black text-foreground hover:bg-foreground hover:text-white transition-all shadow-xl shadow-foreground/5 ml-auto"
+                    className="flex items-center gap-4 px-8 py-5 bg-white border border-foreground/[0.05] rounded-2xl text-sm font-black text-foreground hover:bg-foreground hover:text-white transition-all shadow-xl shadow-foreground/5 ml-auto"
                   >
                     <Edit2 className="w-4 h-4" /> Edit Registry
                   </button>
@@ -617,7 +623,7 @@ export default function BusinessDashboardPage() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-12 py-6 rounded-[32px] text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-4 transition-all duration-500 whitespace-nowrap ${activeTab === tab.id ? 'bg-foreground text-background shadow-premium translate-y-[-6px]' : 'text-foreground/30 hover:text-primary hover:bg-white/50'}`}
+                className={`px-12 py-6 rounded-[32px] text-sm font-black uppercase tracking-[0.2em] flex items-center gap-4 transition-all duration-500 whitespace-nowrap ${activeTab === tab.id ? 'bg-foreground text-background shadow-premium translate-y-[-6px]' : 'text-foreground/30 hover:text-primary hover:bg-white/50'}`}
               >
                 {tab.icon} {tab.label}
               </button>
@@ -634,15 +640,15 @@ export default function BusinessDashboardPage() {
                     </h3>
                     {isEditingProfile && (
                       <div className="flex gap-4">
-                        <button onClick={() => setIsEditingProfile(false)} className="px-8 py-4 text-[11px] font-black text-foreground/40 hover:text-red-500 uppercase tracking-widest transition-colors">Discard</button>
-                        <button onClick={handleUpdateProfile} className="px-14 py-5 bg-primary text-white text-[11px] font-black uppercase tracking-widest rounded-2xl shadow-premium hover:bg-primary-hover active:scale-95 transition-all">Save Changes</button>
+                        <button onClick={() => setIsEditingProfile(false)} className="px-8 py-4 text-sm font-black text-foreground/40 hover:text-red-500 uppercase tracking-widest transition-colors">Discard</button>
+                        <button onClick={handleUpdateProfile} className="px-14 py-5 bg-primary text-white text-sm font-black uppercase tracking-widest rounded-2xl shadow-premium hover:bg-primary-hover active:scale-95 transition-all">Save Changes</button>
                       </div>
                     )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-12">
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black tracking-widest uppercase text-foreground/20 px-4">Entity Identity</label>
+                      <label className="text-xs font-black tracking-widest uppercase text-foreground/20 px-4">Entity Identity</label>
                       <input
                         required
                         disabled={!isEditingProfile}
@@ -652,7 +658,7 @@ export default function BusinessDashboardPage() {
                       />
                     </div>
                     <div className="space-y-3 md:row-span-2">
-                      <label className="text-[10px] font-black tracking-widest uppercase text-foreground/20 px-4">Registry Description</label>
+                      <label className="text-xs font-black tracking-widest uppercase text-foreground/20 px-4">Registry Description</label>
                       <textarea
                         required
                         disabled={!isEditingProfile}
@@ -664,18 +670,18 @@ export default function BusinessDashboardPage() {
                     </div>
                     <div className="space-y-3 md:col-span-2">
                       <div className="flex items-center justify-between px-4 pb-2">
-                        <label className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Entity Classification</label>
+                        <label className="text-xs font-black tracking-widest uppercase text-foreground/20">Entity Classification</label>
                         <div className="flex items-center gap-4">
                           <button
                             type="button"
                             onClick={() => {
                               if ((business?.category || []).length <= 1) {
-                                toast.error("Cannot revoke your only operating domain. Contact support to close your business.");
+                                showToast("System Error", "Cannot revoke your only operating domain. Contact support to close your business.", "error");
                                 return;
                               }
                               setIsRevokingCategory(true);
                             }}
-                            className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:underline flex items-center gap-2 px-3 py-1 bg-rose-500/5 rounded-lg transition-all hover:bg-rose-500/10 relative z-[50]"
+                            className="text-xs font-black text-rose-500 uppercase tracking-widest hover:underline flex items-center gap-2 px-3 py-1 bg-rose-500/5 rounded-lg transition-all hover:bg-rose-500/10 relative z-[50]"
                           >
                             <Trash2 className="w-3.5 h-3.5" /> Revoke Domain
                           </button>
@@ -685,7 +691,7 @@ export default function BusinessDashboardPage() {
                               console.log("Opening category request modal...");
                               setIsRequestingCategory(true);
                             }}
-                            className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-lg transition-all hover:bg-primary/10 relative z-[50]"
+                            className="text-xs font-black text-primary uppercase tracking-widest hover:underline flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-lg transition-all hover:bg-primary/10 relative z-[50]"
                           >
                             <Plus className="w-3.5 h-3.5" /> Request Expansion
                           </button>
@@ -701,7 +707,7 @@ export default function BusinessDashboardPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black tracking-widest uppercase text-foreground/20 px-4">Region</label>
+                        <label className="text-xs font-black tracking-widest uppercase text-foreground/20 px-4">Region</label>
                         <input
                           required
                           disabled={!isEditingProfile}
@@ -711,7 +717,7 @@ export default function BusinessDashboardPage() {
                         />
                       </div>
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black tracking-widest uppercase text-foreground/20 px-4">City / Axis</label>
+                        <label className="text-xs font-black tracking-widest uppercase text-foreground/20 px-4">City / Axis</label>
                         <input
                           required
                           disabled={!isEditingProfile}
@@ -721,7 +727,7 @@ export default function BusinessDashboardPage() {
                         />
                       </div>
                       <div className="md:col-span-2 space-y-3">
-                        <label className="text-[10px] font-black tracking-widest uppercase text-foreground/20 px-4">Specific Address / HQ</label>
+                        <label className="text-xs font-black tracking-widest uppercase text-foreground/20 px-4">Specific Address / HQ</label>
                         <input
                           required
                           disabled={!isEditingProfile}
@@ -732,7 +738,7 @@ export default function BusinessDashboardPage() {
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black tracking-widest uppercase text-foreground/20 px-4">Contact Phone</label>
+                      <label className="text-xs font-black tracking-widest uppercase text-foreground/20 px-4">Contact Phone</label>
                       <input
                         required
                         disabled={!isEditingProfile}
@@ -742,7 +748,7 @@ export default function BusinessDashboardPage() {
                       />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black tracking-widest uppercase text-foreground/20 px-4">Contact Gateway (Email)</label>
+                      <label className="text-xs font-black tracking-widest uppercase text-foreground/20 px-4">Contact Gateway (Email)</label>
                       <input
                         required
                         disabled={!isEditingProfile}
@@ -752,7 +758,7 @@ export default function BusinessDashboardPage() {
                       />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black tracking-widest uppercase text-foreground/20 px-4">Brand Asset (Profile Picture)</label>
+                      <label className="text-xs font-black tracking-widest uppercase text-foreground/20 px-4">Brand Asset (Profile Picture)</label>
                       <div className="flex gap-4">
                         <div className="flex-1 flex flex-col gap-4">
                           {isEditingProfile && (
@@ -766,7 +772,7 @@ export default function BusinessDashboardPage() {
                               />
                               <label
                                 htmlFor="profile-upload"
-                                className="px-8 py-3 bg-foreground text-background text-[10px] font-black uppercase tracking-widest rounded-xl cursor-pointer hover:bg-primary transition-all flex items-center gap-3 shadow-xl whitespace-nowrap"
+                                className="px-8 py-3 bg-foreground text-background text-xs font-black uppercase tracking-widest rounded-xl cursor-pointer hover:bg-primary transition-all flex items-center gap-3 shadow-xl whitespace-nowrap"
                               >
                                 {isUploading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Camera className="w-3 h-3" />}
                                 {isUploading ? "Upload Brand Asset" : "Sync Local Image"}
@@ -811,10 +817,10 @@ export default function BusinessDashboardPage() {
                           </div>
                           <div className="flex-1 bg-foreground/[0.02] border border-foreground/[0.05] rounded-[32px] p-8 -mt-2 group-hover:border-primary/20 transition-colors">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary bg-primary/5 px-4 py-2 rounded-full w-fit">
+                              <span className="text-xs font-black uppercase tracking-[0.3em] text-primary bg-primary/5 px-4 py-2 rounded-full w-fit">
                                 {log.action}
                               </span>
-                              <span className="text-[10px] font-bold tracking-widest text-foreground/30 uppercase">
+                              <span className="text-xs font-bold tracking-widest text-foreground/30 uppercase">
                                 {new Date(log.date).toLocaleString()}
                               </span>
                             </div>
@@ -826,7 +832,7 @@ export default function BusinessDashboardPage() {
                                 href={log.documentUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-3 px-3 md:px-4 lg:px-5 py-3 bg-white border border-foreground/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
+                                className="inline-flex items-center gap-3 px-3 md:px-4 lg:px-5 py-3 bg-white border border-foreground/5 rounded-2xl text-xs font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all shadow-sm"
                               >
                                 <FileText className="w-4 h-4" /> View Archival Document
                               </a>
@@ -844,7 +850,7 @@ export default function BusinessDashboardPage() {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-surface p-10 rounded-[50px] border border-foreground/[0.03] shadow-xl">
                 <div>
                   <h2 className="text-4xl font-black tracking-tightest mb-2 uppercase">Mission <span className="text-primary italic">Registry.</span></h2>
-                  <p className="text-[10px] font-bold text-foreground/30 uppercase tracking-[0.3em]">Real-time traveler intake synchronization</p>
+                  <p className="text-xs font-bold text-foreground/30 uppercase tracking-[0.3em]">Real-time traveler intake synchronization</p>
                 </div>
                 <div className="flex gap-4">
                   <div className="px-8 py-4 bg-primary/5 rounded-3xl border border-primary/10 text-center">
@@ -862,7 +868,7 @@ export default function BusinessDashboardPage() {
                 {bookings.length === 0 ? (
                   <div className="py-32 flex flex-col items-center justify-center bg-foreground/[0.02] rounded-[60px] border border-dashed border-foreground/5">
                     <Calendar className="w-12 h-12 text-foreground/10 mb-6" />
-                    <p className="text-[11px] font-black uppercase tracking-widest text-foreground/20 italic">No mission records detected in registry axis.</p>
+                    <p className="text-sm font-black uppercase tracking-widest text-foreground/20 italic">No mission records detected in registry axis.</p>
                   </div>
                 ) : (
                   bookings.map((booking) => (
@@ -879,11 +885,11 @@ export default function BusinessDashboardPage() {
                         <div className="space-y-1">
                           <h4 className="text-xl font-black tracking-tight">{booking.serviceId?.name || "Unidentified Service"}</h4>
                           <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase">
+                            <div className="flex items-center gap-2 text-xs font-bold text-foreground/40 uppercase">
                               <Users className="w-3.5 h-3.5" /> {booking.guests} Explorers
                             </div>
                             <div className="w-1 h-1 rounded-full bg-foreground/10" />
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/40 uppercase">
+                            <div className="flex items-center gap-2 text-xs font-bold text-foreground/40 uppercase">
                               {booking.userId?.name || "Guest Traveler"}
                             </div>
                           </div>
@@ -919,7 +925,7 @@ export default function BusinessDashboardPage() {
                 <div className="flex flex-wrap items-center gap-3">
                   <button
                     onClick={() => setFilterSvcCategory("all")}
-                    className={`px-3 md:px-4 lg:px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${filterSvcCategory === "all" ? 'bg-primary text-white shadow-lg' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
+                    className={`px-3 md:px-4 lg:px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${filterSvcCategory === "all" ? 'bg-primary text-white shadow-lg' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
                   >
                     Entire Fleet
                   </button>
@@ -927,7 +933,7 @@ export default function BusinessDashboardPage() {
                     <button
                       key={bizCat}
                       onClick={() => setFilterSvcCategory(bizCat)}
-                      className={`px-3 md:px-4 lg:px-5 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${filterSvcCategory === bizCat ? 'bg-primary text-white shadow-lg' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
+                      className={`px-3 md:px-4 lg:px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${filterSvcCategory === bizCat ? 'bg-primary text-white shadow-lg' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
                     >
                       {bizCat.replace(/_/g, " ")}
                     </button>
@@ -941,7 +947,7 @@ export default function BusinessDashboardPage() {
                   <div className="py-40 rounded-[64px] border-4 border-dashed border-foreground/5 bg-white/30 text-center animate-pulse shadow-inner">
                     <Plus className="w-20 h-20 text-foreground/5 mx-auto mb-10" />
                     <h3 className="text-4xl font-black text-foreground/20 tracking-tightest uppercase">Inventory Data Void</h3>
-                    <p className="text-foreground/10 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Strategic Initialization Required</p>
+                    <p className="text-foreground/10 text-xs font-black uppercase tracking-[0.3em] mt-2">Strategic Initialization Required</p>
                   </div>
                 ) : (
                   (filterSvcCategory === "all" ? services : services.filter(s => {
@@ -994,7 +1000,7 @@ export default function BusinessDashboardPage() {
                             </div>
                             <div className="flex items-center gap-2 px-4 py-2 bg-foreground/5 rounded-2xl text-xs font-bold text-foreground/50 border border-foreground/5">
                               <Star className={`w-3.5 h-3.5 ${svc.avgRating ? "text-primary fill-primary" : "text-foreground/10"}`} />
-                              {svc.avgRating ? Number(svc.avgRating).toFixed(1) : <span className="italic text-[10px] opacity-40">New Asset</span>}
+                              {svc.avgRating ? Number(svc.avgRating).toFixed(1) : <span className="italic text-xs opacity-40">New Asset</span>}
                             </div>
                           </div>
                         </div>
@@ -1003,7 +1009,7 @@ export default function BusinessDashboardPage() {
                         <div className="flex flex-col sm:flex-row items-center gap-4">
                           <button
                             onClick={() => setExpandedSvcId(expandedSvcId === svc._id ? null : svc._id)}
-                            className={`px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${expandedSvcId === svc._id ? 'bg-primary text-white shadow-xl' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground hover:text-white'}`}
+                            className={`px-8 py-4 rounded-full text-xs font-black uppercase tracking-widest transition-all ${expandedSvcId === svc._id ? 'bg-primary text-white shadow-xl' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground hover:text-white'}`}
                           >
                             {expandedSvcId === svc._id ? "Hide Intelligence" : "Expose Metrics"}
                           </button>
@@ -1047,7 +1053,7 @@ export default function BusinessDashboardPage() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
                             <div className="space-y-8">
                               <div>
-                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/20 mb-4 ml-1">Asset Description</h4>
+                                <h4 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/20 mb-4 ml-1">Asset Description</h4>
                                 <p className="text-lg text-foreground/60 leading-relaxed font-medium">{svc.description}</p>
                               </div>
 
@@ -1067,7 +1073,7 @@ export default function BusinessDashboardPage() {
 
                                     return (
                                       <div className="col-span-full mb-2">
-                                        <div className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/40 border-b border-primary/5 pb-2">Strategic Inclusions</div>
+                                        <div className="text-xs font-black uppercase tracking-[0.3em] text-primary/40 border-b border-primary/5 pb-2">Strategic Inclusions</div>
                                         <div className="flex flex-wrap gap-3 mt-4">
                                           {activeInclusions.map(([key]) => {
                                             const labels: any = { meals: "🍽️ Meals", transport: "🚐 Transport", guide: "👤 Guide", insurance: "🛡️ Insurance", accommodation: "🏨 Stay", equipment: "⛺ Gear" };
@@ -1182,7 +1188,7 @@ export default function BusinessDashboardPage() {
 
                                       return (
                                         <div key={group.id} className="col-span-full space-y-6 pt-6 border-t border-foreground/[0.03]">
-                                          <div className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/40 ml-1">{group.label}</div>
+                                          <div className="text-xs font-black uppercase tracking-[0.3em] text-primary/40 ml-1">{group.label}</div>
                                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             {groupMeta.map(([key, val]) => {
                                               let displayValue = String(val);
@@ -1206,7 +1212,7 @@ export default function BusinessDashboardPage() {
 
                                               return (
                                                 <div key={key} className="group/meta relative bg-foreground/[0.02] p-5 rounded-3xl border border-foreground/5">
-                                                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 group-hover/meta:text-primary transition-colors duration-500 mb-2 break-words">
+                                                  <div className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 group-hover/meta:text-primary transition-colors duration-500 mb-2 break-words">
                                                     {key.replace(/([A-Z])/g, ' $1').trim()}
                                                   </div>
                                                   <div className="font-bold text-sm text-foreground/80 break-words leading-tight capitalize">
@@ -1225,7 +1231,7 @@ export default function BusinessDashboardPage() {
                                 {/* Special Handling for Itinerary */}
                                 {Array.isArray(svc.metadata?.itinerary) && svc.metadata.itinerary.length > 0 && (
                                   <div className="mt-8 pt-8 border-t border-foreground/10">
-                                    <h4 className="text-[12px] font-black uppercase tracking-[0.4em] text-primary mb-8 pb-3 border-b border-primary/10">
+                                    <h4 className="text-sm font-black uppercase tracking-[0.4em] text-primary mb-8 pb-3 border-b border-primary/10">
                                       {(() => {
                                         const categories = Array.isArray(svc.category) ? svc.category : [];
                                         if (categories.includes("culture")) return "Strategic Cultural Itinerary";
@@ -1261,7 +1267,7 @@ export default function BusinessDashboardPage() {
                             </div>
 
                             <div className="space-y-6">
-                              <div className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/20 ml-2">Visual Artifact Intelligence</div>
+                              <div className="text-xs font-black uppercase tracking-[0.3em] text-foreground/20 ml-2">Visual Artifact Intelligence</div>
                               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                                 {svc.images.map((img: string, idx: number) => (
                                   <div
@@ -1292,14 +1298,14 @@ export default function BusinessDashboardPage() {
                           <div className="pt-10 border-t border-foreground/5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 p-10 rounded-[50px] bg-white border border-foreground/5 shadow-premium">
                               <div className="space-y-4">
-                                <div className="text-[10px] font-black uppercase text-foreground/20 tracking-widest">Trade Currency</div>
+                                <div className="text-xs font-black uppercase text-foreground/20 tracking-widest">Trade Currency</div>
                                 <div className="flex items-center gap-4">
                                   <Globe className="w-5 h-5 text-primary/40" />
                                   <span className="font-black text-lg tracking-tighter text-foreground">{svc.currency}</span>
                                 </div>
                               </div>
                               <div className="space-y-4 border-t sm:border-t-0 sm:border-l border-foreground/5 pt-4 sm:pt-0 sm:pl-8">
-                                <div className="text-[10px] font-black uppercase text-foreground/20 tracking-widest">Verification Tier</div>
+                                <div className="text-xs font-black uppercase text-foreground/20 tracking-widest">Verification Tier</div>
                                 <div className="flex items-center gap-4">
                                   <ShieldCheck className="w-5 h-5 text-primary" />
                                   <span className="font-black text-lg tracking-tighter text-primary italic">Institutional</span>
@@ -1318,7 +1324,7 @@ export default function BusinessDashboardPage() {
 
           {/* Service Modal Overlay */}
           {isAddingService && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-20">
+            <div className="fixed inset-0 z-[100] flex items-start justify-center p-4 sm:p-8">
               <div className="absolute inset-0 bg-black/40 backdrop-blur-md animate-fade-in" onClick={() => { setIsAddingService(false); setIsAddingCustomCategory(false); }} />
               <div className="relative w-full max-w-5xl bg-white rounded-[60px] shadow-premium p-6 md:p-12 overflow-y-auto max-h-[95vh] custom-scrollbar animate-slide-up border border-foreground/5">
                 {/* Institutional Background Accent */}
@@ -1326,9 +1332,9 @@ export default function BusinessDashboardPage() {
 
                 {showSectorSelection ? (
                   <div className="animate-slide-in-left relative z-10">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-16">
                       <div className="max-w-xl">
-                        <div className="text-[11px] font-black tracking-[0.3em] uppercase text-primary mb-4 animate-pulse">Inventory Registry Hub</div>
+                        <div className="text-sm font-black tracking-[0.3em] uppercase text-primary mb-4 animate-pulse">Inventory Registry Hub</div>
                         <h2 className="text-4xl md:text-6xl font-black tracking-tightest leading-none">Choose Your <span className="text-foreground/20">Sector.</span></h2>
                         <p className="text-sm text-foreground/70 mt-4 font-medium max-w-sm">Define the operational domain for your new inventory artifact to begin the synchronization process.</p>
                       </div>
@@ -1399,11 +1405,11 @@ export default function BusinessDashboardPage() {
                             </div>
 
                             <div className="relative z-10 text-left">
-                              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/60 mb-1 block group-hover:text-primary transition-colors">Strategic Domain</span>
+                              <span className="text-xs font-black uppercase tracking-[0.2em] text-foreground/60 mb-1 block group-hover:text-primary transition-colors">Strategic Domain</span>
                               <span className="text-xl font-black tracking-tighter text-foreground group-hover:translate-x-1 transition-transform block">{label}</span>
                             </div>
 
-                            <div className="mt-12 flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-primary group-hover:gap-6 transition-all">
+                            <div className="mt-12 flex items-center gap-4 text-xs font-black uppercase tracking-widest text-primary group-hover:gap-6 transition-all">
                               <span>Initialize Domain</span>
                               <ArrowRight className="w-4 h-4" />
                             </div>
@@ -1418,21 +1424,21 @@ export default function BusinessDashboardPage() {
                       <div className="flex items-start gap-6">
                         {business?.category?.length > 1 && (
                           <button
-                            onClick={() => { setIsAddingService(false); setShowSectorSelection(true); }}
+                            onClick={() => { setIsAddingService(true); setShowSectorSelection(true); }}
                             className="mt-1 w-12 h-12 rounded-2xl bg-foreground/5 flex items-center justify-center text-foreground/40 hover:bg-white hover:text-primary hover:shadow-premium transition-all"
                           >
                             <ChevronLeft className="w-6 h-6" />
                           </button>
                         )}
                         <div>
-                          <div className="text-[11px] font-black tracking-[0.3em] uppercase text-primary mb-3">
+                          <div className="text-sm font-black tracking-[0.3em] uppercase text-primary mb-3">
                             {serviceForm._id ? "Inventory Modification Protocol" : "Inventory Expansion Protocol"}
                           </div>
                           <h2 className="text-4xl md:text-6xl font-black tracking-tightest leading-none">
                             {serviceForm._id ? "Update" : "Register"} <span className="text-foreground/20">Artifact.</span>
                           </h2>
                           <div className="flex items-center gap-4 mt-4">
-                            <div className="px-3 py-1.5 rounded-full glass border border-foreground/5 text-[10px] font-black uppercase tracking-widest text-foreground/70 flex items-center gap-2">
+                            <div className="px-3 py-1.5 rounded-full glass border border-foreground/5 text-xs font-black uppercase tracking-widest text-foreground/70 flex items-center gap-2">
                               <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
                               Domain: {String(selectedSector || "").replace(/_/g, ' ')}
                             </div>
@@ -1447,7 +1453,7 @@ export default function BusinessDashboardPage() {
                     <div className="grid gap-12">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="md:col-span-2 space-y-6 relative group">
-                          <label className="text-[11px] font-black uppercase tracking-[0.3em] text-foreground/60 px-3 md:px-4 lg:px-5 mb-2 block">Registry Identification Name (Official)</label>
+                          <label className="text-sm font-black uppercase tracking-[0.3em] text-foreground/60 px-3 md:px-4 lg:px-5 mb-2 block">Registry Identification Name (Official)</label>
                           <input
                             value={serviceForm.name || ""}
                             onChange={e => setServiceForm({ ...serviceForm, name: e.target.value })}
@@ -1463,7 +1469,7 @@ export default function BusinessDashboardPage() {
 
                         {selectedSector !== "tour_operator" && (
                           <div className="md:col-span-2 space-y-4">
-                            <label className="text-[11px] font-black uppercase tracking-[0.2em] text-primary px-4 mb-2 block">Sector Classification Artifacts</label>
+                            <label className="text-sm font-black uppercase tracking-[0.2em] text-primary px-4 mb-2 block">Sector Classification Artifacts</label>
                             {selectedSector === "car_rental" ? (
                               <div className="relative group/select">
                                 <select
@@ -1526,10 +1532,8 @@ export default function BusinessDashboardPage() {
                                     ],
                                     event_organizer: [
                                       { value: "venue", label: "Event Venue" },
-                                      { value: "wedding", label: "Wedding Planning" },
                                       { value: "corporate", label: "Corporate Meeting" },
-                                      { value: "catering", label: "Catering Service" },
-                                      { value: "av", label: "AV / Tech Support" }
+                                      { value: "catering", label: "Catering Service" }
                                     ],
                                     restaurant: [
                                       { value: "dining", label: "Fixed Menu / Dish" },
@@ -1556,7 +1560,7 @@ export default function BusinessDashboardPage() {
                                         className={`group relative flex flex-col items-start gap-4 p-6 rounded-[32px] border transition-all duration-700 hover-lift ${isChecked ? 'bg-primary text-white border-primary shadow-premium' : 'bg-foreground/[0.01] border-foreground/[0.05] text-foreground/40 hover:border-primary/20 hover:bg-white'}`}
                                       >
                                         <div className={`w-2.5 h-2.5 rounded-full transition-all duration-500 ${isChecked ? 'bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]' : 'bg-foreground/20 group-hover:bg-primary/20'}`} />
-                                        <span className={`text-[11px] font-black uppercase tracking-[0.3em] leading-tight ${isChecked ? 'text-white' : 'text-foreground/60'}`}>{opt.label}</span>
+                                        <span className={`text-sm font-black uppercase tracking-[0.3em] leading-tight ${isChecked ? 'text-white' : 'text-foreground/60'}`}>{opt.label}</span>
                                       </button>
                                     );
                                   });
@@ -1569,7 +1573,7 @@ export default function BusinessDashboardPage() {
                                   className={`group relative flex flex-col items-start gap-4 p-6 rounded-[32px] border-2 border-dashed transition-all duration-700 hover-lift ${isAddingCustomCategory ? 'bg-foreground text-background border-foreground shadow-premium' : 'bg-foreground/[0.01] border-foreground/[0.05] text-foreground/40 hover:border-primary/20 hover:bg-white'}`}
                                 >
                                   <Plus className={`w-5 h-5 transition-all duration-500 ${isAddingCustomCategory ? 'rotate-45 text-background' : 'text-foreground/40'}`} />
-                                  <span className={`text-[11px] font-black uppercase tracking-[0.3em] ${isAddingCustomCategory ? 'text-background' : 'text-foreground/60'}`}>Custom Type</span>
+                                  <span className={`text-sm font-black uppercase tracking-[0.3em] ${isAddingCustomCategory ? 'text-background' : 'text-foreground/60'}`}>Custom Type</span>
                                 </button>
                               </div>
                             )}
@@ -1592,34 +1596,21 @@ export default function BusinessDashboardPage() {
                           </div>
                         )}
 
-                        {/* Domain Specific Questions */}
-                        <div className="md:col-span-2 p-6 md:p-10 bg-primary/[0.02] border border-primary/10 rounded-[50px] space-y-12 relative overflow-hidden group">
-                          <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-700 pointer-events-none">
-                            <Layout className="w-40 h-40 -rotate-12" />
-                          </div>
-
-                          <div className="flex items-center gap-4 relative z-10">
-                            <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                              <CheckCircle2 className="w-6 h-6" />
-                            </div>
-                            <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-primary">Strategic Domain Intelligence</h4>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10">
-                            {/* 2. ACCOMMODATION (Rooms) */}
+                            {/* 1. ACCOMMODATION */}
                             {selectedSector === "hotel" && Array.isArray(serviceForm.category) && serviceForm.category.includes("accommodation") && (
-                              <div className="col-span-full space-y-8 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5">
-                                <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary border-b border-primary/10 pb-2 mb-6 ml-2 flex items-center gap-3">
-                                  <Bed className="w-4 h-4" /> Accommodation Intelligence (FR-02)
+                              <div className="col-span-full space-y-10 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5 relative overflow-hidden group/acc">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                                  <Bed className="w-4 h-4" /> Accommodation Intelligence
                                 </h5>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
                                   <div className="space-y-3">
-                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Price Per Night</label>
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Room Identifier</label>
                                     <input
-                                      type="number"
-                                      value={serviceForm.metadata?.accommodationPrice || 0}
-                                      onChange={e => setServiceForm({ ...serviceForm, price: parseFloat(e.target.value), metadata: { ...serviceForm.metadata, accommodationPrice: parseFloat(e.target.value) } })}
+                                      value={serviceForm.metadata?.roomType || ""}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, roomType: e.target.value } })}
                                       className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="e.g. Deluxe Suite"
                                     />
                                   </div>
                                   <div className="space-y-3">
@@ -1700,7 +1691,7 @@ export default function BusinessDashboardPage() {
                             {/* 3. DINING */}
                             {selectedSector === "hotel" && Array.isArray(serviceForm.category) && serviceForm.category.includes("dining") && (
                               <div className="col-span-full space-y-10 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5 relative overflow-hidden group/dining">
-                                <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
                                   <Utensils className="w-4 h-4" /> Culinary Portfolio Intelligence
                                 </h5>
 
@@ -1789,7 +1780,7 @@ export default function BusinessDashboardPage() {
                             {/* 4. WELLNESS & SPA */}
                             {selectedSector === "hotel" && Array.isArray(serviceForm.category) && serviceForm.category.includes("wellness") && (
                               <div className="col-span-full space-y-8 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5">
-                                <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary border-b border-primary/10 pb-2 mb-6 ml-2 flex items-center gap-3">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary border-b border-primary/10 pb-2 mb-6 ml-2 flex items-center gap-3">
                                   <Sparkles className="w-4 h-4" /> Wellness Intelligence
                                 </h5>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
@@ -1855,7 +1846,7 @@ export default function BusinessDashboardPage() {
                             {/* 5. LEISURE & RECREATION */}
                             {selectedSector === "hotel" && Array.isArray(serviceForm.category) && serviceForm.category.includes("leisure") && (
                               <div className="col-span-full space-y-8 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5">
-                                <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary border-b border-primary/10 pb-2 mb-6 ml-2 flex items-center gap-3">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary border-b border-primary/10 pb-2 mb-6 ml-2 flex items-center gap-3">
                                   <Waves className="w-4 h-4" /> Leisure Intelligence
                                 </h5>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
@@ -1921,7 +1912,7 @@ export default function BusinessDashboardPage() {
                             {/* 6. BUSINESS & EVENTS */}
                             {selectedSector === "hotel" && Array.isArray(serviceForm.category) && serviceForm.category.includes("business_events") && (
                               <div className="col-span-full space-y-8 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5">
-                                <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary border-b border-primary/10 pb-2 mb-6 ml-2 flex items-center gap-3">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary border-b border-primary/10 pb-2 mb-6 ml-2 flex items-center gap-3">
                                   <Briefcase className="w-4 h-4" /> Business Intelligence
                                 </h5>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
@@ -2013,7 +2004,7 @@ export default function BusinessDashboardPage() {
                                 <div className="space-y-12">
                                   {/* 1. Core Identity */}
                                   <div className="space-y-6">
-                                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30">1. Core Identification</div>
+                                    <div className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30">1. Core Identification</div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                       <div className="space-y-3">
                                         <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40">Vehicle Name</label>
@@ -2037,7 +2028,7 @@ export default function BusinessDashboardPage() {
 
                                   {/* 2. Pricing & Financial Protocol */}
                                   <div className="space-y-6">
-                                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30">2. Pricing & Financial Protocol</div>
+                                    <div className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30">2. Pricing & Financial Protocol</div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-primary/[0.01] p-8 rounded-[40px] border border-primary/5">
                                       <div className="space-y-3">
                                         <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40">Pricing Type</label>
@@ -2064,7 +2055,7 @@ export default function BusinessDashboardPage() {
 
                                   {/* 3. Specifications & Architecture */}
                                   <div className="space-y-6">
-                                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30">3. Specifications & Engineering</div>
+                                    <div className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30">3. Specifications & Engineering</div>
                                     <div className="grid grid-cols-2 gap-8">
                                       <div className="space-y-3">
                                         <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40">Brand</label>
@@ -2116,7 +2107,7 @@ export default function BusinessDashboardPage() {
                                 {/* Right Hemisphere: Features, Roles & Governance */}
                                 <div className="space-y-12">
                                   <div className="space-y-6">
-                                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30">4. Features & Comfort Artifacts</div>
+                                    <div className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30">4. Features & Comfort Artifacts</div>
                                     <div className="bg-foreground/[0.01] p-8 rounded-[40px] border border-foreground/5 space-y-8">
                                       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
                                         {[
@@ -2158,12 +2149,12 @@ export default function BusinessDashboardPage() {
 
                                   {/* 5. Driver & Fleet Options */}
                                   <div className="space-y-6">
-                                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30">5. Driver & Operational Modes</div>
+                                    <div className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30">5. Driver & Operational Modes</div>
                                     <div className="grid grid-cols-1 gap-8">
                                       <div className="bg-foreground/[0.01] p-8 rounded-[40px] border border-foreground/5 space-y-6">
                                         <div className="flex items-center gap-4">
                                           <input type="checkbox" checked={serviceForm.metadata?.withDriver || false} onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, withDriver: e.target.checked } })} className="w-6 h-6 rounded-lg accent-primary" />
-                                          <label className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Chauffeur Service (With Driver)</label>
+                                          <label className="text-xs font-black uppercase tracking-widest text-foreground/60">Chauffeur Service (With Driver)</label>
                                         </div>
                                         <div className="grid grid-cols-1 gap-6">
                                           <div className="space-y-3">
@@ -2183,7 +2174,7 @@ export default function BusinessDashboardPage() {
                                       <div className="bg-foreground/[0.01] p-8 rounded-[40px] border border-foreground/5 space-y-6">
                                         <div className="flex items-center gap-4">
                                           <input type="checkbox" checked={serviceForm.metadata?.selfDriveAvailable !== false} onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, selfDriveAvailable: e.target.checked } })} className="w-6 h-6 rounded-lg accent-primary" />
-                                          <label className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Self-Drive Permission</label>
+                                          <label className="text-xs font-black uppercase tracking-widest text-foreground/60">Self-Drive Permission</label>
                                         </div>
                                       </div>
                                     </div>
@@ -2194,7 +2185,7 @@ export default function BusinessDashboardPage() {
                                 {/* Full Width Sub-Grid: Governance & Safety */}
                                 <div className="col-span-full grid grid-cols-1 xl:grid-cols-2 gap-12 pt-12 border-t-2 border-foreground/[0.03]">
                                   <div className="space-y-8">
-                                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-primary border-b border-primary/5 pb-2">Governance & Rental Terms</div>
+                                    <div className="text-xs font-black uppercase tracking-[0.3em] text-primary border-b border-primary/5 pb-2">Governance & Rental Terms</div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                                       <div className="space-y-3">
@@ -2212,11 +2203,11 @@ export default function BusinessDashboardPage() {
                                     </div>
                                   </div>
                                   <div className="space-y-8">
-                                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-primary border-b border-primary/5 pb-2">Safety & Insurance Framework</div>
+                                    <div className="text-xs font-black uppercase tracking-[0.3em] text-primary border-b border-primary/5 pb-2">Safety & Insurance Framework</div>
                                     <div className="space-y-6 bg-primary/[0.01] p-8 rounded-[40px] border border-primary/5">
                                       <div className="flex items-center gap-4">
                                         <input type="checkbox" checked={serviceForm.metadata?.insuranceIncluded || true} onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, insuranceIncluded: e.target.checked } })} className="w-6 h-6 rounded-lg accent-primary" />
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-foreground/60">Insurance Included</label>
+                                        <label className="text-xs font-black uppercase tracking-widest text-foreground/60">Insurance Included</label>
                                       </div>
                                       <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-3">
@@ -2257,7 +2248,7 @@ export default function BusinessDashboardPage() {
                             {/* 8. GENERAL HOTEL SERVICES */}
                             {selectedSector === "hotel" && Array.isArray(serviceForm.category) && serviceForm.category.includes("general_services") && (
                               <div className="col-span-full space-y-8 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5">
-                                <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary border-b border-primary/10 pb-2 mb-6 ml-2 flex items-center gap-3">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary border-b border-primary/10 pb-2 mb-6 ml-2 flex items-center gap-3">
                                   <ShieldCheck className="w-4 h-4" /> Comprehensive General Intelligence
                                 </h5>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
@@ -2311,13 +2302,13 @@ export default function BusinessDashboardPage() {
                               <div className="col-span-full space-y-16 animate-fade-in relative mt-8 pt-8 border-t border-foreground/[0.05]">
                                 {/* 1. Basic Tour Overview */}
                                 <div className="space-y-6">
-                                  <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">1. Basic Tour Overview</h5>
+                                  <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">1. Basic Tour Overview</h5>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-3">
                                       <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Expedition Duration</label>
                                       <div className="grid grid-cols-2 gap-4">
                                         <div className="relative group">
-                                          <div className="absolute top-1/2 -translate-y-1/2 right-6 text-[10px] font-black text-foreground/20 uppercase tracking-widest pointer-events-none group-focus-within:text-primary transition-colors">Days</div>
+                                          <div className="absolute top-1/2 -translate-y-1/2 right-6 text-xs font-black text-foreground/20 uppercase tracking-widest pointer-events-none group-focus-within:text-primary transition-colors">Days</div>
                                           <input
                                             type="number"
                                             min="1"
@@ -2338,7 +2329,7 @@ export default function BusinessDashboardPage() {
                                           />
                                         </div>
                                         <div className="relative group">
-                                          <div className="absolute top-1/2 -translate-y-1/2 right-6 text-[10px] font-black text-foreground/20 uppercase tracking-widest pointer-events-none group-focus-within:text-primary transition-colors">Nights</div>
+                                          <div className="absolute top-1/2 -translate-y-1/2 right-6 text-xs font-black text-foreground/20 uppercase tracking-widest pointer-events-none group-focus-within:text-primary transition-colors">Nights</div>
                                           <input
                                             type="number"
                                             min="0"
@@ -2361,7 +2352,7 @@ export default function BusinessDashboardPage() {
                                       </div>
                                       <div className="flex items-center gap-3 px-3 md:px-4 lg:px-5 py-3 bg-primary/[0.03] rounded-2xl border border-primary/5 w-fit">
                                         <Calendar className="w-3.5 h-3.5 text-primary" />
-                                        <span className="text-[10px] font-black uppercase tracking-wider text-primary/60">
+                                        <span className="text-xs font-black uppercase tracking-wider text-primary/60">
                                           Registry Sync: {serviceForm.metadata?.durationDays || 0} Days & {serviceForm.metadata?.durationNights || 0} Nights
                                         </span>
                                       </div>
@@ -2383,7 +2374,7 @@ export default function BusinessDashboardPage() {
                                                     wildlife: "Wildlife Safari", hiking: "Hiking & Trekking", logistics: "Logistics & Transport",
                                                     niche: "Niche Artifact", custom: "Custom Category"
                                                   };
-                                                  return <span key={c} className="bg-primary/5 text-primary px-3 py-1 rounded-full text-[10px]">{labels[c] || c}</span>;
+                                                  return <span key={c} className="bg-primary/5 text-primary px-3 py-1 rounded-full text-xs">{labels[c] || c}</span>;
                                                 })
                                               ) : (
                                                 <span className="text-foreground/20">Select Strategic Tour Classifications...</span>
@@ -2415,7 +2406,7 @@ export default function BusinessDashboardPage() {
                                                     }}
                                                     className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all ${isChecked ? 'bg-primary/5 text-primary' : 'hover:bg-foreground/[0.02] text-foreground/40'}`}
                                                   >
-                                                    <span className="text-[11px] font-black uppercase tracking-widest">{opt.label}</span>
+                                                    <span className="text-sm font-black uppercase tracking-widest">{opt.label}</span>
                                                     <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all ${isChecked ? 'bg-primary border-primary' : 'border-foreground/10'}`}>
                                                       {isChecked && <Check className="w-3 h-3 text-white" />}
                                                     </div>
@@ -2443,7 +2434,7 @@ export default function BusinessDashboardPage() {
                                                 }}
                                                 className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 border-dashed ${isAddingCustomCategory ? 'bg-foreground text-background border-foreground shadow-lg' : 'border-foreground/5 text-foreground/40 hover:border-primary/20 hover:bg-white'}`}
                                               >
-                                                <span className="text-[11px] font-black uppercase tracking-widest">{isAddingCustomCategory ? 'Modify Custom Type' : 'Add Custom Type'}</span>
+                                                <span className="text-sm font-black uppercase tracking-widest">{isAddingCustomCategory ? 'Modify Custom Type' : 'Add Custom Type'}</span>
                                                 <Plus className={`w-4 h-4 transition-all ${isAddingCustomCategory ? 'rotate-45' : ''}`} />
                                               </button>
                                             </div>
@@ -2474,22 +2465,31 @@ export default function BusinessDashboardPage() {
 
                                 {/* 2. Pricing & Included */}
                                 <div className="space-y-6">
-                                  <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">2. Pricing & What's Included</h5>
+                                  <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">2. Pricing & What's Included</h5>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-3">
-                                      <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Pricing Type</label>
-                                      <div className="relative group/select">
-                                        <select
-                                          value={serviceForm.metadata?.pricingType || "Per Person"}
-                                          onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, pricingType: e.target.value } })}
-                                          className="w-full bg-white px-3 md:px-4 lg:px-5 py-4 rounded-3xl border border-foreground/5 font-bold text-sm outline-none cursor-pointer focus:ring-8 focus:ring-primary/5 transition-all focus:border-primary/20 appearance-none pr-12"
-                                        >
-                                          <option value="Per Person">Per Person</option>
-                                          <option value="Per Group">Per Group</option>
-                                        </select>
-                                        <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-hover/select:text-primary transition-colors pointer-events-none" />
+                                        <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Pricing Type</label>
+                                        <div className="relative group/select">
+                                          <select
+                                            value={serviceForm.metadata?.pricingType || "Per Person"}
+                                            onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, pricingType: e.target.value } })}
+                                            className="w-full bg-white px-3 md:px-4 lg:px-5 py-4 rounded-3xl border border-foreground/5 font-bold text-sm outline-none cursor-pointer focus:ring-8 focus:ring-primary/5 transition-all focus:border-primary/20 appearance-none pr-12"
+                                          >
+                                            <option value="Per Person">Per Person</option>
+                                            <option value="Per Group">Per Group</option>
+                                          </select>
+                                          <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-hover/select:text-primary transition-colors pointer-events-none" />
+                                        </div>
                                       </div>
-                                    </div>
+                                      <div className="space-y-3">
+                                        <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Maximum Capacity</label>
+                                        <input
+                                          type="number"
+                                          value={serviceForm.availability?.quantity || 1}
+                                          onChange={e => setServiceForm({ ...serviceForm, availability: { ...serviceForm.availability, quantity: parseInt(e.target.value) || 1 } })}
+                                          className="w-full bg-white px-3 md:px-4 lg:px-5 py-4 rounded-3xl border border-foreground/5 font-bold text-sm outline-none focus:ring-8 focus:ring-primary/5 transition-all focus:border-primary/20"
+                                        />
+                                      </div>
                                     <div className="md:col-span-2 space-y-4">
                                       <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Inclusion Inventory (Standard Artifacts)</label>
                                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -2519,7 +2519,7 @@ export default function BusinessDashboardPage() {
                                               className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${isIncluded ? 'bg-primary/5 border-primary/20 text-primary shadow-sm' : 'bg-white border-foreground/5 text-foreground/30 hover:border-foreground/10'}`}
                                             >
                                               <span className="text-lg">{item.icon}</span>
-                                              <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+                                              <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
                                               {isIncluded && <Check className="w-3 h-3 ml-auto" />}
                                             </button>
                                           );
@@ -2539,7 +2539,7 @@ export default function BusinessDashboardPage() {
 
                                 {/* 3. Departure & Logistics */}
                                 <div className="space-y-6">
-                                  <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">3. Departure Details</h5>
+                                  <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">3. Departure Details</h5>
                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     <div className="space-y-3 lg:col-span-2">
                                       <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Start Location</label>
@@ -2556,7 +2556,7 @@ export default function BusinessDashboardPage() {
                                         className="w-full bg-white px-3 md:px-4 lg:px-5 py-4 rounded-3xl border border-foreground/5 font-bold text-sm outline-none focus:ring-8 focus:ring-primary/5 transition-all focus:border-primary/20"
                                       />
                                       {serviceForm.metadata?.departureDates && new Date(serviceForm.metadata.departureDates) < new Date().setHours(0, 0, 0, 0) && (
-                                        <div className="mt-2 text-[10px] font-bold text-red-500 italic px-4">
+                                        <div className="mt-2 text-xs font-bold text-red-500 italic px-4">
                                           ⚠ Temporal Exception: Departure date must be in the future.
                                         </div>
                                       )}
@@ -2574,7 +2574,7 @@ export default function BusinessDashboardPage() {
 
                                 {/* 4. Infrastructure */}
                                 <div className="space-y-6">
-                                  <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">4. Accommodation & Transport</h5>
+                                  <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">4. Accommodation & Transport</h5>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-3">
                                       <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Accommodation Type</label>
@@ -2597,7 +2597,7 @@ export default function BusinessDashboardPage() {
 
                                 {/* 5. Requirements & Safety */}
                                 <div className="space-y-6">
-                                  <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">5. Requirements & Safety Info</h5>
+                                  <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">5. Requirements & Safety Info</h5>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-3">
                                       <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Fitness Level</label>
@@ -2627,14 +2627,14 @@ export default function BusinessDashboardPage() {
 
                                 {/* 6. Policy & Standing Out */}
                                 <div className="space-y-6">
-                                  <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">6. Policy & Extra Value</h5>
+                                  <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary/60 border-b border-primary/10 pb-2">6. Policy & Extra Value</h5>
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-3">
                                       <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Official Cancellation Deadline Date</label>
                                       <input required type="date" value={serviceForm.metadata?.cancellationDeadline || ""} onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, cancellationDeadline: e.target.value } })} className="w-full bg-white px-3 md:px-4 lg:px-5 py-4 rounded-3xl border border-foreground/5 font-bold text-sm outline-none focus:ring-8 focus:ring-primary/5 transition-all focus:border-primary/20" />
                                       {serviceForm.metadata?.departureDates && serviceForm.metadata?.cancellationDeadline &&
                                         new Date(serviceForm.metadata.cancellationDeadline) > new Date(serviceForm.metadata.departureDates) && (
-                                          <div className="mt-2 text-[10px] font-bold text-red-500 italic px-4 animate-pulse">
+                                          <div className="mt-2 text-xs font-bold text-red-500 italic px-4 animate-pulse">
                                             ⚠ Policy Exception: Cancellation deadline cannot fall after the commencement date.
                                           </div>
                                         )}
@@ -2649,7 +2649,7 @@ export default function BusinessDashboardPage() {
                                 {/* 7. Detailed Itinerary Builder */}
                                 <div className="space-y-6 mt-8 pt-8 border-t border-foreground/10">
                                   <div className="flex items-center justify-between">
-                                    <h5 className="text-[11px] font-black uppercase tracking-[0.4em] text-primary">
+                                    <h5 className="text-sm font-black uppercase tracking-[0.4em] text-primary">
                                       {(() => {
                                         const categories = Array.isArray(serviceForm.category) ? serviceForm.category : [];
                                         if (categories.includes("culture")) return "7. Cultural Experience Itinerary";
@@ -2671,7 +2671,7 @@ export default function BusinessDashboardPage() {
                                           <Trash2 className="w-4 h-4" />
                                         </button>
                                         <div className="mb-6 flex items-center gap-3">
-                                          <span className="px-4 py-1.5 bg-foreground/5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 border border-foreground/10">Day {day.day}</span>
+                                          <span className="px-4 py-1.5 bg-foreground/5 rounded-full text-xs font-black uppercase tracking-[0.2em] text-foreground/40 border border-foreground/10">Day {day.day}</span>
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                           <div className="space-y-3">
@@ -2692,7 +2692,7 @@ export default function BusinessDashboardPage() {
                                     {(!serviceForm.metadata?.itinerary || serviceForm.metadata.itinerary.length === 0) && (
                                       <div className="text-center py-12 px-3 md:px-4 lg:px-5 border-2 border-dashed border-foreground/5 rounded-[40px] bg-foreground/[0.01]">
                                         <Compass className="w-10 h-10 text-foreground/10 mx-auto mb-4" />
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-foreground/30">No Itinerary Days Segmented</p>
+                                        <p className="text-xs font-black uppercase tracking-widest text-foreground/30">No Itinerary Days Segmented</p>
                                       </div>
                                     )}
                                   </div>
@@ -2700,12 +2700,289 @@ export default function BusinessDashboardPage() {
                               </div>
                             )}
 
+                            {/* ========================================== */}
+                            {/* EVENT ORGANIZER DETAILS */}
+                            {/* ========================================== */}
+                            
+                            {/* EVENT VENUE */}
+                            {selectedSector === "event_organizer" && Array.isArray(serviceForm.category) && serviceForm.category.includes("venue") && (
+                              <div className="col-span-full space-y-10 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5 relative overflow-hidden group/venue">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                                  <Box className="w-4 h-4" /> Event Venue Intelligence
+                                </h5>
 
-                          </div>
-                        </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Space Type</label>
+                                    <div className="relative group/select">
+                                      <select
+                                        value={serviceForm.metadata?.spaceType || "indoor"}
+                                        onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, spaceType: e.target.value } })}
+                                        className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all appearance-none cursor-pointer pr-12"
+                                      >
+                                        <option value="indoor">Indoor Hall</option>
+                                        <option value="outdoor">Outdoor / Garden</option>
+                                        <option value="rooftop">Rooftop Terrace</option>
+                                        <option value="mixed">Mixed Indoor & Outdoor</option>
+                                      </select>
+                                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-hover/select:text-primary transition-colors pointer-events-none" />
+                                    </div>
+                                  </div>
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Maximum Capacity</label>
+                                    <input
+                                      type="number"
+                                      value={serviceForm.metadata?.capacity || 100}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, capacity: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                    />
+                                  </div>
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Seating Layouts Available</label>
+                                    <input
+                                      value={serviceForm.metadata?.layouts || ""}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, layouts: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="Theater, Banquet, Classroom..."
+                                    />
+                                  </div>
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">AV Equipment Included</label>
+                                    <div className="relative group/select">
+                                      <select
+                                        value={serviceForm.metadata?.avIncluded || "no"}
+                                        onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, avIncluded: e.target.value } })}
+                                        className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all appearance-none cursor-pointer pr-12"
+                                      >
+                                        <option value="yes">Yes (Projector, Mic, Sound)</option>
+                                        <option value="no">No (Bring Your Own)</option>
+                                      </select>
+                                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-hover/select:text-primary transition-colors pointer-events-none" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* CATERING */}
+                            {(selectedSector === "event_organizer" || selectedSector === "restaurant") && Array.isArray(serviceForm.category) && serviceForm.category.includes("catering") && (
+                              <div className="col-span-full space-y-10 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5 relative overflow-hidden group/catering">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                                  <Utensils className="w-4 h-4" /> Catering & Culinary Intelligence
+                                </h5>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Menu Archetype</label>
+                                    <input
+                                      value={serviceForm.metadata?.menuType || ""}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, menuType: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="Buffet, Plated 3-Course, Cocktail Canapés..."
+                                    />
+                                  </div>
+
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Maximum Capacity</label>
+                                    <input
+                                      type="number"
+                                      value={serviceForm.metadata?.capacity || 100}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, capacity: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                    />
+                                  </div>
+
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Service Staff Included</label>
+                                    <div className="relative group/select">
+                                      <select
+                                        value={serviceForm.metadata?.staffIncluded || "yes"}
+                                        onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, staffIncluded: e.target.value } })}
+                                        className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all appearance-none cursor-pointer pr-12"
+                                      >
+                                        <option value="yes">Waiters & Servers Included</option>
+                                        <option value="no">Food Drop-off Only</option>
+                                      </select>
+                                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-hover/select:text-primary transition-colors pointer-events-none" />
+                                    </div>
+                                  </div>
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Dietary Options</label>
+                                    <input
+                                      value={serviceForm.metadata?.dietary || ""}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, dietary: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="Vegan, Fasting (Tsom), Gluten-Free..."
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* CORPORATE MEETING */}
+                            {selectedSector === "event_organizer" && Array.isArray(serviceForm.category) && serviceForm.category.includes("corporate") && (
+                              <div className="col-span-full space-y-10 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5 relative overflow-hidden group/corporate">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                                  <Briefcase className="w-4 h-4" /> Corporate Meeting Intelligence
+                                </h5>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Meeting Format</label>
+                                    <div className="relative group/select">
+                                      <select
+                                        value={serviceForm.metadata?.meetingFormat || "boardroom"}
+                                        onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, meetingFormat: e.target.value } })}
+                                        className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all appearance-none cursor-pointer pr-12"
+                                      >
+                                        <option value="boardroom">Boardroom</option>
+                                        <option value="seminar">Seminar / Workshop</option>
+                                        <option value="conference">Large Conference</option>
+                                      </select>
+                                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-hover/select:text-primary transition-colors pointer-events-none" />
+                                    </div>
+                                  </div>
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Business Amenities Included</label>
+                                    <input
+                                      value={serviceForm.metadata?.businessAmenities || ""}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, businessAmenities: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="High-Speed Wi-Fi, Print Station, Whiteboards..."
+                                    />
+                                  </div>
+
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Maximum Capacity</label>
+                                    <input
+                                      type="number"
+                                      value={serviceForm.metadata?.capacity || 100}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, capacity: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* AV / TECH SUPPORT */}
+                            {selectedSector === "event_organizer" && Array.isArray(serviceForm.category) && serviceForm.category.includes("av") && (
+                              <div className="col-span-full space-y-10 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5 relative overflow-hidden group/av">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                                  <Monitor className="w-4 h-4" /> AV & Tech Intelligence
+                                </h5>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Equipment Domain</label>
+                                    <input
+                                      value={serviceForm.metadata?.avEquipment || ""}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, avEquipment: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="Sound Systems, LED Screens, Lighting Rigs..."
+                                    />
+                                  </div>
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">On-Site Technician Included</label>
+                                    <div className="relative group/select">
+                                      <select
+                                        value={serviceForm.metadata?.technicianIncluded || "yes"}
+                                        onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, technicianIncluded: e.target.value } })}
+                                        className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all appearance-none cursor-pointer pr-12"
+                                      >
+                                        <option value="yes">Yes, Dedicated Technician</option>
+                                        <option value="no">Equipment Drop-off Only</option>
+                                      </select>
+                                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-hover/select:text-primary transition-colors pointer-events-none" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* ========================================== */}
+                            {/* RESTAURANT DETAILS */}
+                            {/* ========================================== */}
+                            
+                            {/* DINING & SEATING */}
+                            {selectedSector === "restaurant" && Array.isArray(serviceForm.category) && (serviceForm.category.includes("dining") || serviceForm.category.includes("seating")) && (
+                              <div className="col-span-full space-y-10 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5 relative overflow-hidden group/rest-dining">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                                  <Utensils className="w-4 h-4" /> Dining & Seating Intelligence
+                                </h5>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Cuisine Identity</label>
+                                    <input
+                                      value={serviceForm.metadata?.cuisineIdentity || ""}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, cuisineIdentity: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="Traditional Habesha, Italian Fusion..."
+                                    />
+                                  </div>
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Seating Experience</label>
+                                    <div className="relative group/select">
+                                      <select
+                                        value={serviceForm.metadata?.seatingType || "indoor"}
+                                        onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, seatingType: e.target.value } })}
+                                        className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all appearance-none cursor-pointer pr-12"
+                                      >
+                                        <option value="indoor">Main Dining Room</option>
+                                        <option value="outdoor">Patio / Garden</option>
+                                        <option value="private">Private VIP Room</option>
+                                        <option value="bar">Chef's Table / Bar</option>
+                                      </select>
+                                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-hover/select:text-primary transition-colors pointer-events-none" />
+                                    </div>
+                                  </div>
+                                  <div className="space-y-3 md:col-span-2">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Atmosphere / Vibe</label>
+                                    <input
+                                      value={serviceForm.metadata?.vibe || ""}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, vibe: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="Romantic, Casual, Fine-Dining, High-Energy..."
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* RESTAURANT PRIVATE EVENT & BAR */}
+                            {selectedSector === "restaurant" && Array.isArray(serviceForm.category) && (serviceForm.category.includes("event") || serviceForm.category.includes("bar")) && (
+                              <div className="col-span-full space-y-10 animate-fade-in p-8 rounded-[40px] bg-white border border-foreground/5 relative overflow-hidden group/rest-event">
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] text-primary flex items-center gap-3">
+                                  <GlassWater className="w-4 h-4" /> Lounge & Event Intelligence
+                                </h5>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Beverage Focus</label>
+                                    <input
+                                      value={serviceForm.metadata?.beverageFocus || ""}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, beverageFocus: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="Signature Cocktails, Craft Beers, Wine Selection..."
+                                    />
+                                  </div>
+                                  <div className="space-y-3">
+                                    <label className="text-[9px] font-black tracking-[0.3em] uppercase text-foreground/40 ml-4">Private Hire Minimum Spend</label>
+                                    <input
+                                      type="number"
+                                      value={serviceForm.metadata?.minSpend || 0}
+                                      onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, minSpend: e.target.value } })}
+                                      className="w-full bg-foreground/[0.02] px-3 md:px-4 lg:px-5 py-4 rounded-2xl border border-foreground/5 font-bold text-sm outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                                      placeholder="Amount in your currency..."
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
 
                         <div className="md:col-span-2 space-y-4 group">
-                          <label className="text-[11px] font-black uppercase tracking-[0.3em] text-foreground/60 px-3 md:px-4 lg:px-5">Detailed Strategic Narrative</label>
+                          <label className="text-sm font-black uppercase tracking-[0.3em] text-foreground/60 px-3 md:px-4 lg:px-5">Detailed Strategic Narrative</label>
                           <textarea
                             required
                             value={serviceForm.description || ""}
@@ -2719,7 +2996,7 @@ export default function BusinessDashboardPage() {
                         {/* Media Assets */}
                         <div className="md:col-span-2 space-y-8">
                           <div className="flex items-center justify-between px-3 md:px-4 lg:px-5">
-                            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30">Institutional Portfolio Synchronization</label>
+                            <label className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30">Institutional Portfolio Synchronization</label>
                             <span className="px-4 py-1 rounded-full bg-primary/10 text-[9px] font-black text-primary uppercase tracking-widest">{serviceForm.images.length} / 10 Assets</span>
                           </div>
 
@@ -2734,13 +3011,13 @@ export default function BusinessDashboardPage() {
                             />
                             <label
                               htmlFor="service-assets"
-                              className={`w-full md:w-auto px-12 py-7 bg-foreground text-background rounded-[30px] text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-5 cursor-pointer hover:bg-primary active:scale-95 ${serviceForm.images.length >= 10 ? "opacity-30 cursor-not-allowed pointer-events-none" : "shadow-2xl shadow-black/20"}`}
+                              className={`w-full md:w-auto px-12 py-7 bg-foreground text-background rounded-[30px] text-xs font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-5 cursor-pointer hover:bg-primary active:scale-95 ${serviceForm.images.length >= 10 ? "opacity-30 cursor-not-allowed pointer-events-none" : "shadow-2xl shadow-black/20"}`}
                             >
                               {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
                               {isUploading ? "Synchronizing..." : "Sync Visual Artifacts"}
                             </label>
                             <div className="flex-1 text-center md:text-left">
-                              <p className="text-[10px] font-black text-foreground/20 uppercase tracking-[0.1em]">Atmospheric Asset Requirements</p>
+                              <p className="text-xs font-black text-foreground/20 uppercase tracking-[0.1em]">Atmospheric Asset Requirements</p>
                               <p className="text-xs text-foreground/40 font-medium mt-1 italic">High-resolution JPG/PNG landscape preferred for institutional indexing.</p>
                             </div>
                           </div>
@@ -2749,7 +3026,7 @@ export default function BusinessDashboardPage() {
                             {serviceForm.images.length === 0 ? (
                               <div className="col-span-full py-20 flex flex-col items-center justify-center border-2 border-dashed border-foreground/5 rounded-[40px] bg-foreground/[0.005]">
                                 <Box className="w-12 h-12 text-foreground/5 mb-4" />
-                                <p className="text-[10px] font-black text-foreground/10 uppercase tracking-[0.4em]">Zero Visual Artifacts Synchronized</p>
+                                <p className="text-xs font-black text-foreground/10 uppercase tracking-[0.4em]">Zero Visual Artifacts Synchronized</p>
                               </div>
                             ) : (
                               serviceForm.images.map((img: string, i: number) => (
@@ -2776,7 +3053,7 @@ export default function BusinessDashboardPage() {
                         </div>
 
                         <div className="space-y-6">
-                          <label className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Institutional Pricing (ETB)</label>
+                          <label className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Institutional Pricing (ETB)</label>
                           <div className="relative group">
                             <input
                               required
@@ -2797,7 +3074,7 @@ export default function BusinessDashboardPage() {
 
 
                         <div className="space-y-6">
-                          <label className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Trade Currency</label>
+                          <label className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Trade Currency</label>
                           <div className="relative group/select">
                             <select
                               value={serviceForm.currency || "ETB"}
@@ -2815,10 +3092,10 @@ export default function BusinessDashboardPage() {
 
                       <div className="pt-12 mt-4 border-t border-foreground/[0.05] flex flex-col items-center">
                         <div className="max-w-md text-center mb-8">
-                          <p className="text-[11px] font-black text-foreground/60 uppercase tracking-[0.3em]">
+                          <p className="text-sm font-black text-foreground/60 uppercase tracking-[0.3em]">
                             {serviceForm._id ? "Registry Update Confirmation" : "Final Terminal Action"}
                           </p>
-                          <p className="text-[12px] text-foreground/70 mt-2 font-medium">
+                          <p className="text-sm text-foreground/70 mt-2 font-medium">
                             {serviceForm._id ? "Synchronize these modifications with the global Wondar Ethiopia registry." : "Synchronize this experiential artifact with the global Wondar Ethiopia registry."}
                           </p>
                         </div>
@@ -2848,8 +3125,8 @@ export default function BusinessDashboardPage() {
 
         {/* Category Request Modal (Registration Portal Style) */}
         {isRequestingCategory && (
-          <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/80 backdrop-blur-xl animate-fade-in p-6 overflow-y-auto">
-            <div className="bg-white rounded-[60px] w-full max-w-4xl my-auto overflow-hidden shadow-premium animate-slide-up relative">
+          <div className="fixed inset-0 z-[2000] flex items-start justify-center bg-black/80 backdrop-blur-xl animate-fade-in p-6 sm:p-8 overflow-y-auto pt-10 sm:pt-20">
+            <div className="bg-white rounded-[60px] w-full max-w-4xl overflow-hidden shadow-premium animate-slide-up relative">
               <div className="max-h-[85vh] overflow-y-auto no-scrollbar">
                 <div className="p-12 md:p-20 space-y-16">
                   <div className="flex items-center justify-between">
@@ -2873,7 +3150,7 @@ export default function BusinessDashboardPage() {
                     <div className="space-y-8">
                       <div className="flex items-center gap-4 text-primary">
                         <Layout className="w-5 h-5" />
-                        <h3 className="text-[11px] font-black uppercase tracking-[0.3em]">Protocol Domains</h3>
+                        <h3 className="text-sm font-black uppercase tracking-[0.3em]">Protocol Domains</h3>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
@@ -2896,7 +3173,7 @@ export default function BusinessDashboardPage() {
                               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${isSelected ? 'bg-white/20 text-white' : 'bg-primary/5 text-primary group-hover:scale-110'}`}>
                                 {cat.icon}
                               </div>
-                              <span className="text-[11px] font-black uppercase tracking-widest leading-none">{cat.label}</span>
+                              <span className="text-sm font-black uppercase tracking-widest leading-none">{cat.label}</span>
                               {isOwned && <span className="text-[8px] font-black uppercase text-foreground/20 italic tracking-tighter">Already Verified</span>}
                               {isSelected && <Check className="w-4 h-4 text-white" />}
                             </div>
@@ -2910,13 +3187,13 @@ export default function BusinessDashboardPage() {
                       <div className="space-y-12 animate-fade-in p-10 rounded-[40px] bg-foreground/[0.01] border border-foreground/[0.03]">
                         <div className="flex items-center gap-4 text-primary">
                           <FileText className="w-5 h-5" />
-                          <h3 className="text-[11px] font-black uppercase tracking-[0.3em]">Institutional Verification Data</h3>
+                          <h3 className="text-sm font-black uppercase tracking-[0.3em]">Institutional Verification Data</h3>
                         </div>
 
                         <div className="grid grid-cols-1 gap-12">
                           {categoryRequestForm.categories.includes("hotel") && (
                             <div className="space-y-6 pt-4 border-t border-foreground/[0.03]">
-                              <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Hotel Expansion Protocol</h4>
+                              <h4 className="text-xs font-black text-primary uppercase tracking-[0.4em]">Hotel Expansion Protocol</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="relative group/select">
                                   <select
@@ -2936,7 +3213,7 @@ export default function BusinessDashboardPage() {
                                 </div>
                                 <input required name="website" type="text" placeholder="Institutional Website" onChange={handleRequestIndustryChange} className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none focus:ring-8 focus:ring-primary/5" />
                                 <div className="md:col-span-2 space-y-4">
-                                  <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Upload Hospitality License</label>
+                                  <label className="text-xs font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Upload Hospitality License</label>
                                   <div className="relative group">
                                     <input required name="hotelLicense" id="hotelLicense" type="file" onChange={handleRequestFileChange} className="hidden" accept=".pdf,image/*" />
                                     <label htmlFor="hotelLicense" className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none flex items-center justify-between cursor-pointer group-hover:border-primary/20 transition-all">
@@ -2955,12 +3232,12 @@ export default function BusinessDashboardPage() {
 
                           {categoryRequestForm.categories.includes("tour_operator") && (
                             <div className="space-y-6 pt-6 border-t border-foreground/[0.03]">
-                              <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Operator Expansion Protocol</h4>
+                              <h4 className="text-xs font-black text-primary uppercase tracking-[0.4em]">Operator Expansion Protocol</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <input required name="languages" type="text" placeholder="Global Languages Supported" onChange={handleRequestIndustryChange} className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none focus:ring-8 focus:ring-primary/5" />
                                 <input required name="specialization" type="text" placeholder="Expedition Archetype Focus" onChange={handleRequestIndustryChange} className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none focus:ring-8 focus:ring-primary/5" />
                                 <div className="md:col-span-2 space-y-4">
-                                  <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Tour Operator Certificate</label>
+                                  <label className="text-xs font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Tour Operator Certificate</label>
                                   <div className="relative group">
                                     <input required name="tourCert" id="tourCert" type="file" onChange={handleRequestFileChange} className="hidden" accept=".pdf,image/*" />
                                     <label htmlFor="tourCert" className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none flex items-center justify-between cursor-pointer group-hover:border-primary/20 transition-all">
@@ -2979,12 +3256,12 @@ export default function BusinessDashboardPage() {
 
                           {categoryRequestForm.categories.includes("car_rental") && (
                             <div className="space-y-6 pt-6 border-t border-foreground/[0.03]">
-                              <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Transport Expansion Protocol</h4>
+                              <h4 className="text-xs font-black text-primary uppercase tracking-[0.4em]">Transport Expansion Protocol</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <input required name="fleetSize" type="number" placeholder="Fleet Density (Artifact Count)" onChange={handleRequestIndustryChange} className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none focus:ring-8 focus:ring-primary/5" />
                                 <input required name="vehicleTypes" type="text" placeholder="Vehicle Archetypes (e.g. 4x4, Luxury)" onChange={handleRequestIndustryChange} className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none focus:ring-8 focus:ring-primary/5" />
                                 <div className="md:col-span-2 space-y-4">
-                                  <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Transport & Rental License</label>
+                                  <label className="text-xs font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Transport & Rental License</label>
                                   <div className="relative group">
                                     <input required name="carRentalLicense" id="carRentalLicense" type="file" onChange={handleRequestFileChange} className="hidden" accept=".pdf,image/*" />
                                     <label htmlFor="carRentalLicense" className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none flex items-center justify-between cursor-pointer group-hover:border-primary/20 transition-all">
@@ -3003,12 +3280,12 @@ export default function BusinessDashboardPage() {
 
                           {categoryRequestForm.categories.includes("event_organizer") && (
                             <div className="space-y-6 pt-6 border-t border-foreground/[0.03]">
-                              <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.4em]">Events Expansion Protocol</h4>
+                              <h4 className="text-xs font-black text-primary uppercase tracking-[0.4em]">Events Expansion Protocol</h4>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <input required name="experienceYears" type="number" placeholder="Operational Experience (Years)" onChange={handleRequestIndustryChange} className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none focus:ring-8 focus:ring-primary/5" />
                                 <input required name="eventType" type="text" placeholder="Primary Event Specialization" onChange={handleRequestIndustryChange} className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none focus:ring-8 focus:ring-primary/5" />
                                 <div className="md:col-span-2 space-y-4">
-                                  <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Event Organizer Certificate</label>
+                                  <label className="text-xs font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Event Organizer Certificate</label>
                                   <div className="relative group">
                                     <input required name="eventCert" id="eventCert" type="file" onChange={handleRequestFileChange} className="hidden" accept=".pdf,image/*" />
                                     <label htmlFor="eventCert" className="w-full px-8 py-5 bg-white border border-foreground/[0.05] rounded-[24px] text-sm font-bold outline-none flex items-center justify-between cursor-pointer group-hover:border-primary/20 transition-all">
@@ -3029,7 +3306,7 @@ export default function BusinessDashboardPage() {
                     )}
 
                     <div className="space-y-6">
-                      <label className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Strategic Justification</label>
+                      <label className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Strategic Justification</label>
                       <textarea
                         required
                         rows={4}
@@ -3052,7 +3329,7 @@ export default function BusinessDashboardPage() {
                         {isSubmittingRequest ? <Loader2 className="w-6 h-6 animate-spin" /> : <div className="w-3 h-3 rounded-full bg-white group-hover:scale-150 transition-transform" />}
                         {isSubmittingRequest ? "Transmitting Credentials..." : "Finalize Expansion Request"}
                       </button>
-                      <p className="text-center text-[10px] font-black text-foreground/20 uppercase tracking-[0.3em] mt-10 italic">
+                      <p className="text-center text-xs font-black text-foreground/20 uppercase tracking-[0.3em] mt-10 italic">
                         Reviewed by institutional tourism & super admin authorities.
                       </p>
                     </div>
@@ -3084,7 +3361,7 @@ export default function BusinessDashboardPage() {
                 </div>
                 <form onSubmit={submitRevokeCategory} className="space-y-12">
                   <div className="space-y-6">
-                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Select Domain to Revoke</label>
+                    <label className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Select Domain to Revoke</label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {(business?.category || []).map((cat: string) => (
                         <button
@@ -3099,7 +3376,7 @@ export default function BusinessDashboardPage() {
                     </div>
                   </div>
                   <div className="space-y-6">
-                    <label className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Revocation Justification</label>
+                    <label className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30 px-3 md:px-4 lg:px-5">Revocation Justification</label>
                     <textarea
                       required
                       rows={4}
@@ -3111,7 +3388,7 @@ export default function BusinessDashboardPage() {
                   </div>
 
                   <div className="space-y-4">
-                    <label className="text-[10px] font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Supporting Document (Optional)</label>
+                    <label className="text-xs font-black tracking-widest uppercase text-foreground/30 px-3 md:px-4 lg:px-5">Supporting Document (Optional)</label>
                     <div className="relative group">
                       <input id="revokeDoc" type="file" onChange={(e) => setRevokeForm({ ...revokeForm, document: e.target.files?.[0] || null })} className="hidden" accept=".pdf,image/*" />
                       <label htmlFor="revokeDoc" className="w-full px-8 py-5 bg-foreground/[0.02] border border-foreground/[0.05] rounded-[40px] text-sm font-bold outline-none flex items-center justify-between cursor-pointer group-hover:border-rose-500/30 transition-all">
@@ -3134,7 +3411,7 @@ export default function BusinessDashboardPage() {
                       {isSubmittingRevoke ? <Loader2 className="w-6 h-6 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                       {isSubmittingRevoke ? "Executing Revocation..." : "Confirm Domain Surrender"}
                     </button>
-                    <p className="text-center text-[10px] font-black text-rose-500/40 uppercase tracking-[0.3em] mt-10 italic">
+                    <p className="text-center text-xs font-black text-rose-500/40 uppercase tracking-[0.3em] mt-10 italic">
                       Warning: This action is immediate and irrevocable.
                     </p>
                   </div>
@@ -3203,10 +3480,10 @@ export default function BusinessDashboardPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-                    <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">Mission Intel Report</span>
+                    <span className="text-xs font-black tracking-[0.3em] uppercase text-primary">Mission Intel Report</span>
                   </div>
                   <h2 className="text-4xl font-black tracking-tightest uppercase">{selectedBooking.serviceId?.name || "Service Profile"}</h2>
-                  <div className="text-[10px] font-bold text-foreground/30 uppercase mt-2">Registry ID: {selectedBooking._id}</div>
+                  <div className="text-xs font-bold text-foreground/30 uppercase mt-2">Registry ID: {selectedBooking._id}</div>
                 </div>
                 <button onClick={() => setSelectedBooking(null)} className="w-14 h-14 rounded-full bg-foreground/5 hover:bg-foreground hover:text-white transition-all flex items-center justify-center">
                   <X className="w-6 h-6" />
@@ -3250,7 +3527,7 @@ export default function BusinessDashboardPage() {
                       <div className="text-3xl font-black text-primary tracking-tighter leading-none mb-2">
                         {selectedBooking.currency} {selectedBooking.totalPrice?.toLocaleString()}
                       </div>
-                      <div className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Inventory Paid ✓</div>
+                      <div className="text-xs font-black uppercase tracking-widest text-emerald-500">Inventory Paid ✓</div>
                     </div>
                   </div>
 
@@ -3264,7 +3541,7 @@ export default function BusinessDashboardPage() {
               </div>
 
               <div className="pt-8 border-t border-foreground/5">
-                <button onClick={() => setSelectedBooking(null)} className="w-full py-5 bg-foreground text-background rounded-3xl text-[10px] font-black uppercase tracking-widest hover:bg-primary transition-all shadow-xl shadow-foreground/5">
+                <button onClick={() => setSelectedBooking(null)} className="w-full py-5 bg-foreground text-background rounded-3xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-xl shadow-foreground/5">
                   Close Report
                 </button>
               </div>

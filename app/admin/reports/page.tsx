@@ -152,7 +152,7 @@ export default function AdminReportsPage() {
           <div className="max-w-4xl mb-12">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">
+              <span className="text-xs font-black tracking-[0.3em] uppercase text-primary">
                 Grievance Master Terminal
               </span>
             </div>
@@ -169,7 +169,7 @@ export default function AdminReportsPage() {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-8 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 whitespace-nowrap ${filter === f
+                className={`px-8 py-3.5 text-sm font-black uppercase tracking-widest rounded-2xl border transition-all duration-300 whitespace-nowrap ${filter === f
                     ? "bg-primary text-white border-primary shadow-xl shadow-primary/20 scale-105"
                     : "bg-white text-foreground/30 border-foreground/5 hover:border-primary/20 hover:text-primary"
                   }`}
@@ -184,7 +184,7 @@ export default function AdminReportsPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-40 gap-6">
             <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
-            <span className="text-[10px] font-black tracking-widest uppercase text-foreground/20">Syncing Registry...</span>
+            <span className="text-xs font-black tracking-widest uppercase text-foreground/20">Syncing Registry...</span>
           </div>
         ) : reports.length === 0 ? (
           <div className="text-center py-48 bg-white/50 rounded-[60px] border-4 border-dashed border-foreground/5">
@@ -210,7 +210,7 @@ export default function AdminReportsPage() {
                   <h2 className="text-3xl font-black tracking-tighter text-foreground capitalize">
                     {business?.name || "Unknown Entity"}
                   </h2>
-                  <div className="px-4 py-1.5 bg-rose-50 text-rose-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-rose-100 shadow-sm flex items-center gap-2">
+                  <div className="px-4 py-1.5 bg-rose-50 text-rose-600 rounded-full text-xs font-black uppercase tracking-widest border border-rose-100 shadow-sm flex items-center gap-2">
                     <AlertOctagon className="w-3 h-3" />
                     {items.length} Active Grievance{items.length !== 1 ? 's' : ''}
                   </div>
@@ -237,17 +237,17 @@ export default function AdminReportsPage() {
                           {report.businessId?.name}
                         </h3>
                         <div className="flex flex-wrap items-center gap-4 mt-2">
-                          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-red-500/50 flex items-center gap-2">
+                          <span className="text-sm font-black uppercase tracking-[0.2em] text-red-500/50 flex items-center gap-2">
                             <AlertOctagon className="w-3.5 h-3.5" /> {report.reason.replace(/_/g, " ")}
                           </span>
                           <div className="w-1 h-1 rounded-full bg-foreground/10" />
-                          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground/30 flex items-center gap-2">
+                          <span className="text-sm font-black uppercase tracking-[0.2em] text-foreground/30 flex items-center gap-2">
                             <Calendar className="w-3.5 h-3.5" /> {new Date(report.createdAt).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className={`px-5 py-2.5 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm shrink-0`}>
+                    <div className={`px-5 py-2.5 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] shadow-sm shrink-0`}>
                       {sc.icon} {sc.label}
                     </div>
                   </div>
@@ -266,14 +266,14 @@ export default function AdminReportsPage() {
                       className="flex items-center gap-4 px-6 py-4 bg-primary/5 text-primary rounded-xl border border-primary/10 hover:bg-primary hover:text-white transition-all group/chat relative w-fit"
                     >
                       <MessageSquare className="w-5 h-5 group-hover/chat:scale-110 transition-transform" />
-                      <span className="text-[11px] font-black uppercase tracking-[0.3em]">Discussion</span>
+                      <span className="text-sm font-black uppercase tracking-[0.3em]">Discussion</span>
                       {(() => {
                         const unreadCount = report.discussion 
                           ? report.discussion.slice(readReports[report._id] || 0).filter(m => m.senderRole !== "super_admin").length 
                           : 0;
                         if (unreadCount > 0) {
                           return (
-                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                            <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-xs font-black rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                               {unreadCount}
                             </div>
                           );
@@ -299,37 +299,37 @@ export default function AdminReportsPage() {
                         <User className="w-7 h-7" />
                       </div>
                       <div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-foreground/20 block mb-0.5">Reporter Entity</span>
+                        <span className="text-xs font-black uppercase tracking-widest text-foreground/20 block mb-0.5">Reporter Entity</span>
                         <span className="text-[15px] font-bold text-foreground/60">{report.reporterId?.name}</span>
                       </div>
                     </div>
 
                     <div className="flex gap-4 w-full md:w-auto">
                       {report.status === "pending" ? (
-                        <div className="px-6 py-4 bg-amber-50 text-amber-600 text-[10px] font-black rounded-2xl border border-amber-100 uppercase tracking-widest text-center shadow-sm">
+                        <div className="px-6 py-4 bg-amber-50 text-amber-600 text-xs font-black rounded-2xl border border-amber-100 uppercase tracking-widest text-center shadow-sm">
                           Awaiting Tourism Admin Recommendation
                         </div>
                       ) : ["dismissed", "suspended", "warned"].includes(report.status) ? (
-                        <div className="px-6 py-4 bg-primary/5 text-primary text-[10px] font-black rounded-2xl border border-primary/10 uppercase tracking-widest text-center shadow-sm">
+                        <div className="px-6 py-4 bg-primary/5 text-primary text-xs font-black rounded-2xl border border-primary/10 uppercase tracking-widest text-center shadow-sm">
                           Action Taken: {report.status.toUpperCase()}
                         </div>
                       ) : (
                         <div className="grid grid-cols-3 gap-3 w-full md:w-auto">
                           <button
                             onClick={() => handleAction(report._id, "warned")}
-                            className="px-5 py-4 bg-white border border-foreground/10 text-foreground/60 text-[10px] font-black rounded-xl hover:bg-amber-50 hover:text-amber-600 transition-all uppercase tracking-widest text-center shadow-sm"
+                            className="px-5 py-4 bg-white border border-foreground/10 text-foreground/60 text-xs font-black rounded-xl hover:bg-amber-50 hover:text-amber-600 transition-all uppercase tracking-widest text-center shadow-sm"
                           >
                             Issue Warning
                           </button>
                           <button
                             onClick={() => handleAction(report._id, "dismissed")}
-                            className="px-5 py-4 bg-white border border-foreground/10 text-foreground/60 text-[10px] font-black rounded-xl hover:bg-foreground hover:text-white transition-all uppercase tracking-widest text-center shadow-sm"
+                            className="px-5 py-4 bg-white border border-foreground/10 text-foreground/60 text-xs font-black rounded-xl hover:bg-foreground hover:text-white transition-all uppercase tracking-widest text-center shadow-sm"
                           >
                             Final Dismissal
                           </button>
                           <button
                             onClick={() => handleAction(report._id, "suspended")}
-                            className="px-5 py-4 bg-red-500 text-white text-[10px] font-black rounded-xl hover:bg-red-600 transition-all shadow-xl shadow-red-500/20 uppercase tracking-widest flex items-center justify-center gap-2"
+                            className="px-5 py-4 bg-red-500 text-white text-xs font-black rounded-xl hover:bg-red-600 transition-all shadow-xl shadow-red-500/20 uppercase tracking-widest flex items-center justify-center gap-2"
                           >
                             <Gavel className="w-3.5 h-3.5" /> Suspend
                           </button>

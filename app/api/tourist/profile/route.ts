@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import dbConnect from "@/lib/mongodb";
 import TourismProfile from "@/models/TourismProfile";
-
+import mongoose from "mongoose";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -12,7 +12,7 @@ export async function GET() {
     }
 
     await dbConnect();
-    const profile = await TourismProfile.findOne({ userId: session.user.id });
+    const profile = await TourismProfile.findOne({ userId: new mongoose.Types.ObjectId(session.user.id) });
     
     return NextResponse.json({ profile });
   } catch (error: any) {
@@ -29,10 +29,10 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     await dbConnect();
-
+    const userId = new mongoose.Types.ObjectId(session.user.id);
     const profile = await TourismProfile.findOneAndUpdate(
-      { userId: session.user.id },
-      { ...body, userId: session.user.id, isCompleted: true },
+      { userId },
+      { ...body, userId, isCompleted: true },
       { upsert: true, new: true, runValidators: true }
     );
 

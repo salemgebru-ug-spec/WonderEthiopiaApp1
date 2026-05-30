@@ -74,6 +74,13 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
+        // Check if temporary password has expired
+        if (user.needsPasswordChange && user.tempPasswordExpiresAt) {
+          if (new Date() > user.tempPasswordExpiresAt) {
+            throw new Error("EXPIRED_TEMP_PASSWORD");
+          }
+        }
+
         return {
           id: user._id.toString(),
           name: user.name,
@@ -87,7 +94,11 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 2 * 60 * 60, // 2 hours
+    updateAge: 10 * 60, // 10 minutes
+  },
+  jwt: {
+    maxAge: 2 * 60 * 60, // align JWT expiration with session
   },
   callbacks: {
     async jwt({ token, user, trigger, session: updateSession }) {
@@ -97,7 +108,7 @@ export const authOptions: NextAuthOptions = {
         token.needsPasswordChange = (user as any).needsPasswordChange;
         token.image = (user as any).image;
       }
-      
+
       // Handle manual session updates (trigger: "update")
       if (trigger === "update" && updateSession) {
         if (updateSession.role) token.role = updateSession.role;
@@ -106,7 +117,7 @@ export const authOptions: NextAuthOptions = {
         }
         if (updateSession.image) token.image = updateSession.image;
       }
-      
+
       return token;
     },
     async session({ session, token }) {
@@ -117,7 +128,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).image = token.image as string;
       }
       return session;
-    },
+    }
   },
   pages: {
     signIn: "/login",

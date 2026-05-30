@@ -17,6 +17,8 @@ import {
 import { toast } from "react-toastify";
 import Link from "next/link";
 
+import { showToast } from "@/lib/toast";
+
 export default function SetupSecurityPage() {
   const { data: session, update } = useSession();
   const searchParams = useSearchParams();
@@ -42,17 +44,17 @@ export default function SetupSecurityPage() {
     e.preventDefault();
     
     if (newPassword !== confirmPassword) {
-      toast.error("Credential mismatch. Please synchronize your passwords.");
+      showToast("System Error", "Credential mismatch. Please synchronize your passwords.", "error");
       return;
     }
 
     if (!tempPassword) {
-      toast.error("Institutional verification error. Temporary password is required.");
+      showToast("System Error", "Institutional verification error. Temporary password is required.", "error");
       return;
     }
 
     if (newPassword.length < 6) {
-      toast.error("Security threshold error. Password must be at least 6 characters.");
+      showToast("System Error", "Security threshold error. Password must be at least 6 characters.", "error");
       return;
     }
 
@@ -71,7 +73,7 @@ export default function SetupSecurityPage() {
       if (res.ok) {
         const data = await res.json();
         setSuccess(true);
-        toast.success("Security perimeter secured successfully.");
+        showToast("Success", "Security perimeter secured successfully.", "success");
         
         if (session) {
           await update({ 
@@ -82,10 +84,10 @@ export default function SetupSecurityPage() {
         }
       } else {
         const data = await res.json();
-        toast.error(data.error || "Failed to update security credentials.");
+        showToast("System Error", data.error || "Failed to update security credentials.", "error");
       }
     } catch (error) {
-      toast.error("Network communication failure. Please retry.");
+      showToast("System Error", "Network communication failure. Please retry.", "error");
     } finally {
       setLoading(false);
     }
@@ -128,7 +130,7 @@ export default function SetupSecurityPage() {
              <ShieldCheck className="w-10 h-10" />
           </div>
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-[10px] font-black tracking-[0.4em] uppercase text-primary">Institutional Security Axis</span>
+            <span className="text-xs font-black tracking-[0.4em] uppercase text-primary">Institutional Security Axis</span>
             <Sparkles className="w-3 h-3 text-primary animate-bounce" />
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tightest uppercase text-center leading-none">Initialize <span className="text-primary italic">Credentials.</span></h1>
@@ -140,7 +142,7 @@ export default function SetupSecurityPage() {
            </div>
            <div className="space-y-1">
               <h3 className="text-sm font-black uppercase tracking-tight text-amber-900">Mandatory Security Protocol</h3>
-              <p className="text-[13px] font-medium text-amber-800/60 leading-relaxed">
+              <p className="text-base font-medium text-amber-800/60 leading-relaxed">
                 Your account for <strong>{emailParam || "Wonder Ethiopia Partner"}</strong> requires unique credentials. Please establishment your private password below before proceeding to login.
               </p>
            </div>
@@ -149,7 +151,7 @@ export default function SetupSecurityPage() {
         <form onSubmit={handleSubmit} className="space-y-8 bg-white p-10 md:p-14 rounded-[50px] shadow-3xl border border-foreground/[0.03]">
           <div className="space-y-6">
             <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/30 px-2">
+              <label className="text-xs font-black uppercase tracking-widest text-foreground/30 px-2">
                 {session?.user?.needsPasswordChange === false ? "Current Security Key" : "Temporary Security Key"}
               </label>
               <div className="relative group">
@@ -175,7 +177,7 @@ export default function SetupSecurityPage() {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/30 px-2">New Security Hash</label>
+              <label className="text-xs font-black uppercase tracking-widest text-foreground/30 px-2">New Security Hash</label>
               <div className="relative group">
                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-foreground/20 group-focus-within:text-primary transition-colors">
                     <Lock className="w-5 h-5" />
@@ -199,7 +201,7 @@ export default function SetupSecurityPage() {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-widest text-foreground/30 px-2">Synchronize Password</label>
+              <label className="text-xs font-black uppercase tracking-widest text-foreground/30 px-2">Synchronize Password</label>
               <div className="relative group">
                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-foreground/20 group-focus-within:text-primary transition-colors">
                     <ShieldCheck className="w-5 h-5" />
@@ -231,7 +233,7 @@ export default function SetupSecurityPage() {
           <div className="pt-6 border-t border-foreground/5 text-center">
              <Link 
                href="/login"
-               className="text-[10px] font-black uppercase tracking-widest text-foreground/20 hover:text-primary transition-colors"
+               className="text-xs font-black uppercase tracking-widest text-foreground/20 hover:text-primary transition-colors"
              >
                 Return to Login Gateway
              </Link>

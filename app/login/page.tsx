@@ -13,6 +13,32 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [requestingNew, setRequestingNew] = useState(false);
+
+  const handleRequestNewPassword = async () => {
+    if (!email) {
+      setError("Please enter your email address above first.");
+      return;
+    }
+    setRequestingNew(true);
+    try {
+      const res = await fetch("/api/auth/request-new-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setError("Success! New credentials have been sent to your email.");
+      } else {
+        setError(data.error || "Failed to request new credentials.");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+    } finally {
+      setRequestingNew(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +100,7 @@ export default function LoginPage() {
       <div className="relative w-full max-w-[440px] animate-fade-in">
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-[13px] font-bold text-foreground/40 hover:text-primary transition-colors mb-12 group"
+          className="inline-flex items-center gap-2 text-base font-bold text-foreground/40 hover:text-primary transition-colors mb-12 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Explorations
@@ -93,15 +119,30 @@ export default function LoginPage() {
         <div className="glass-elevated rounded-[32px] p-8 md:p-10 shadow-2xl shadow-foreground/5 border border-foreground/[0.03]">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-100 rounded-2xl p-4 text-red-500 text-[13px] text-center font-bold animate-shake">
-                {error}
+              <div className={`border rounded-2xl p-4 text-base text-center font-bold animate-shake ${error.startsWith("Success!") ? "bg-green-50 border-green-100 text-green-600" : "bg-red-50 border-red-100 text-red-500"}`}>
+                {error === "EXPIRED_TEMP_PASSWORD" ? (
+                  <div className="flex flex-col gap-3 items-center">
+                    <p>Your temporary password has expired.</p>
+                    <button 
+                      type="button" 
+                      onClick={handleRequestNewPassword}
+                      disabled={requestingNew}
+                      className="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-black hover:bg-red-200 transition-colors flex items-center gap-2"
+                    >
+                      {requestingNew ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                      Request New Setup Link
+                    </button>
+                  </div>
+                ) : (
+                  error
+                )}
               </div>
             )}
 
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="block text-[11px] font-black text-foreground/30 uppercase tracking-[0.1em]"
+                className="block text-sm font-black text-foreground/30 uppercase tracking-[0.1em]"
               >
                 Email Address
               </label>
@@ -122,7 +163,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="block text-[11px] font-black text-foreground/30 uppercase tracking-[0.1em]"
+                className="block text-sm font-black text-foreground/30 uppercase tracking-[0.1em]"
               >
                 Password
               </label>
@@ -158,7 +199,7 @@ export default function LoginPage() {
 
           <div className="my-8 flex items-center gap-4">
             <div className="h-px bg-foreground/[0.05] flex-1" />
-            <span className="text-foreground/20 text-[10px] font-black uppercase tracking-widest">
+            <span className="text-foreground/20 text-xs font-black uppercase tracking-widest">
               Secure Login
             </span>
             <div className="h-px bg-foreground/[0.05] flex-1" />

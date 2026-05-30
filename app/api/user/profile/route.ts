@@ -32,16 +32,15 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { name, bio, phoneNumber, preferences, profileImage } = body;
+    const { name, bio, phoneNumber, profileImage } = body;
 
     await dbConnect();
     const user = await User.findByIdAndUpdate(
       session.user.id,
       { 
-        name, 
-        bio, 
-        phoneNumber, 
-        preferences, 
+        name,
+        bio,
+        phoneNumber,
         profileImage 
       },
       { new: true }

@@ -41,7 +41,7 @@ export default function ExpansionChatDrawer({ isOpen, onClose, notificationId, b
         <div className="px-8 py-6 border-b border-foreground/[0.03] flex items-center justify-between bg-primary/[0.02]">
           <div>
             <h2 className="text-xl font-black tracking-tight text-foreground">{businessName}</h2>
-            <p className="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mt-1">Expansion Deliberation Thread</p>
+            <p className="text-xs font-bold text-primary uppercase tracking-[0.2em] mt-1">Expansion Deliberation Thread</p>
           </div>
           <button 
             onClick={onClose}

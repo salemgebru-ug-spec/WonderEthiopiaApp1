@@ -314,7 +314,7 @@ export default function BusinessDetail() {
 
             <div className="flex flex-col md:flex-row items-end justify-between w-full gap-12 mt-12 mb-20">
               <div className="max-w-3xl">
-                <div className="inline-flex items-center gap-3 px-4 py-1.5 mb-6 text-[10px] font-black tracking-[0.2em] text-primary uppercase bg-primary/10 rounded-full border border-primary/10">
+                <div className="inline-flex items-center gap-3 px-4 py-1.5 mb-6 text-xs font-black tracking-[0.2em] text-primary uppercase bg-primary/10 rounded-full border border-primary/10">
                   Verified Partner <ShieldCheck className="w-3.5 h-3.5" />
                 </div>
                 <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-[0.9]">
@@ -324,7 +324,7 @@ export default function BusinessDetail() {
                   <div className="flex items-center gap-2.5 bg-primary/5 px-5 py-2.5 rounded-2xl border border-primary/10">
                     <Star className="w-5 h-5 fill-primary text-primary" />
                     <span className="font-black text-lg">{avgRating ? avgRating.toFixed(1) : "5.0"}</span>
-                    <span className="text-[10px] font-black text-foreground/30 uppercase tracking-widest ml-2">{reviews.length} Experiences</span>
+                    <span className="text-xs font-black text-foreground/30 uppercase tracking-widest ml-2">{reviews.length} Experiences</span>
                   </div>
                   <div className="flex items-center gap-3 bg-foreground/5 px-5 py-2.5 rounded-2xl border border-foreground/5 font-bold text-sm text-foreground/60">
                     <MapPin className="w-5 h-5 text-primary/40" />
@@ -335,7 +335,7 @@ export default function BusinessDetail() {
 
               <button
                 onClick={() => setReportModal(true)}
-                className="flex items-center gap-3 px-8 py-4 bg-red-500/5 text-red-500 border border-red-500/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-red-500 hover:text-white transition-all shadow-xl shadow-red-500/5 group"
+                className="flex items-center gap-3 px-8 py-4 bg-red-500/5 text-red-500 border border-red-500/10 rounded-2xl text-xs font-black uppercase tracking-[0.2em] hover:bg-red-500 hover:text-white transition-all shadow-xl shadow-red-500/5 group"
               >
                 <AlertTriangle className="w-4 h-4 group-hover:animate-bounce" /> Report Entity
               </button>
@@ -379,14 +379,14 @@ export default function BusinessDetail() {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                   <div className="space-y-4">
                     <h2 className="text-4xl font-bold tracking-tight">Partner Offerings</h2>
-                    <p className="text-foreground/40 font-bold uppercase text-[10px] tracking-[0.3em]">Direct Inventory & Strategic Facilities</p>
+                    <p className="text-foreground/40 font-bold uppercase text-xs tracking-[0.3em]">Direct Inventory & Strategic Facilities</p>
                   </div>
 
                   {/* Filtration Chips */}
                   <div className="flex flex-wrap items-center gap-3">
                     <button
                       onClick={() => setFilterCategory("all")}
-                      className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${filterCategory === "all" ? 'bg-primary text-white' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
+                      className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${filterCategory === "all" ? 'bg-primary text-white' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
                     >
                       All Units
                     </button>
@@ -394,7 +394,7 @@ export default function BusinessDetail() {
                       <button
                         key={bizCat}
                         onClick={() => setFilterCategory(bizCat)}
-                        className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${filterCategory === bizCat ? 'bg-primary text-white' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
+                        className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${filterCategory === bizCat ? 'bg-primary text-white' : 'bg-foreground/5 text-foreground/30 hover:bg-foreground/10'}`}
                       >
                         {bizCat === "event_organizer" ? "events" : bizCat.replace(/_/g, " ")}
                       </button>
@@ -498,14 +498,14 @@ export default function BusinessDetail() {
                                 <div className="flex flex-col sm:flex-row md:flex-col gap-3 w-full md:w-auto">
                                   <Link
                                     href={`/booking/${targetRoute}/${service._id}`}
-                                    className="px-8 py-4 bg-primary text-white text-center rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-primary-hover transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 group/btn"
+                                    className="px-8 py-4 bg-primary text-white text-center rounded-full text-xs font-black uppercase tracking-widest hover:bg-primary-hover transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 group/btn"
                                   >
                                     Book Now
                                     <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
                                   </Link>
                                   <button
                                     onClick={() => setExpandedService(expandedService === service._id ? null : service._id)}
-                                    className={`px-8 py-4 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${expandedService === service._id ? 'bg-foreground text-background' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground/10'}`}
+                                    className={`px-8 py-4 rounded-full text-xs font-black uppercase tracking-widest transition-all ${expandedService === service._id ? 'bg-foreground text-background' : 'bg-foreground/5 text-foreground/40 hover:bg-foreground/10'}`}
                                   >
                                     {expandedService === service._id ? "Hide Details" : "View Assets"}
                                   </button>
@@ -518,7 +518,7 @@ export default function BusinessDetail() {
                                   <div className="space-y-12 pb-6">
                                     {/* Sub-gallery Slider */}
                                     <div className="space-y-4">
-                                      <div className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30 ml-1">Asset Portfolio Gallery</div>
+                                      <div className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30 ml-1">Asset Portfolio Gallery</div>
                                       <div className="flex overflow-x-auto gap-6 pb-4 no-scrollbar snap-x">
                                         {service.images.map((img, idx) => (
                                           <div
@@ -538,7 +538,7 @@ export default function BusinessDetail() {
                                     </div>
 
                                     <div>
-                                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/30 mb-3 ml-1">Detailed Features & Specifications</h4>
+                                      <h4 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/30 mb-3 ml-1">Detailed Features & Specifications</h4>
                                       <p className="text-base text-foreground/70 leading-relaxed font-medium whitespace-pre-line bg-foreground/[0.01] p-6 rounded-3xl border border-foreground/[0.02]">
                                         {service.description}
                                       </p>
@@ -552,7 +552,7 @@ export default function BusinessDetail() {
                                       </div>
                                       <Link
                                         href={`/booking/${targetRoute}/${service._id}`}
-                                        className="w-full sm:w-auto px-8 py-4 bg-primary text-white text-center rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary-hover shadow-xl shadow-primary/10 flex items-center justify-center gap-2"
+                                        className="w-full sm:w-auto px-8 py-4 bg-primary text-white text-center rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-primary-hover shadow-xl shadow-primary/10 flex items-center justify-center gap-2"
                                       >
                                         Proceed to Booking Form <ArrowRight className="w-4 h-4" />
                                       </Link>
@@ -572,7 +572,7 @@ export default function BusinessDetail() {
               <div className="pt-24 border-t border-foreground/5 space-y-16">
                 <div className="space-y-4">
                   <h2 className="text-4xl font-bold tracking-tight">Verified Feedback</h2>
-                  <p className="text-foreground/40 font-bold uppercase text-[10px] tracking-[0.3em]">Authentic operational reports from previous clients</p>
+                  <p className="text-foreground/40 font-bold uppercase text-xs tracking-[0.3em]">Authentic operational reports from previous clients</p>
                 </div>
 
                 {/* Review Form Area */}
@@ -582,7 +582,7 @@ export default function BusinessDetail() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40 block ml-1">Select Target Module</label>
+                        <label className="text-xs font-black uppercase tracking-widest text-foreground/40 block ml-1">Select Target Module</label>
                         <select
                           value={selectedReviewService}
                           onChange={(e) => setSelectedReviewService(e.target.value)}
@@ -595,7 +595,7 @@ export default function BusinessDetail() {
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40 block ml-1">Rating Scalar</label>
+                        <label className="text-xs font-black uppercase tracking-widest text-foreground/40 block ml-1">Rating Scalar</label>
                         <div className="flex items-center gap-3 h-14 bg-background px-6 rounded-2xl border border-foreground/10">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <button
@@ -612,7 +612,7 @@ export default function BusinessDetail() {
                     </div>
 
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40 block ml-1">Operational Summary Comments</label>
+                      <label className="text-xs font-black uppercase tracking-widest text-foreground/40 block ml-1">Operational Summary Comments</label>
                       <textarea
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
@@ -627,7 +627,7 @@ export default function BusinessDetail() {
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="px-10 py-4 bg-primary text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-primary-hover disabled:opacity-50 transition-all flex items-center gap-3"
+                      className="px-10 py-4 bg-primary text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-primary-hover disabled:opacity-50 transition-all flex items-center gap-3"
                     >
                       {submitting ? "Transmitting..." : "Submit Verified Report"} <Send className="w-3.5 h-3.5" />
                     </button>
@@ -648,7 +648,7 @@ export default function BusinessDetail() {
                             </div>
                             <div>
                               <div className="font-bold text-sm">{rev.userId?.name || rev.userName || "System User"}</div>
-                              <div className="text-[10px] text-foreground/30 font-black uppercase tracking-widest">{rev.userId?.role || "Verified Client"}</div>
+                              <div className="text-xs text-foreground/30 font-black uppercase tracking-widest">{rev.userId?.role || "Verified Client"}</div>
                             </div>
                           </div>
                           <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/5 rounded-xl text-xs font-black text-primary">
@@ -668,7 +668,7 @@ export default function BusinessDetail() {
             <div className="lg:col-span-4">
               <div className="sticky top-32 bg-surface p-8 md:p-10 rounded-[50px] border border-foreground/[0.03] space-y-8 shadow-2xl shadow-primary/[0.02]">
                 <div className="space-y-2">
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Operational Branch Context</div>
+                  <div className="text-xs font-black uppercase tracking-[0.2em] text-primary">Operational Branch Context</div>
                   <h3 className="text-2xl font-bold tracking-tight">Entity Directory</h3>
                 </div>
 
@@ -678,7 +678,7 @@ export default function BusinessDetail() {
                       <Compass className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mb-0.5">Physical Head Office</div>
+                      <div className="text-xs font-black text-foreground/30 uppercase tracking-widest mb-0.5">Physical Head Office</div>
                       <div className="text-sm font-bold text-foreground/70">{business.location.address || "Main Boulevard Center"}</div>
                       <div className="text-xs font-semibold text-foreground/40">{business.location.city}, {business.location.region}</div>
                     </div>
@@ -689,7 +689,7 @@ export default function BusinessDetail() {
                       <Car className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mb-0.5">Asset Categories Managed</div>
+                      <div className="text-xs font-black text-foreground/30 uppercase tracking-widest mb-0.5">Asset Categories Managed</div>
                       <div className="text-sm font-bold text-foreground/70 uppercase tracking-wide text-xs">
                         {Array.isArray(business.category) ? business.category.join(' / ') : business.category}
                       </div>
@@ -701,7 +701,7 @@ export default function BusinessDetail() {
                       <CalendarDays className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mb-0.5">Last Manifest Sync</div>
+                      <div className="text-xs font-black text-foreground/30 uppercase tracking-widest mb-0.5">Last Manifest Sync</div>
                       <div className="text-sm font-bold text-foreground/70">{new Date(business.updatedAt).toLocaleDateString(undefined, { dateStyle: 'long' })}</div>
                     </div>
                   </div>
@@ -753,7 +753,7 @@ export default function BusinessDetail() {
 
             <form onSubmit={handleSubmitReport} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40 ml-1">Infraction Category</label>
+                <label className="text-xs font-black uppercase tracking-widest text-foreground/40 ml-1">Infraction Category</label>
                 <select
                   value={reportReason}
                   onChange={(e) => setReportReason(e.target.value)}
@@ -768,7 +768,7 @@ export default function BusinessDetail() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40 ml-1">Event Logs & Description</label>
+                <label className="text-xs font-black uppercase tracking-widest text-foreground/40 ml-1">Event Logs & Description</label>
                 <textarea
                   value={reportDescription}
                   onChange={(e) => setReportDescription(e.target.value)}
@@ -782,14 +782,14 @@ export default function BusinessDetail() {
                 <button
                   type="button"
                   onClick={() => setReportModal(false)}
-                  className="flex-1 py-4 bg-foreground/5 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-foreground/10 transition-all"
+                  className="flex-1 py-4 bg-foreground/5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-foreground/10 transition-all"
                 >
                   Abstain
                 </button>
                 <button
                   type="submit"
                   disabled={reportStatus === "submitting"}
-                  className="flex-1 py-4 bg-red-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-red-600 shadow-xl shadow-red-500/10 transition-all"
+                  className="flex-1 py-4 bg-red-500 text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-red-600 shadow-xl shadow-red-500/10 transition-all"
                 >
                   {reportStatus === "submitting" ? "Transmitting Violation..." : "File Official Report"}
                 </button>

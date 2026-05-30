@@ -92,7 +92,7 @@ export default function NotificationCenter() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Trigger Button */}
+      {/* Notification Button (always visible) */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className={`w-11 h-11 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-all relative ${
@@ -112,10 +112,10 @@ export default function NotificationCenter() {
         <div className="absolute top-full right-0 mt-4 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-[40px] shadow-2xl shadow-foreground/10 border border-foreground/[0.05] overflow-hidden animate-slide-up z-[100]">
           <div className="px-10 py-8 border-b border-foreground/[0.03] flex items-center justify-between bg-primary/[0.02]">
             <div>
-              <h2 className="text-[13px] font-black tracking-[0.2em] uppercase text-foreground">
+              <h2 className="text-base font-black tracking-[0.2em] uppercase text-foreground">
                 Alert Feed
               </h2>
-              <p className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest mt-1">Registry Monitor</p>
+              <p className="text-xs font-bold text-foreground/30 uppercase tracking-widest mt-1">Registry Monitor</p>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-foreground/20 hover:text-red-500 transition-colors">
               <X className="w-5 h-5" />
@@ -143,7 +143,7 @@ export default function NotificationCenter() {
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
                         <div className={`w-2 h-2 rounded-full ${!n.isRead ? "bg-primary animate-pulse" : "bg-foreground/10"}`} />
-                        <h3 className={`text-[13px] font-black tracking-tight uppercase ${!n.isRead ? "text-foreground" : "text-foreground/30"}`}>
+                        <h3 className={`text-base font-black tracking-tight uppercase ${!n.isRead ? "text-foreground" : "text-foreground/30"}`}>
                           {n.title}
                         </h3>
                       </div>
@@ -159,8 +159,8 @@ export default function NotificationCenter() {
                        {n.relatedId && (
                          <Link 
                            href={getActionHref(n.type, session?.user?.role)}
-                           onClick={() => setIsOpen(false)}
-                           className="inline-flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
+                           onClick={() => { setIsOpen(false); if (!n.isRead) markAsRead(n._id); }}
+                           className="inline-flex items-center gap-2 text-xs font-black text-primary uppercase tracking-widest hover:underline"
                          >
                            <Building2 className="w-3.5 h-3.5" /> {getActionText(n.type)}
                          </Link>
@@ -181,7 +181,7 @@ export default function NotificationCenter() {
           </div>
           
           <div className="p-6 bg-foreground/[0.01] border-t border-foreground/[0.03] text-center">
-             <span className="text-[10px] font-black text-foreground/20 uppercase tracking-[0.2em]">Institutional Command Center</span>
+             <span className="text-xs font-black text-foreground/20 uppercase tracking-[0.2em]">Institutional Command Center</span>
           </div>
         </div>
       )}

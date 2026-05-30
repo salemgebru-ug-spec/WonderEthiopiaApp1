@@ -320,7 +320,7 @@ export default function CarBookingPage() {
                         <span className="font-bold text-[#1B263B]">Total Amount</span>
                         <div className="text-right">
                           <span className="text-2xl font-bold text-primary">{totalPrice.toLocaleString()} ETB</span>
-                          <p className="text-[10px] text-gray-500 uppercase tracking-tighter">VAT Included</p>
+                          <p className="text-xs text-gray-500 uppercase tracking-tighter">VAT Included</p>
                         </div>
                       </div>
                     </div>

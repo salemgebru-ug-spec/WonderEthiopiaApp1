@@ -58,19 +58,22 @@ export async function DELETE(
   }
 }
 
-export async function GET(request: Request,
-  { params }: { params: { serviceId: string } }){
-    try{
-        await dbConnect();
-        const {serviceId}=params;
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await dbConnect();
+    const { id } = await params;
 
-    const payment = await Service.findOne({_id: serviceId});
-     return NextResponse.json(
-              {
-                message: "Service retrieved successfully",
-                data: payment
-              },
-              { status: 200 });
+    const payment = await Service.findOne({ _id: id });
+    return NextResponse.json(
+      {
+        message: "Service retrieved successfully",
+        data: payment
+      },
+      { status: 200 }
+    );
    
     }catch(error:any){
         const status = error.status || 500;

@@ -126,7 +126,7 @@ export default function ReportChat({ reportId, currentRole, initialDiscussion }:
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-4 text-foreground/10 py-12">
             <MessageSquare className="w-12 h-12" />
-            <p className="text-[12px] font-bold italic text-center max-w-[200px]">No institutional notes yet. Start the deliberation.</p>
+            <p className="text-sm font-bold italic text-center max-w-[200px]">No institutional notes yet. Start the deliberation.</p>
           </div>
         ) : (
           messages.map((msg, idx) => {
@@ -139,7 +139,7 @@ export default function ReportChat({ reportId, currentRole, initialDiscussion }:
                   <span className="text-[9px] font-bold text-foreground/20">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
                 
-                <div className={`px-5 py-3 rounded-[24px] text-[13px] font-medium leading-relaxed shadow-sm transition-all hover:shadow-md ${
+                <div className={`px-5 py-3 rounded-[24px] text-base font-medium leading-relaxed shadow-sm transition-all hover:shadow-md ${
                   isMe 
                     ? 'bg-primary text-white rounded-tr-none' 
                     : 'bg-white border border-foreground/[0.03] text-foreground/70 rounded-tl-none'
@@ -164,7 +164,7 @@ export default function ReportChat({ reportId, currentRole, initialDiscussion }:
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Institutional note..."
-            className="flex-1 px-5 py-3 bg-transparent text-[13px] font-medium focus:outline-none placeholder-foreground/20"
+            className="flex-1 px-5 py-3 bg-transparent text-base font-medium focus:outline-none placeholder-foreground/20"
           />
           <button
             type="submit"

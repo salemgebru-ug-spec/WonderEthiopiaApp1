@@ -328,3 +328,70 @@ export async function sendSuspensionEmail(
   };
   return transporter.sendMail(mailOptions);
 }
+
+export async function sendInactivityWarningEmail(
+  to: string,
+  businessName: string,
+  gracePeriodDays: number
+) {
+  const mailOptions = {
+    from: `"Wondar Ethiopia Compliance" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: `Action Required: Inactivity Warning for ${businessName}`,
+    html: `
+      <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 24px; color: #1a1a1a;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <div style="display: inline-block; padding: 12px 20px; background: #f59e0b; border-radius: 12px; color: white; font-weight: 900; font-size: 18px;">Wondar Ethiopia</div>
+        </div>
+        <h2 style="text-align: center; font-size: 26px; font-weight: 900; letter-spacing: -0.02em; color: #1a1a1a; margin-bottom: 8px;">Inactivity Warning ⚠️</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 36px; font-size: 15px;">We noticed that you haven't updated your business profile or services recently.</p>
+
+        <p style="font-size: 14px; color: #555; line-height: 1.7;">
+          To ensure tourists have access to accurate and up-to-date information, we require active participation from our partners. <strong>${businessName}</strong> will be removed from the active directory if no activity is detected within the next <strong>${gracePeriodDays} days</strong>.
+        </p>
+
+        <div style="text-align: center; margin-top: 36px;">
+          <a href="${process.env.NEXTAUTH_URL}/business/dashboard" style="background-color: #1a1a1a; color: #fff; padding: 14px 32px; text-decoration: none; font-weight: 900; border-radius: 12px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em;">Log In & Update Profile</a>
+        </div>
+
+        <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #f0f0f0; text-align: center; font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em;">
+          Wondar Ethiopia Compliance Authority
+        </div>
+      </div>
+    `,
+  };
+  return transporter.sendMail(mailOptions);
+}
+
+export async function sendInactivityRemovalEmail(
+  to: string,
+  businessName: string
+) {
+  const mailOptions = {
+    from: `"Wondar Ethiopia Compliance" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: `Notice: ${businessName} Suspended Due to Inactivity`,
+    html: `
+      <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: auto; padding: 40px; border: 1px solid #f0f0f0; border-radius: 24px; color: #1a1a1a;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <div style="display: inline-block; padding: 12px 20px; background: #dc2626; border-radius: 12px; color: white; font-weight: 900; font-size: 18px;">Wondar Ethiopia</div>
+        </div>
+        <h2 style="text-align: center; font-size: 26px; font-weight: 900; letter-spacing: -0.02em; color: #1a1a1a; margin-bottom: 8px;">Business Suspended 🚫</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 36px; font-size: 15px;">Your business operations have been officially suspended due to prolonged inactivity.</p>
+
+        <p style="font-size: 14px; color: #555; line-height: 1.7;">
+          Despite our previous warning, we did not detect any activity from <strong>${businessName}</strong>. As a result, your business has been suspended and removed from the active directory.
+        </p>
+        
+        <div style="background: #fffbeb; padding: 20px; border-radius: 12px; margin: 24px 0; border: 1px solid #fde68a;">
+          <p style="margin-bottom: 0; font-size: 13px; color: #92400e;">To restore your registry standing, you must physically report to the Ministry of Tourism with your business credentials to file an appeal.</p>
+        </div>
+
+        <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #f0f0f0; text-align: center; font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.1em;">
+          Wondar Ethiopia Compliance Authority
+        </div>
+      </div>
+    `,
+  };
+  return transporter.sendMail(mailOptions);
+}

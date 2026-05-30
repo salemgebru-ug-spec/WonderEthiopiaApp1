@@ -32,6 +32,8 @@ export interface IBusiness extends Document {
   }[];
   createdAt: Date;
   updatedAt: Date;
+  lastActivityAt?: Date;
+  inactivityWarningSentAt?: Date;
 }
 
 const BusinessSchema = new Schema<IBusiness>(
@@ -129,6 +131,14 @@ const BusinessSchema = new Schema<IBusiness>(
       date: { type: Date, default: Date.now },
       documentUrl: { type: String },
     }],
+    lastActivityAt: {
+      type: Date,
+      default: Date.now,
+    },
+    inactivityWarningSentAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

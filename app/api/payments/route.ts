@@ -119,3 +119,7 @@ export async function listPayments(){
     
 }
 
+export async function GET() {
+    return listPayments();
+}
+

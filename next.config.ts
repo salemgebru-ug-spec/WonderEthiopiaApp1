@@ -2,10 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["mongoose"],
-  // @ts-ignore
-  turbopack: {
-    root: "C:/Users/Yeabtesga/Desktop/school/wonderethiopia-current/WondarEthiopia",
-  },
   async headers() {
     return [
       {

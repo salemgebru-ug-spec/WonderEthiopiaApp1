@@ -58,7 +58,7 @@ export async function GET(request: Request) {
         await AppNotification.create({
           recipientRole: "business_owner",
           title: "New Paid Reservation",
-          message: `A new reservation has been confirmed and paid by ${booking.userId?.name || "a traveler"}.`,
+          message: `A new reservation has been confirmed and paid by ${(booking.userId as any)?.name || "a traveler"}.`,
           type: "booking_new",
           relatedId: booking._id,
         });

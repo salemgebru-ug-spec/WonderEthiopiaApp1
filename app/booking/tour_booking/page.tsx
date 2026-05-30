@@ -240,7 +240,7 @@ export default function TourBookingPage() {
                         className="w-full pl-10 pr-4 py-3 rounded-lg border border-[var(--border)] font-medium text-[#1B263B] focus:ring-2 focus:ring-primary outline-none transition-all" 
                       />
                     </div>
-                    <p className="mt-2 text-[11px] text-gray-500 uppercase font-medium">
+                    <p className="mt-2 text-sm text-gray-500 uppercase font-medium">
                       {tourData.slots} spots available for departure
                     </p>
                   </div>

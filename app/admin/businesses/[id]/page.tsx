@@ -12,6 +12,8 @@ import {
 import ChatDrawer from "@/components/admin/ChatDrawer";
 import BusinessChat from "@/components/admin/BusinessChat";
 
+import { showToast } from "@/lib/toast";
+
 const statusConfig: Record<string, { label: string; color: string; bg: string; border: string }> = {
   pending:              { label: "Pending Review",           color: "text-amber-600",   bg: "bg-amber-50",   border: "border-amber-100" },
   recommended_approve:  { label: "Approval Recommended",     color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
@@ -95,11 +97,11 @@ export default function AdminBusinessDetailPage() {
         setBusiness(data.business);
         setNotifications(data.notifications || []);
       } else {
-        toast.error(data.error || "Failed to load business.");
+        showToast("System Error", data.error || "Failed to load business.", "error");
         router.push("/admin/businesses");
       }
     } catch (e) {
-      toast.error("A connection error occurred.");
+      showToast("System Error", "A connection error occurred.", "error");
     } finally {
       setLoading(false);
     }
@@ -117,15 +119,15 @@ export default function AdminBusinessDetailPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        toast.success(data.message || "Action completed.");
+        showToast("Success", data.message || "Action completed.", "success");
         setActingOn(false);
         setActionNote("");
         fetchData();
       } else {
-        toast.error(data.error || "Action failed.");
+        showToast("System Error", data.error || "Action failed.", "error");
       }
     } catch (e) {
-      toast.error("An unexpected error occurred.");
+      showToast("System Error", "An unexpected error occurred.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -136,20 +138,20 @@ export default function AdminBusinessDetailPage() {
     try {
       const res = await fetch(`/api/businesses/${id}`, { method: "DELETE" });
       if (res.ok) {
-        toast.success("Business permanently removed from registry.");
+        showToast("Success", "Business permanently removed from registry.", "success");
         router.push("/admin/businesses");
       } else {
-        toast.error("Deletion failed.");
+        showToast("System Error", "Deletion failed.", "error");
       }
     } catch (e) {
-      toast.error("A connection error occurred during deletion.");
+      showToast("System Error", "A connection error occurred during deletion.", "error");
     }
   };
 
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-6">
       <Loader2 className="w-12 h-12 text-primary/20 animate-spin" />
-      <span className="text-[10px] font-black uppercase tracking-widest text-foreground/20 italic">Loading Registry Profile...</span>
+      <span className="text-xs font-black uppercase tracking-widest text-foreground/20 italic">Loading Registry Profile...</span>
     </div>
   );
 
@@ -192,7 +194,7 @@ export default function AdminBusinessDetailPage() {
       <main className="max-w-6xl mx-auto px-3 md:px-4 lg:px-5 py-10 lg:py-20">
 
         {/* Back Navigation */}
-        <Link href="/admin/businesses" className="inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-widest text-foreground/30 hover:text-primary transition-colors mb-12 group">
+        <Link href="/admin/businesses" className="inline-flex items-center gap-3 text-sm font-black uppercase tracking-widest text-foreground/30 hover:text-primary transition-colors mb-12 group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Registry
         </Link>
 
@@ -209,7 +211,7 @@ export default function AdminBusinessDetailPage() {
                 <h1 className="text-5xl font-black tracking-tightest leading-none mb-3">{business.name}</h1>
                 <div className="flex flex-wrap gap-3 mb-4">
                   {categories.map((c: string) => (
-                    <span key={c} className="px-4 py-1.5 bg-foreground/5 text-foreground/50 text-[10px] font-black uppercase tracking-[0.2em] rounded-full">
+                    <span key={c} className="px-4 py-1.5 bg-foreground/5 text-foreground/50 text-xs font-black uppercase tracking-[0.2em] rounded-full">
                       {c.replace(/_/g, " ")}
                     </span>
                   ))}
@@ -220,7 +222,7 @@ export default function AdminBusinessDetailPage() {
                 </div>
               </div>
             </div>
-            <div className={`px-8 py-3 rounded-full border ${sc.bg} ${sc.border} ${sc.color} flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] shrink-0`}>
+            <div className={`px-8 py-3 rounded-full border ${sc.bg} ${sc.border} ${sc.color} flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] shrink-0`}>
               {business.status === "approved" ? <ShieldCheck className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
               {sc.label}
             </div>
@@ -240,19 +242,19 @@ export default function AdminBusinessDetailPage() {
             { id: "history",  label: `Audit History (${auditItems.length})`, icon: <History className="w-4 h-4" /> },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
-              className={`px-10 py-5 rounded-[28px] text-[11px] font-black uppercase tracking-[0.2em] flex items-center gap-3 transition-all ${activeTab === tab.id ? "bg-foreground text-background shadow-xl" : "bg-white border border-foreground/5 text-foreground/30 hover:text-primary hover:border-primary/20"}`}>
+              className={`px-10 py-5 rounded-[28px] text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3 transition-all ${activeTab === tab.id ? "bg-foreground text-background shadow-xl" : "bg-white border border-foreground/5 text-foreground/30 hover:text-primary hover:border-primary/20"}`}>
               {tab.icon} {tab.label}
             </button>
           ))}
         </div>
 
         {activeTab === "overview" ? (
-          <div className="grid grid-cols-1 xl:grid-cols-[3fr_1fr] gap-10 items-start animate-fade-in">
+          <div className="grid grid-cols-1 gap-10 items-start animate-fade-in">
             {/* LEFT: Main business info */}
             <div className="space-y-10">
             {/* Info Grid */}
             <div className="bg-white rounded-[60px] p-10 md:p-16 shadow-2xl shadow-foreground/5 border border-foreground/[0.03]">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-10">Registry Identity</h2>
+              <h2 className="text-xs font-black uppercase tracking-[0.4em] text-primary mb-10">Registry Identity</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {[
                   { label: "Permit Number",   value: business.permitNumber,  icon: <FileText className="w-5 h-5" /> },
@@ -278,7 +280,7 @@ export default function AdminBusinessDetailPage() {
             {/* Industry Details */}
             {business.industryDetails && Object.keys(business.industryDetails).length > 0 && (
               <div className="bg-white rounded-[60px] p-10 md:p-16 shadow-2xl shadow-foreground/5 border border-foreground/[0.03]">
-                <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-10">Sector-Specific Intelligence Hub</h2>
+                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-primary mb-10">Sector-Specific Intelligence Hub</h2>
                 <div className="space-y-12">
                   {categories.map((sector: string) => {
                     const sectorLabels: any = { hotel: "Hotel Intelligence", tour_operator: "Expedition Intelligence", car_rental: "Fleet Logistics", event_organizer: "Event Metrics" };
@@ -289,7 +291,7 @@ export default function AdminBusinessDetailPage() {
                       <div key={sector}>
                         <div className="flex items-center gap-4 mb-8">
                           <div className="h-[1px] flex-1 bg-foreground/5" />
-                          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/40 px-4 py-2 border border-foreground/5 rounded-full bg-foreground/[0.01]">
+                          <span className="text-xs font-black uppercase tracking-[0.3em] text-foreground/40 px-4 py-2 border border-foreground/5 rounded-full bg-foreground/[0.01]">
                             {sectorLabels[sector] || sector.replace(/_/g, " ")}
                           </span>
                           <div className="h-[1px] flex-1 bg-foreground/5" />
@@ -311,7 +313,7 @@ export default function AdminBusinessDetailPage() {
                     <div className="pt-10 border-t border-foreground/5">
                       <div className="flex items-center gap-3 mb-8">
                         <ShieldCheck className="w-4 h-4 text-emerald-500/40" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-foreground/30 italic">Verification Artifacts & Credentials</span>
+                        <span className="text-xs font-black uppercase tracking-[0.3em] text-foreground/30 italic">Verification Artifacts & Credentials</span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {business.industryDetails.documents.map((v: any, idx: number) => (
@@ -322,7 +324,7 @@ export default function AdminBusinessDetailPage() {
                             </div>
                             <div className="min-w-0">
                               <span className="text-[8px] font-black uppercase text-foreground/20 block mb-1">{v.fieldName}</span>
-                              <span className="text-[11px] font-extrabold text-foreground/60 truncate block uppercase">{v.fileName || "View Document"}</span>
+                              <span className="text-sm font-extrabold text-foreground/60 truncate block uppercase">{v.fileName || "View Document"}</span>
                             </div>
                           </a>
                         ))}
@@ -332,26 +334,6 @@ export default function AdminBusinessDetailPage() {
                 </div>
               </div>
             )}
-
-
-            </div>{/* end left column */}
-
-            {/* RIGHT: Discussion Panel (1fr) */}
-            <div className="sticky top-8">
-              <div className="bg-white rounded-[40px] shadow-2xl shadow-foreground/5 border border-foreground/[0.03] overflow-hidden flex flex-col" style={{ height: "calc(100vh - 12rem)" }}>
-                <div className="px-8 py-6 border-b border-foreground/[0.03] bg-primary/[0.02] flex items-center gap-4 shrink-0">
-                  <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                    <MessageSquare className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground">Internal Discussion</p>
-                    <p className="text-[9px] font-bold text-foreground/30 uppercase tracking-widest mt-0.5">Admin ↔ Tourism Office</p>
-                  </div>
-                </div>
-                <div className="flex-1 min-h-0">
-                  <BusinessChat businessId={id} currentRole="super_admin" />
-                </div>
-              </div>
             </div>
           </div>
         ) : (
@@ -391,10 +373,10 @@ export default function AdminBusinessDetailPage() {
                           </div>
                           <div className="flex-1 bg-foreground/[0.01] border border-foreground/[0.05] rounded-[32px] p-8 -mt-1 group-hover:border-primary/20 transition-colors">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                              <span className={`text-[10px] font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full border w-fit ${badgeColor}`}>
+                              <span className={`text-xs font-black uppercase tracking-[0.3em] px-4 py-2 rounded-full border w-fit ${badgeColor}`}>
                                 {item.action}
                               </span>
-                              <span className="text-[10px] font-bold tracking-widest text-foreground/30 uppercase">
+                              <span className="text-xs font-bold tracking-widest text-foreground/30 uppercase">
                                 {item.date.toLocaleString()}
                               </span>
                             </div>
@@ -414,7 +396,7 @@ export default function AdminBusinessDetailPage() {
                                       <div className="flex flex-wrap gap-3 pt-2">
                                         {linkParts.map((s, i) => (
                                           <a key={i} href={s.href} target="_blank" rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-foreground/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm group/doc">
+                                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-foreground/10 rounded-2xl text-xs font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm group/doc">
                                             <FileText className="w-3.5 h-3.5" /> {s.content}
                                           </a>
                                         ))}
@@ -427,7 +409,7 @@ export default function AdminBusinessDetailPage() {
                             {/* Legacy documentUrl fallback (from historyLogs) */}
                             {item.documentUrl && (
                               <a href={item.documentUrl} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-3 mt-4 px-6 py-3 bg-white border border-foreground/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
+                                className="inline-flex items-center gap-3 mt-4 px-6 py-3 bg-white border border-foreground/5 rounded-2xl text-xs font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
                                 <FileText className="w-4 h-4" /> View Archival Document
                               </a>
                             )}

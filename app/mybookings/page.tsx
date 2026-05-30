@@ -344,7 +344,7 @@ export default function MyBookings() {
 
                   {/* Image Container with Absolute Layout Context */}
                   <div className="md:w-64 h-48 md:h-auto bg-[#1B263B]/5 relative flex items-center justify-center overflow-hidden min-h-[180px]">
-                    <div className="absolute top-4 left-4 z-10 bg-[#1B263B] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    <div className="absolute top-4 left-4 z-10 bg-[#1B263B] text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                       {booking.status}
                     </div>
                     {booking.image ? (

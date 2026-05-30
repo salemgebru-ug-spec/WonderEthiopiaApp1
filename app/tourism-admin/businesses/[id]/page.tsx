@@ -208,7 +208,7 @@ export default function TourismAdminBusinessDetailPage() {
         </div>
 
         {activeTab === "overview" ? (
-          <div className="grid grid-cols-1 xl:grid-cols-[3fr_1fr] gap-10 items-start animate-fade-in">
+          <div className="grid grid-cols-1 gap-10 items-start animate-fade-in">
             {/* LEFT: Main business info & Controls */}
             <div className="space-y-10">
               {/* Info Grid */}
@@ -292,24 +292,6 @@ export default function TourismAdminBusinessDetailPage() {
 
 
             </div>{/* end left column */}
-
-            {/* RIGHT: Discussion Panel (1fr) */}
-            <div className="sticky top-8">
-              <div className="bg-white rounded-[40px] shadow-2xl shadow-foreground/5 border border-foreground/[0.03] overflow-hidden flex flex-col" style={{ height: "calc(100vh - 12rem)" }}>
-                <div className="px-8 py-6 border-b border-foreground/[0.03] bg-primary/[0.02] flex items-center gap-4 shrink-0">
-                  <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                    <MessageSquare className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground">Internal Discussion</p>
-                    <p className="text-[9px] font-bold text-foreground/30 uppercase tracking-widest mt-0.5">Tourism Office ↔ Admin</p>
-                  </div>
-                </div>
-                <div className="flex-1 min-h-0">
-                  <BusinessChat businessId={id} currentRole="tourism_admin" />
-                </div>
-              </div>
-            </div>
           </div>
 
         ) : (

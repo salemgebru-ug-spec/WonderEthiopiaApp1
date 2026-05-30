@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import { registerPayment } from "../../payments/route";
 import TourBooking from "@/models/TourBooking";
-
+import Service from "@/models/Service";
 export async function POST(request: Request) {
     try {
         await dbConnect(); 
@@ -14,6 +14,23 @@ export async function POST(request: Request) {
         // 1. Validation
         if (!number_of_people || !user_id || !tour_id || !total_price) {
             return NextResponse.json({ error: "All fields are required",data:body }, { status: 400 });
+        }
+
+        // 1.5 Capacity Check
+        const service = await Service.findById(tour_id);
+        if (!service) {
+            return NextResponse.json({ error: "Tour service not found" }, { status: 404 });
+        }
+
+        const maxCapacity = service.availability?.quantity || service.metadata?.capacity || service.metadata?.maxOccupancy || service.metadata?.eventCapacity || 0;
+        
+        if (maxCapacity > 0) {
+            const existingBookings = await TourBooking.find({ tour_id });
+            const totalBooked = existingBookings.reduce((sum, b) => sum + (b.number_of_people || 0), 0);
+            
+            if (totalBooked + number_of_people > maxCapacity) {
+                return NextResponse.json({ error: `Capacity exceeded. Only ${Math.max(0, maxCapacity - totalBooked)} spots available.` }, { status: 400 });
+            }
         }
 
         // 2. Initiate Payment

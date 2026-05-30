@@ -26,8 +26,7 @@ const TourismProfileSchema: Schema = new Schema(
     },
     travel_style: { 
       type: String, 
-      enum: ["luxury", "budget", "backpacking", "eco_friendly"],
-      required: true 
+      enum: ["luxury", "budget", "backpacking", "eco_friendly", ""]
     },
     interests: { 
       type: [String], 
@@ -36,13 +35,11 @@ const TourismProfileSchema: Schema = new Schema(
     },
     accommodation_type: { 
       type: String, 
-      enum: ["hotel", "lodge", "hostel"],
-      required: true 
+      enum: ["hotel", "lodge", "hostel", ""]
     },
     room_type: { 
       type: String, 
-      enum: ["private", "shared"],
-      required: true 
+      enum: ["private", "shared", ""]
     },
     amenities: { 
       type: [String], 
@@ -51,18 +48,15 @@ const TourismProfileSchema: Schema = new Schema(
     },
     duration_preference: { 
       type: String, 
-      enum: ["short", "medium", "long"],
-      required: true 
+      enum: ["short", "medium", "long", ""]
     },
     fitness_level: { 
       type: String, 
-      enum: ["easy", "moderate", "hard"],
-      required: true 
+      enum: ["easy", "moderate", "hard", ""]
     },
     group_type: { 
       type: String, 
-      enum: ["solo", "couple", "family"],
-      required: true 
+      enum: ["solo", "couple", "family", ""]
     },
     isCompleted: { type: Boolean, default: false }
   },

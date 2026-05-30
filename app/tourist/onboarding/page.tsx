@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 
+import { showToast } from "@/lib/toast";
+
 const steps = [
   { id: "activities", title: "Adventure", icon: <Mountain className="w-5 h-5" /> },
   { id: "style", title: "Style", icon: <Compass className="w-5 h-5" /> },
@@ -122,7 +124,7 @@ export default function OnboardingPage() {
 
   const handleNext = async () => {
     if (!validateStep()) {
-      toast.warn("Please complete your profile pointers.");
+      showToast("Notice", "Please complete your profile pointers.", "warn");
       return;
     }
 
@@ -139,11 +141,30 @@ export default function OnboardingPage() {
         body: JSON.stringify(formData),
       });
       if (res.ok) {
-        toast.success("Intelligence profile synchronized.");
+        showToast("Success", "Intelligence profile synchronized.", "success");
         window.location.href = "/dashboard";
       }
     } catch {
-      toast.error("Synchronization interrupted.");
+      showToast("System Error", "Synchronization interrupted.", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSkip = async () => {
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/tourist/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      if (res.ok) {
+        showToast("Intelligence", "Profile setup skipped. You can update it later.", "info");
+        window.location.href = "/dashboard";
+      }
+    } catch {
+      showToast("System Error", "An error occurred while skipping.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -168,7 +189,7 @@ export default function OnboardingPage() {
           {currentStep === 0 && (
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
               <div className="text-center">
-                <div className="text-primary font-black text-[10px] tracking-[0.4em] mb-4 uppercase">Protocol 01</div>
+                <div className="text-primary font-black text-xs tracking-[0.4em] mb-4 uppercase">Protocol 01</div>
                 <h1 className="text-4xl font-black tracking-tightest uppercase text-foreground mb-4">Adventure <span className="text-primary italic">& Activity.</span></h1>
                 <p className="text-foreground/40 text-sm font-medium italic">Define your expedition signals</p>
               </div>
@@ -193,7 +214,7 @@ export default function OnboardingPage() {
           {currentStep === 1 && (
             <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4">
               <div className="text-center">
-                <div className="text-primary font-black text-[10px] tracking-[0.4em] mb-4 uppercase">Protocol 02</div>
+                <div className="text-primary font-black text-xs tracking-[0.4em] mb-4 uppercase">Protocol 02</div>
                 <h1 className="text-4xl font-black tracking-tightest uppercase text-foreground mb-4">Travel <span className="text-primary italic">Style.</span></h1>
                 <p className="text-foreground/40 text-sm font-medium italic">Your primary exploration baseline</p>
               </div>
@@ -202,7 +223,7 @@ export default function OnboardingPage() {
                   <button key={opt.id} onClick={() => setSingle('travel_style', opt.id)}
                     className={`p-8 rounded-[40px] border transition-all text-left ${formData.travel_style === opt.id ? "bg-foreground text-background border-foreground shadow-xl" : "bg-white/40 border-foreground/5 hover:border-primary/20"}`}>
                     <h3 className="text-xl font-black tracking-tight mb-2">{opt.label}</h3>
-                    <p className={`text-[11px] font-medium italic ${formData.travel_style === opt.id ? "opacity-40" : "text-foreground/30"}`}>{opt.desc}</p>
+                    <p className={`text-sm font-medium italic ${formData.travel_style === opt.id ? "opacity-40" : "text-foreground/30"}`}>{opt.desc}</p>
                   </button>
                 ))}
               </div>
@@ -219,7 +240,7 @@ export default function OnboardingPage() {
               <div className="flex flex-wrap justify-center gap-3">
                 {interestOptions.map(opt => (
                   <button key={opt.id} onClick={() => toggleMulti('interests', opt.id)}
-                    className={`px-8 py-5 rounded-full text-[13px] font-black transition-all flex items-center gap-4 ${formData.interests.includes(opt.id) ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105" : "bg-white/40 border-foreground/5 text-foreground/40 hover:text-primary"}`}>
+                    className={`px-8 py-5 rounded-full text-base font-black transition-all flex items-center gap-4 ${formData.interests.includes(opt.id) ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105" : "bg-white/40 border-foreground/5 text-foreground/40 hover:text-primary"}`}>
                     {opt.icon}
                     {opt.label}
                   </button>
@@ -240,7 +261,7 @@ export default function OnboardingPage() {
                 <div className="grid grid-cols-3 gap-3">
                   {accommodationOptions.map(opt => (
                     <button key={opt.id} onClick={() => setSingle('accommodation_type', opt.id)}
-                      className={`py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest border transition-all ${formData.accommodation_type === opt.id ? "bg-foreground text-background border-foreground shadow-lg" : "border-foreground/5 hover:border-primary/20"}`}>
+                      className={`py-4 rounded-2xl text-sm font-black uppercase tracking-widest border transition-all ${formData.accommodation_type === opt.id ? "bg-foreground text-background border-foreground shadow-lg" : "border-foreground/5 hover:border-primary/20"}`}>
                       {opt.label}
                     </button>
                   ))}
@@ -252,7 +273,7 @@ export default function OnboardingPage() {
                 <div className="flex justify-center gap-4">
                   {["private", "shared"].map(opt => (
                     <button key={opt} onClick={() => setSingle('room_type', opt)}
-                      className={`flex-1 max-w-[140px] py-4 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${formData.room_type === opt ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" : "border-foreground/5 hover:text-primary"}`}>
+                      className={`flex-1 max-w-[140px] py-4 rounded-full text-xs font-black uppercase tracking-widest border transition-all ${formData.room_type === opt ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" : "border-foreground/5 hover:text-primary"}`}>
                       {opt}
                     </button>
                   ))}
@@ -264,7 +285,7 @@ export default function OnboardingPage() {
                 <div className="flex flex-wrap justify-center gap-3">
                   {amenityOptions.map(opt => (
                     <button key={opt.id} onClick={() => toggleMulti('amenities', opt.id)}
-                      className={`px-6 py-3 rounded-xl border text-[11px] font-bold transition-all flex items-center gap-3 ${formData.amenities.includes(opt.id) ? "bg-primary/10 text-primary border-primary shadow-sm" : "border-foreground/5 opacity-40 hover:opacity-100"}`}>
+                      className={`px-6 py-3 rounded-xl border text-sm font-bold transition-all flex items-center gap-3 ${formData.amenities.includes(opt.id) ? "bg-primary/10 text-primary border-primary shadow-sm" : "border-foreground/5 opacity-40 hover:opacity-100"}`}>
                       {opt.icon}
                       {opt.label}
                     </button>
@@ -291,7 +312,7 @@ export default function OnboardingPage() {
                    <div className="flex flex-col gap-2">
                      {[{id:"short", l:"1–3 Days"}, {id:"medium", l:"1 Week"}, {id:"long", l:"Extended"}].map(opt => (
                        <button key={opt.id} onClick={() => setSingle('duration_preference', opt.id)}
-                         className={`px-4 py-3 rounded-xl text-[11px] font-bold text-left border transition-all ${formData.duration_preference === opt.id ? "bg-primary text-white border-primary" : "border-foreground/5 hover:border-primary/20"}`}>
+                         className={`px-4 py-3 rounded-xl text-sm font-bold text-left border transition-all ${formData.duration_preference === opt.id ? "bg-primary text-white border-primary" : "border-foreground/5 hover:border-primary/20"}`}>
                          {opt.l}
                        </button>
                      ))}
@@ -306,7 +327,7 @@ export default function OnboardingPage() {
                    <div className="flex flex-col gap-2">
                      {["easy", "moderate", "hard"].map(opt => (
                        <button key={opt} onClick={() => setSingle('fitness_level', opt)}
-                         className={`px-4 py-3 rounded-xl text-[11px] font-bold text-left border capitalize transition-all ${formData.fitness_level === opt ? "bg-primary text-white border-primary" : "border-foreground/5 hover:border-primary/20"}`}>
+                         className={`px-4 py-3 rounded-xl text-sm font-bold text-left border capitalize transition-all ${formData.fitness_level === opt ? "bg-primary text-white border-primary" : "border-foreground/5 hover:border-primary/20"}`}>
                          {opt}
                        </button>
                      ))}
@@ -321,7 +342,7 @@ export default function OnboardingPage() {
                    <div className="flex flex-col gap-2">
                      {["solo", "couple", "family"].map(opt => (
                        <button key={opt} onClick={() => setSingle('group_type', opt)}
-                         className={`px-4 py-3 rounded-xl text-[11px] font-bold text-left border capitalize transition-all ${formData.group_type === opt ? "bg-primary text-white border-primary" : "border-foreground/5 hover:border-primary/20"}`}>
+                         className={`px-4 py-3 rounded-xl text-sm font-bold text-left border capitalize transition-all ${formData.group_type === opt ? "bg-primary text-white border-primary" : "border-foreground/5 hover:border-primary/20"}`}>
                          {opt}
                        </button>
                      ))}
@@ -333,14 +354,22 @@ export default function OnboardingPage() {
 
           {/* Navigation */}
           <div className="mt-16 flex items-center justify-between gap-6 w-full">
-            {currentStep > 0 ? (
-              <button onClick={() => setCurrentStep(prev => prev - 1)}
-                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-foreground/20 hover:text-primary transition-colors">
-                <ChevronLeft className="w-3 h-3" /> Back
+            <div className="flex items-center gap-4">
+              {currentStep > 0 ? (
+                <button onClick={() => setCurrentStep(prev => prev - 1)}
+                  className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-foreground/20 hover:text-primary transition-colors">
+                  <ChevronLeft className="w-3 h-3" /> Back
+                </button>
+              ) : <div />}
+              
+              <button onClick={handleSkip} disabled={isSubmitting}
+                className="flex items-center gap-2 text-xs font-bold text-foreground/40 hover:text-foreground transition-colors ml-4 underline underline-offset-4 decoration-foreground/20 hover:decoration-foreground">
+                Skip for now
               </button>
-            ) : <div />}
+            </div>
+            
             <button onClick={handleNext} disabled={isSubmitting}
-              className="px-12 h-14 bg-foreground text-background text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-primary hover:text-white transition-all transform active:scale-95 shadow-premium flex items-center justify-center gap-3">
+              className="px-12 h-14 bg-foreground text-background text-sm font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-primary hover:text-white transition-all transform active:scale-95 shadow-premium flex items-center justify-center gap-3">
               {isSubmitting ? (
                 <Loader2 className="w-4 h-4 animate-spin text-background" />
               ) : (

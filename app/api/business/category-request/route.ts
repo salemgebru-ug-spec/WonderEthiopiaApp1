@@ -204,7 +204,7 @@ export async function PATCH(req: Request) {
       // Apply the expansion if approved
       if (action === "approve" && requestedCategories.length > 0) {
         const currentCats = Array.isArray(business.category) ? business.category : [business.category];
-        business.category = Array.from(new Set([...currentCats, ...requestedCategories]));
+        business.category = Array.from(new Set([...currentCats, ...requestedCategories])) as ("hotel" | "tour_operator" | "car_rental" | "event_organizer")[];
 
         // Parse Supplemental Industry Data from notification message and merge into industryDetails
         const existingDetails = business.industryDetails || {};

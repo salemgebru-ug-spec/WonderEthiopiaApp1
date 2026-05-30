@@ -49,13 +49,13 @@ export default function UnauthorizedPage() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href="/"
-            className="w-full sm:w-auto px-3 md:px-4 lg:px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-black text-[13px] font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300"
+            className="w-full sm:w-auto px-3 md:px-4 lg:px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-black text-base font-bold rounded-full hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300"
           >
             Go Home
           </Link>
           <Link
             href="/dashboard"
-            className="w-full sm:w-auto px-3 md:px-4 lg:px-5 py-3 border border-white/[0.08] text-[13px] font-medium text-gray-400 rounded-full hover:text-white hover:border-white/[0.15] transition-all duration-300"
+            className="w-full sm:w-auto px-3 md:px-4 lg:px-5 py-3 border border-white/[0.08] text-base font-medium text-gray-400 rounded-full hover:text-white hover:border-white/[0.15] transition-all duration-300"
           >
             Back to Dashboard
           </Link>

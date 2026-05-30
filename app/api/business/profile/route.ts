@@ -75,6 +75,7 @@ export async function PATCH(request: Request) {
     updatableFields.forEach(f => {
       if (json[f] !== undefined) update[f] = json[f];
     });
+    update.lastActivityAt = new Date(); // Reset inactivity timer
 
     console.log("UPDATING BUSINESS PROFILE:", { id: session.user.id, businessId: json._id, update });
     console.log("PROFILE PICTURE IN UPDATE:", update.profilePicture);

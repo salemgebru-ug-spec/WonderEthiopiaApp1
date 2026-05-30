@@ -2,11 +2,13 @@ import dbConnect from "@/lib/mongodb";
 import Payment from "@/models/Payment";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request,
-  { params }: { params: { id: string } }){
-    try{
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+    try {
         await dbConnect();
-        const {id}=params;
+        const { id } = await params;
 
     const payment=await Payment.find({ car_id: id });
      return NextResponse.json(

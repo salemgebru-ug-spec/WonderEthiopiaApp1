@@ -86,7 +86,7 @@ export default function UserBookingsPage() {
         <div className="animate-fade-in">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">
+            <span className="text-xs font-black tracking-[0.3em] uppercase text-primary">
               Personal Asset Log
             </span>
           </div>
@@ -132,7 +132,7 @@ export default function UserBookingsPage() {
                           {booking.serviceId?.name}
                         </h2>
                       </div>
-                      <div className={`px-5 py-2 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm`}>
+                      <div className={`px-5 py-2 rounded-full border ${sc.bg} ${sc.color} flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] shadow-sm`}>
                          {sc.icon}
                          {sc.label}
                       </div>
@@ -162,17 +162,17 @@ export default function UserBookingsPage() {
 
                     {/* Bottom Row: Actions */}
                     <div className="flex items-center justify-between pt-8 mt-4">
-                       <span className="text-[10px] font-bold text-foreground/30">ID: ...{booking._id.slice(-8).toUpperCase()}</span>
+                       <span className="text-xs font-bold text-foreground/30">ID: ...{booking._id.slice(-8).toUpperCase()}</span>
                        <div className="flex items-center gap-2 md:gap-4">
                          <Link 
                            href={`/discover/businesses/${booking.businessId?._id}`}
-                           className="px-3 md:px-4 lg:px-5 py-3 bg-foreground text-background text-[10px] font-black rounded-2xl hover:bg-primary transition-all flex items-center gap-3 uppercase tracking-widest"
+                           className="px-3 md:px-4 lg:px-5 py-3 bg-foreground text-background text-xs font-black rounded-2xl hover:bg-primary transition-all flex items-center gap-3 uppercase tracking-widest"
                          >
                            Partner Intel
                          </Link>
                          <Link 
                            href={`/discover/businesses/${booking.businessId?._id}`}
-                           className="px-3 md:px-4 lg:px-5 py-3 bg-primary text-white text-[10px] font-black rounded-2xl hover:bg-primary-hover shadow-xl shadow-primary/20 transition-all flex items-center gap-2 uppercase tracking-widest"
+                           className="px-3 md:px-4 lg:px-5 py-3 bg-primary text-white text-xs font-black rounded-2xl hover:bg-primary-hover shadow-xl shadow-primary/20 transition-all flex items-center gap-2 uppercase tracking-widest"
                          >
                            <Star className="w-3.5 h-3.5 fill-current" /> Rate Asset
                          </Link>

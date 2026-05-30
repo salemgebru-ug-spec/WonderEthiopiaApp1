@@ -8,21 +8,6 @@ export interface IUser extends Document {
   phoneNumber?: string;
   bio?: string;
   profileImage?: string;
-  preferences?: {
-    travelStyle?: string; // cultural, adventure, relaxation, luxury, backpacking
-    preferredAccommodationType?: string; // hotel, hostel, resort, lodge
-    roomPreference?: string; // private, shared
-    preferredActivities?: string[]; // hiking, wildlife safari, city tours, nightlife, historical sites
-    transportPreference?: string; // private vehicle, group transport, public transport
-    comfortLevel?: string; // standard, luxury
-    onboardingComplete?: boolean;
-    
-    // existing support
-    categories?: string[]; 
-    regions?: string[];
-    budget?: "low" | "mid" | "high";
-    language?: string;
-  };
   needsPasswordChange?: boolean;
   tempPasswordExpiresAt?: Date;
   createdAt: Date;
@@ -56,15 +41,7 @@ const UserSchema = new Schema<IUser>(
     phoneNumber: { type: String, default: "" },
     bio: { type: String, default: "" },
     profileImage: { type: String, default: "" },
-    preferences: {
-      type: Schema.Types.Mixed,
-      default: {
-        categories: [],
-        regions: [],
-        budget: "mid",
-        language: "english",
-      },
-    },
+
     needsPasswordChange: {
       type: Boolean,
       default: false,
