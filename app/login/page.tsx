@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { signInWithPopup, auth,signInWithRedirect, getRedirectResult, googleProvider } from "@/lib/firebase";
+import { signInWithRedirect, getRedirectResult, auth, googleProvider } from "@/lib/firebase";
 import { ArrowLeft, Mail, Lock, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
@@ -14,6 +14,27 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [requestingNew, setRequestingNew] = useState(false);
+
+  // Handle Firebase redirect result
+  useEffect(() => {
+    (async () => {
+      const result = await getRedirectResult(auth);
+      if (result?.user) {
+        const idToken = await result.user.getIdToken();
+        const nextAuthResult = await signIn("credentials", {
+          idToken,
+          redirect: false,
+        });
+        if (nextAuthResult?.error) {
+          setError(nextAuthResult.error);
+          setLoading(false);
+        } else {
+          router.push("/dashboard");
+          router.refresh();
+        }
+      }
+    })();
+  }, [router]);
 
   const handleRequestNewPassword = async () => {
     if (!email) {
@@ -44,14 +65,12 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
-
       if (result?.error) {
         setError(result.error);
         setLoading(false);
@@ -69,21 +88,8 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const idToken = await result.user.getIdToken();
-
-      const nextAuthResult = await signIn("credentials", {
-        idToken,
-        redirect: false,
-      });
-
-      if (nextAuthResult?.error) {
-        setError(nextAuthResult.error);
-        setLoading(false);
-      } else {
-        router.push("/dashboard");
-        router.refresh();
-      }
+      await signInWithRedirect(auth, googleProvider);
+      // Result handled in useEffect
     } catch (err: any) {
       setError(err.message || "Google sign in failed");
       setLoading(false);
@@ -98,10 +104,7 @@ export default function LoginPage() {
       </div>
 
       <div className="relative w-full max-w-[440px] animate-fade-in">
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 text-base font-bold text-foreground/40 hover:text-primary transition-colors mb-12 group"
-        >
+        <Link href="/" className="inline-flex items-center gap-2 text-base font-bold text-foreground/40 hover:text-primary transition-colors mb-12 group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Back to Explorations
         </Link>
@@ -119,36 +122,24 @@ export default function LoginPage() {
         <div className="glass-elevated rounded-[32px] p-8 md:p-10 shadow-2xl shadow-foreground/5 border border-foreground/[0.03]">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className={`border rounded-2xl p-4 text-base text-center font-bold animate-shake ${error.startsWith("Success!") ? "bg-green-50 border-green-100 text-green-600" : "bg-red-50 border-red-100 text-red-500"}`}>
-                {error === "EXPIRED_TEMP_PASSWORD" ? (
-                  <div className="flex flex-col gap-3 items-center">
-                    <p>Your temporary password has expired.</p>
-                    <button 
-                      type="button" 
-                      onClick={handleRequestNewPassword}
-                      disabled={requestingNew}
-                      className="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-black hover:bg-red-200 transition-colors flex items-center gap-2"
-                    >
-                      {requestingNew ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                      Request New Setup Link
-                    </button>
-                  </div>
-                ) : (
-                  error
-                )}
+              <div
+                className={`border rounded-2xl p-4 text-base text-center font-bold animate-shake ${
+                  error.startsWith("Success!")
+                    ? "bg-green-50 border-green-100 text-green-600"
+                    : "bg-red-50 border-red-100 text-red-500"
+                }`}
+              >
+                {error}
               </div>
             )}
 
             <div className="space-y-2">
-              <label
-                htmlFor="email"
-                className="block text-sm font-black text-foreground/30 uppercase tracking-[0.1em]"
-              >
+              <label htmlFor="email" className="block text-sm font-black text-foreground/30 uppercase tracking-[0.1em]">
                 Email Address
               </label>
               <div className="relative group">
-                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
-                 <input
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
+                <input
                   id="email"
                   type="email"
                   value={email}
@@ -161,10 +152,7 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <label
-                htmlFor="password"
-                className="block text-sm font-black text-foreground/30 uppercase tracking-[0.1em]"
-              >
+              <label htmlFor="password" className="block text-sm font-black text-foreground/30 uppercase tracking-[0.1em]">
                 Password
               </label>
               <div className="relative group">
@@ -208,40 +196,25 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full py-4 glass text-foreground font-bold text-[14px] rounded-2xl border-foreground/5 hover:bg-foreground/[0.02] transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98]"
+            className="w-full py-4 glass text-foreground font-bold text-[14px] rounded-2xl border-foreground/5 hover:bg-foreground/[0.02] transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+              <path fill="#EA4334" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
             Sign in with Google
           </button>
-        </div>
 
-        <div className="mt-10 text-center">
-          <p className="text-foreground/40 text-[14px] font-medium">
-            New to the platform?{" "}
-            <Link
-              href="/register"
-              className="text-primary hover:text-primary-hover font-bold transition-all border-b border-primary/20 hover:border-primary pb-0.5"
-            >
-              Begin Registration
-            </Link>
-          </p>
+          <div className="mt-10 text-center">
+            <p className="text-foreground/40 text-[14px] font-medium">
+              New to the platform?{' '}
+              <Link href="/register" className="text-primary hover:text-primary-hover font-bold transition-all border-b border-primary/20 hover:border-primary pb-0.5">
+                Begin Registration
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

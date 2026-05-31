@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { signInWithPopup, signInWithRedirect, getRedirectResult,auth, googleProvider } from "@/lib/firebase";
+import { signInWithRedirect, getRedirectResult, auth, googleProvider } from "@/lib/firebase";
 import { ArrowLeft, User, Mail, Lock, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
@@ -17,6 +17,26 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const result = await getRedirectResult(auth);
+      if (result?.user) {
+        const idToken = await result.user.getIdToken();
+        const nextAuthResult = await signIn("credentials", {
+          idToken,
+          redirect: false,
+        });
+        if (nextAuthResult?.error) {
+          setError(nextAuthResult.error);
+          setLoading(false);
+        } else {
+          router.push("/dashboard");
+          router.refresh();
+        }
+      }
+    })();
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -62,21 +82,8 @@ export default function RegisterPage() {
     setError("");
     setLoading(true);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const idToken = await result.user.getIdToken();
-
-      const nextAuthResult = await signIn("credentials", {
-        idToken,
-        redirect: false,
-      });
-
-      if (nextAuthResult?.error) {
-        setError(nextAuthResult.error);
-        setLoading(false);
-      } else {
-        router.push("/dashboard");
-        router.refresh();
-      }
+      await signInWithRedirect(auth, googleProvider);
+      // Result will be handled in useEffect above
     } catch (err: any) {
       setError(err.message || "Google sign in failed");
       setLoading(false);
@@ -98,8 +105,8 @@ export default function RegisterPage() {
       </div>
 
       <div className="relative w-full max-w-[460px] animate-fade-in">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="inline-flex items-center gap-2 text-base font-bold text-foreground/40 hover:text-primary transition-colors mb-12 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
