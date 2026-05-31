@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
 import dbConnect from "@/lib/mongodb";
 import Business from "@/models/Business";
 import AppNotification from "@/models/Notification";
 import { pusherServer } from "@/lib/pusher";
+import { adminStorage } from "@/lib/firebase-admin";
 
 export async function POST(request: Request) {
   try {
@@ -52,25 +51,22 @@ export async function POST(request: Request) {
 
     // Process files
     const uploadedFilePaths: string[] = [];
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-    // Ensure directory exists (just in case)
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {}
-
-    // Extract industry files
     const industryFilesMetadata: any[] = [];
+    const bucket = adminStorage.bucket();
     
     for (const [key, value] of Array.from(formData.entries())) {
       if (key.startsWith("file_") && value instanceof File) {
         const file = value;
         const buffer = Buffer.from(await file.arrayBuffer());
-        const fileName = `${Date.now()}_${file.name.replace(/\s+/g, "_")}`;
-        const filePath = path.join(uploadDir, fileName);
+        const fileName = `business_uploads/${Date.now()}_${file.name.replace(/\\s+/g, "_")}`;
         
-        await writeFile(filePath, buffer);
-        const publicUrl = `/uploads/${fileName}`;
+        const fileRef = bucket.file(fileName);
+        await fileRef.save(buffer, {
+          metadata: { contentType: file.type },
+          public: true,
+        });
+        
+        const publicUrl = fileRef.publicUrl();
         
         uploadedFilePaths.push(publicUrl);
         industryFilesMetadata.push({
