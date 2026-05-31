@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
 
         // 1. Google (Firebase) Authentication Flow
         if (credentials?.idToken) {
-          try {
+        try {
             const decodedToken = await adminAuth.verifyIdToken(credentials.idToken);
             if (!decodedToken.email) throw new Error("No email in Google record");
 
@@ -44,9 +44,12 @@ export const authOptions: NextAuthOptions = {
               needsPasswordChange: user.needsPasswordChange,
               image: user.profileImage,
             };
-          } catch (error) {
-            console.error("Firebase Auth Error:", error);
-            throw new Error("Invalid Google sign-in.");
+          } catch (error: any) {
+            console.error("Firebase Auth Error code:", error?.code);
+            console.error("Firebase Auth Error message:", error?.message);
+            console.error("Firebase project ID in use:", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID);
+            console.error("Firebase client email in use:", process.env.FIREBASE_CLIENT_EMAIL);
+            throw new Error("Invalid Google sign-in: " + (error?.message || "unknown"));
           }
         }
 
