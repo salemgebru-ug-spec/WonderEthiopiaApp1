@@ -24,7 +24,7 @@ async function getArrayBufferFromItem(item: string): Promise<ArrayBuffer | null>
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   await dbConnect();
 
@@ -102,10 +102,10 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const {id}=await params;
+    const { id } = await params;
     await dbConnect();
     const deletedDestination = await Landmark.findByIdAndDelete(id);
 
