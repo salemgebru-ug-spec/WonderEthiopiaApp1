@@ -183,6 +183,7 @@ export default function LoginPage() {
           </div>
 
           <button
+            type="button"
             onClick={handleGoogleSignIn}
             disabled={loading}
             className="w-full py-4 glass text-foreground font-bold text-[14px] rounded-2xl border-foreground/5 hover:bg-foreground/[0.02] transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
