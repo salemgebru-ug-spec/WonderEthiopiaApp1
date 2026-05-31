@@ -58,7 +58,7 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch {
-      setError("An unexpected error occurred");
+      setError("An unexpected error occurred. Please try again.");
       setLoading(false);
     }
   };
@@ -79,7 +79,11 @@ export default function LoginPage() {
         }
       }
     } catch (err: any) {
-      setError(err.message || "Google sign in failed");
+      if (err.code === "auth/popup-closed-by-user") {
+        setError("The sign-in window was closed. Please try again.");
+      } else {
+        setError("Authentication failed. Please try again later.");
+      }
     } finally {
       setLoading(false);
     }

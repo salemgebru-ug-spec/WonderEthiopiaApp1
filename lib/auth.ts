@@ -21,7 +21,7 @@ export const authOptions: NextAuthOptions = {
         if (credentials?.idToken) {
           try {
             const decodedToken = await adminAuth.verifyIdToken(credentials.idToken);
-            if (!decodedToken.email) throw new Error("No email in Google record");
+            if (!decodedToken.email) throw new Error("Authentication failed. No email address associated with this account.");
 
             let user = await User.findOne({ email: decodedToken.email.toLowerCase() });
 
@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
             };
           } catch (error) {
             console.error("Firebase Auth Error:", error);
-            throw new Error("Invalid Google sign-in.");
+            throw new Error("Authentication failed. Please try again later.");
           }
         }
 
@@ -62,7 +62,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!user) {
-          throw new Error("Invalid email or password");
+          throw new Error("Incorrect email or password. Please try again.");
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -71,7 +71,7 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isPasswordValid) {
-          throw new Error("Invalid email or password");
+          throw new Error("Incorrect email or password. Please try again.");
         }
 
         // Check if temporary password has expired
