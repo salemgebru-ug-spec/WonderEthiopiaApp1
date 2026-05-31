@@ -140,7 +140,7 @@ export default function BusinessDashboardPage() {
 
     // Synchronize with Institutional Root
     if (serviceForm.price !== total) {
-      setServiceForm(prev => ({ ...prev, price: total }));
+      setServiceForm((prev: any) => ({ ...prev, price: total }));
     }
   }, [serviceForm.metadata, selectedSector, serviceForm.price]);
 
@@ -159,8 +159,8 @@ export default function BusinessDashboardPage() {
 
       // Append files with file_ prefix
       Object.entries(categoryRequestForm.industryFiles).forEach(([key, file]) => {
-        if (file) formData.append(`file_${key}`, file);
-      });
+  if (file) formData.append(`file_${key}`, file as File);
+});
 
       const res = await fetch("/api/business/category-request", {
         method: "POST",
@@ -961,10 +961,10 @@ export default function BusinessDashboardPage() {
                     };
                     const matchTags = bizCatTagMap[filterSvcCategory];
                     if (matchTags) {
-                      return svcCats.some(c => matchTags.includes(String(c)));
+                      return svcCats.some((c: string) => matchTags.includes(String(c)));
                     }
                     // Fallback: direct match against any service category tag
-                    return svcCats.some(c => String(c) === filterSvcCategory);
+                    return svcCats.some((c: string) => String(c) === filterSvcCategory);
                   })).map((svc) => (
                     <div
                       key={svc._id}
@@ -1025,10 +1025,9 @@ export default function BusinessDashboardPage() {
                               const tourTags = ["tour", "expedition", "culture", "wildlife", "hiking", "transfer", "custom"];
                               const carTags = ["car", "rental", "vehicle", "driver"];
 
-                              if (categories.some(c => hotelTags.includes(c))) derivedSector = "hotel";
-                              else if (categories.some(c => tourTags.includes(c))) derivedSector = "tour_operator";
-                              else if (categories.some(c => carTags.includes(c))) derivedSector = "car_rental";
-                              else derivedSector = business?.category?.[0] || "tour_operator";
+                              if (categories.some((c: string) => hotelTags.includes(c))) derivedSector = "hotel";
+                              else if (categories.some((c: string) => tourTags.includes(c))) derivedSector = "tour_operator";
+                              else if (categories.some((c: string) => carTags.includes(c))) derivedSector = "car_rental";
 
                               setSelectedSector(derivedSector);
                               setShowSectorSelection(false);
@@ -1091,7 +1090,7 @@ export default function BusinessDashboardPage() {
                                   {(() => {
                                     const categories = Array.isArray(svc.category) ? svc.category : [svc.category];
                                     const carTags = ["car", "rental", "vehicle", "driver", "economy", "luxury", "van", "transfer", "transport"];
-                                    const isTransport = categories.some(c => carTags.includes(c));
+                                    const isTransport = categories.some((c: string) => carTags.includes(c));
 
                                     const protocolGroups = [
                                       {
@@ -1196,8 +1195,8 @@ export default function BusinessDashboardPage() {
                                                 displayValue = val ? "Yes" : "No";
                                               } else if (Array.isArray(val)) {
                                                 displayValue = val.join(', ');
-                                              } else if (typeof val === 'object') {
-                                                const booleans = Object.entries(val).filter(([_, v]) => v === true);
+                                              } else if (typeof val === 'object' && val !== null) {
+                                                  const booleans = Object.entries(val).filter(([_, v]) => v === true);
                                                 if (booleans.length > 0) {
                                                   displayValue = booleans.map(([k]) => k.replace(/([A-Z])/g, ' $1').trim()).join(", ");
                                                 } else {
@@ -2555,7 +2554,7 @@ export default function BusinessDashboardPage() {
                                         onChange={e => setServiceForm({ ...serviceForm, metadata: { ...serviceForm.metadata, departureDates: e.target.value } })}
                                         className="w-full bg-white px-3 md:px-4 lg:px-5 py-4 rounded-3xl border border-foreground/5 font-bold text-sm outline-none focus:ring-8 focus:ring-primary/5 transition-all focus:border-primary/20"
                                       />
-                                      {serviceForm.metadata?.departureDates && new Date(serviceForm.metadata.departureDates) < new Date().setHours(0, 0, 0, 0) && (
+                                      {serviceForm.metadata?.departureDates && new Date(serviceForm.metadata.departureDates) < new Date(new Date().setHours(0, 0, 0, 0)) && (
                                         <div className="mt-2 text-xs font-bold text-red-500 italic px-4">
                                           ⚠ Temporal Exception: Departure date must be in the future.
                                         </div>

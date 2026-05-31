@@ -29,7 +29,7 @@ interface Report {
   description: string;
   status: string;
   adminNotes: string;
-  reporterId: { name: string; email: string };
+  reporterId: { _id: string; name: string; email: string };
   businessId: { _id: string; name: string };
   reviewedBy: { name: string } | null;
   discussion: Array<{

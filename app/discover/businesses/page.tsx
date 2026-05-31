@@ -130,7 +130,7 @@ export default function DiscoverBusinesses() {
         
         const data = await res.json();
         console.log(data);
-        const availableServices = data.filter(d => d.availability.isAvailable === true);
+        const availableServices = data.filter((d: any) => d.availability.isAvailable === true);
         setServices(availableServices); 
       } catch (error) {
         console.error("Failed to fetch services:", error);

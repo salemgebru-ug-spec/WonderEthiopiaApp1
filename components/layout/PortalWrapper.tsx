@@ -129,7 +129,8 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
       return;
     }
     
-    if (session?.user?.needsPasswordChange && pathname !== "/setup-security") {
+    if ((session?.user as any)?.needsPasswordChange
+     && pathname !== "/setup-security") {
       window.location.href = "/setup-security";
       return;
     }
@@ -244,7 +245,7 @@ export default function PortalWrapper({ children }: { children: React.ReactNode 
                   <span className="group-hover:scale-110 transition-transform">{action.icon}</span>
                   {action.label}
                 </div>
-                {action.count > 0 && <span className="w-5 h-5 rounded-full bg-red-100 text-red-600 text-xs flex items-center justify-center animate-pulse">{action.count}</span>}
+                {(action.count ?? 0) > 0 && <span className="w-5 h-5 rounded-full bg-red-100 text-red-600 text-xs flex items-center justify-center animate-pulse">{action.count}</span>}
               </Link>
             ))}
             <div className="h-px bg-foreground/[0.03] my-8" />

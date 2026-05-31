@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import Landmark from './models/Landmark';
+import Landmark from '../models/Landmark';
+
 
 dotenv.config({ path: '.env.local' });
 

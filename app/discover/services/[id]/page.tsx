@@ -97,10 +97,10 @@ export default function ServiceDetailPage() {
   console.log(service);
   
   // Ensure we capture variables securely
-  const serviceId = id || service?.id || service?._id;
+  const serviceId = id || service?._id;
   const servicePrice = service?.price || "";
   const serviceName = service?.name || "";
-  const slots=service?.availability?.quantity || "";
+  const slots = service?.quantity || "";
 
   if (service?.category?.includes('room')) {
     router.push(

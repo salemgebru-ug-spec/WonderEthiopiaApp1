@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+
+type Category = "hotel" | "tour_operator" | "car_rental" | "event_organizer";
 import { authOptions } from "@/lib/auth";
 import dbConnect from "@/lib/mongodb";
 import Business from "@/models/Business";
@@ -17,7 +19,7 @@ export async function POST(req: Request) {
 
     await dbConnect();
     const formData = await req.formData();
-    const category = formData.get("category") as string;
+    const category = formData.get("category") as Category;
     const reason = formData.get("reason") as string;
     const file = formData.get("document") as File | null;
 
@@ -30,13 +32,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Business not found" }, { status: 404 });
     }
 
-    let currentCats = Array.isArray(business.category) ? business.category : [business.category];
+    const currentCats = (Array.isArray(business.category) ? business.category : [business.category]) as Category[];
     
     if (currentCats.length <= 1) {
       return NextResponse.json({ error: "Cannot revoke your only operating domain. Please contact support to initiate full business closure." }, { status: 400 });
     }
 
-    if (!currentCats.includes(category)) {
+    if (!(currentCats as string[]).includes(category)) {
       return NextResponse.json({ error: "Your business does not hold credentials for this domain." }, { status: 400 });
     }
 
@@ -66,7 +68,7 @@ export async function POST(req: Request) {
     });
 
     // Revoke the category
-    business.category = currentCats.filter((c: string) => c !== category);
+    business.category = currentCats.filter((c) => c !== category);
     await business.save();
 
     const notifMessage = `Business "${business.name}" has voluntarily revoked their credential for the "${category}" domain.\n\n**Justification provided:** ${reason}${documentAttachment}`;

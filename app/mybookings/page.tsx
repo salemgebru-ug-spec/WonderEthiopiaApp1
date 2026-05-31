@@ -9,14 +9,14 @@ import Image from 'next/image';
 
 export default function MyBookings() {
   const [activeTab, setActiveTab] = useState('all');
-  const [carBookings, setCarBookings] = useState([]);
-  const [roomBookings, setRoomBookings] = useState([]);
-  const [eventBookings, setEventBookings] = useState([]);
-  const [tourBookings, setTourBookings] = useState([]);
+  const [carBookings, setCarBookings] = useState<any[]>([]);
+  const [roomBookings, setRoomBookings] = useState<any[]>([]);
+  const [eventBookings, setEventBookings] = useState<any[]>([]);
+  const [tourBookings, setTourBookings] = useState<any[]>([]);
 
   // Modal & Drawer State Management
-  const [selectedReceipt, setSelectedReceipt] = useState(null);
-  const [selectedDetails, setSelectedDetails] = useState(null);
+const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
+const [selectedDetails, setSelectedDetails] = useState<any>(null);
 
   useEffect(() => {
    const getRoomBookings = async () => {
@@ -36,7 +36,7 @@ export default function MyBookings() {
 
     // Use Promise.all to map over ALL bookings concurrently
     const allRoomBookings = await Promise.all(
-      json.data.map(async (booking) => {
+      json.data.map(async (booking: any) => {
         const serviceId = booking.room_id;
         const paymentId = booking.payment_id;
 
@@ -53,7 +53,7 @@ export default function MyBookings() {
           }
         }
 
-        let paymentInfo = {};
+        let paymentInfo: any = {};
         if (paymentId) {
           try {
             const paymentRes = await fetch(`/api/payments/${paymentId}`);
@@ -87,9 +87,9 @@ export default function MyBookings() {
     );
 
     setRoomBookings(allRoomBookings); // Pass the whole array instead of just one item
-  } catch (error) {
-    console.error("Error in getRoomBookings:", error.message);
-  }
+  } catch (error: any) {
+  console.error("Error in getRoomBookings:", error.message);
+}
 };
 
 const getCarBookings = async () => {
@@ -108,7 +108,7 @@ const getCarBookings = async () => {
     }
 
     const allCarBookings = await Promise.all(
-      json.data.map(async (booking) => {
+      json.data.map(async (booking: any) => {
         const carServiceId = booking.car_id || booking.service_id;
         const paymentId = booking.payment_id;
 
@@ -125,7 +125,7 @@ const getCarBookings = async () => {
           }
         }
 
-        let paymentInfo = {};
+        let paymentInfo: any = {};
         if (paymentId) {
           try {
             const paymentRes = await fetch(`/api/payments/${paymentId}`);
@@ -159,7 +159,7 @@ const getCarBookings = async () => {
     );
 
     setCarBookings(allCarBookings);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in getCarBookings:", error.message);
   }
 };
@@ -180,7 +180,7 @@ const getTourBookings = async () => {
     }
 
     const allTourBookings = await Promise.all(
-      json.data.map(async (booking) => {
+      json.data.map(async (booking: any) => {
         const tourServiceId = booking.tour_id || booking.service_id;
         const paymentId = booking.payment_id;
 
@@ -197,7 +197,7 @@ const getTourBookings = async () => {
           }
         }
 
-        let paymentInfo = {};
+        let paymentInfo: any = {};
         if (paymentId) {
           try {
             const paymentRes = await fetch(`/api/payments/${paymentId}`);
@@ -231,7 +231,7 @@ const getTourBookings = async () => {
     );
 
     setTourBookings(allTourBookings);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in getTourBookings:", error.message);
   }
 };
@@ -252,7 +252,7 @@ const getEventBookings = async () => {
     }
 
     const allEventBookings = await Promise.all(
-      json.data.map(async (booking) => {
+      json.data.map(async (booking: any) => {
         const eventServiceId = booking.event_id || booking.service_id;
         const paymentId = booking.payment_id;
 
@@ -269,7 +269,7 @@ const getEventBookings = async () => {
           }
         }
 
-        let paymentInfo = {};
+        let paymentInfo: any = {};
         if (paymentId) {
           try {
             const paymentRes = await fetch(`/api/payments/${paymentId}`);
@@ -303,7 +303,7 @@ const getEventBookings = async () => {
     );
 
     setEventBookings(allEventBookings);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in getEventBookings:", error.message);
   }
 };
@@ -540,7 +540,7 @@ const getEventBookings = async () => {
                 <div className="mb-6">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Amenities & Perks</h4>
                   <div className="flex flex-wrap gap-2">
-                    {selectedDetails.features.map((feature, fIndex) => (
+                    {selectedDetails.features.map((feature: any, fIndex: number) => (
                       <span key={fIndex} className="text-xs font-medium bg-[#1B263B]/5 text-[#1B263B] px-3 py-1 rounded-lg">
                         ✓ {feature}
                       </span>
@@ -552,7 +552,7 @@ const getEventBookings = async () => {
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">System Metadata</h4>
                 <div className="border border-gray-100 rounded-xl divide-y divide-gray-50 font-mono text-xs p-2 bg-gray-50/50">
-                  {Object.entries(selectedDetails.rawBooking).map(([key, val]) => {
+                  {Object.entries(selectedDetails.rawBooking).map(([key, val]: [string, any]) => {
                     if (typeof val === 'object' || key.startsWith('_') || key.includes('id')) return null;
                     return (
                       <div key={key} className="flex justify-between py-1.5 px-2">

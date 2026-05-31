@@ -40,6 +40,7 @@ interface Review {
     name: string;
     role: string;
   };
+  targetId?: string | { _id: string };
   userName?: string;
   rating: number;
   comment: string;

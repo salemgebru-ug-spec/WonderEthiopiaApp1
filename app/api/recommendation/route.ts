@@ -96,7 +96,7 @@ export async function GET(request: Request) {
   }
 }
 
-    destinations.forEach((p, i) => {
+    destinations.forEach((p: any, i: number) => {
   console.log("DEST", i, p.embedding);
 });
 
@@ -118,15 +118,14 @@ export async function GET(request: Request) {
   }
 }
 
-async function getEmbeddings(text: string) {
-  
-   const embedding = await hf.featureExtraction({
+async function getEmbeddings(text: string): Promise<number[]> {
+  const embedding = await hf.featureExtraction({
     model: "sentence-transformers/all-MiniLM-L6-v2",
     inputs: text,
   });
   // Return the actual vector (array of numbers)
-   console.log("RAW:", embedding);
-    return Array.isArray(embedding[0]) ? embedding[0] : embedding;
+  console.log("RAW:", embedding);
+  return (Array.isArray(embedding[0]) ? embedding[0] : embedding) as number[];
 }
 
 function cosineSimilarity(a: number[], b: number[]) {
