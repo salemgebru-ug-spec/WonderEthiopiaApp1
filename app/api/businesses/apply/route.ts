@@ -128,8 +128,10 @@ export async function POST(request: Request) {
     );
   } catch (error: any) {
     console.error("Application error:", error);
+    
+    // Send a professional message to the user, hiding internal technical details
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: "An unexpected error occurred while processing your application. Please try again later." },
       { status: 500 }
     );
   }
