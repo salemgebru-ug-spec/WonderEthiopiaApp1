@@ -4,13 +4,20 @@ import Landmark from "@/models/Landmark";
 import { formatError } from "@/lib/apiError";
 // getImageEmbedding will be imported lazily in POST handler
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await dbConnect();
-    const landmarks = await Landmark.find(); // ✅ FIXED
-    console.log(`GET /api/landmarks – returned ${landmarks.length} documents`);
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const skip  = parseInt(searchParams.get("skip")  || "0");
 
-    return NextResponse.json(landmarks);
+    const [landmarks, total] = await Promise.all([
+      Landmark.find().skip(skip).limit(limit).lean(),
+      Landmark.countDocuments(),
+    ]);
+    console.log(`GET /api/landmarks – returned ${landmarks.length}/${total} documents`);
+
+    return NextResponse.json({ landmarks, total, skip, limit });
   } catch (error: any) {
     console.error("GET Landmarks Error:", error);
     return NextResponse.json(formatError(error, 500));
