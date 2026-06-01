@@ -39,10 +39,20 @@ export async function GET(request: Request) {
     }
 
     // Detect MIME type from fileName or URL extension
-    const sourceString = fileName ?? url;
-    const ext = sourceString.split("?")[0].split(".").pop()?.toLowerCase() ||  "";
-    const contentType = MIME_MAP[ext] || "application/octet-stream";
 
+    const ext = (
+      fileName
+        ? fileName.split(".").pop()
+        : parsedUrl.pathname.split(".").pop()
+    )?.toLowerCase().split("?")[0]  "";
+
+    const OFFICE_EXTENSIONS = ["doc", "docx", "xls", "xlsx", "ppt", "pptx"];
+    if (OFFICE_EXTENSIONS.includes(ext)) {
+      const googleViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+      return NextResponse.redirect(googleViewerUrl);
+    }
+
+    const contentType = MIME_MAP[ext] ||  "application/octet-stream";
     const fileResponse = await fetch(url);
     if (!fileResponse.ok) {
       return NextResponse.json({ error: "Failed to fetch document" }, { status: fileResponse.status });
