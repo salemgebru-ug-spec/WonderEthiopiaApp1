@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -18,8 +18,16 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    if (name === "name") {
+    
+      const alphabetOnly = value.replace(/[^a-zA-Z\s]/g, "");
+      setFormData((prev) => ({ ...prev, [name]: alphabetOnly }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +61,7 @@ export default function RegisterPage() {
         router.push("/login?registered=true");
       }
     } catch {
-      setError("An unexpected error occurred. Please try again.");
+      setError("An unexpected error occurred");
       setLoading(false);
     }
   };
@@ -63,29 +71,37 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      if (result?.user) {
-        const idToken = await result.user.getIdToken();
-        const nextAuthResult = await signIn("credentials", { idToken, redirect: false });
-        if (nextAuthResult?.error) {
-          setError(nextAuthResult.error);
-        } else {
-          router.push("/dashboard");
-          router.refresh();
-        }
+      const idToken = await result.user.getIdToken();
+
+      const nextAuthResult = await signIn("credentials", {
+        idToken,
+        redirect: false,
+      });
+
+      if (nextAuthResult?.error) {
+        setError(nextAuthResult.error);
+        setLoading(false);
+      } else {
+        router.push("/dashboard");
+        router.refresh();
       }
     } catch (err: any) {
-      if (err.code === "auth/popup-closed-by-user") {
-        setError("The sign-in window was closed. Please try again.");
-      } else {
-        setError("Authentication failed. Please try again later.");
-      }
-    } finally {
+      setError(err.message || "Google sign in failed");
       setLoading(false);
     }
   };
 
   const fields = [
-    { id: "name", label: "Full Name", type: "text", placeholder: "Abebe Kebede", icon: <User className="w-4 h-4" /> },
+    { 
+      id: "name", 
+      label: "Full Name", 
+      type: "text", 
+      placeholder: "Abebe Kebede",
+      minLength: 3, 
+      pattern: "^[a-zA-Z\\s]{3,}$", // Updated regex to enforce at least 3 characters natively
+      title: "Full Name must be at least 3 characters long and contain only letters.",
+      icon: <User className="w-4 h-4" /> 
+    },
     { id: "email", label: "Email Address", type: "email", placeholder: "abebe@example.com", icon: <Mail className="w-4 h-4" /> },
     { id: "password", label: "Password", type: "password", placeholder: "••••••••", minLength: 6, icon: <Lock className="w-4 h-4" /> },
     { id: "confirmPassword", label: "Confirm Password", type: "password", placeholder: "••••••••", minLength: 6, icon: <Lock className="w-4 h-4" /> },
@@ -99,8 +115,8 @@ export default function RegisterPage() {
       </div>
 
       <div className="relative w-full max-w-[460px] animate-fade-in">
-        <Link
-          href="/"
+        <Link 
+          href="/" 
           className="inline-flex items-center gap-2 text-base font-bold text-foreground/40 hover:text-primary transition-colors mb-12 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
@@ -147,6 +163,8 @@ export default function RegisterPage() {
                       className="w-full pl-12 pr-4 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl text-foreground text-[14px] font-medium placeholder:text-foreground/20 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary/20 transition-all duration-300"
                       placeholder={field.placeholder}
                       minLength={field.minLength}
+                      pattern={field.pattern}
+                      title={field.title}
                       required
                     />
                   </div>
@@ -179,7 +197,6 @@ export default function RegisterPage() {
           </div>
 
           <button
-            type="button"
             onClick={handleGoogleSignIn}
             disabled={loading}
             className="w-full py-4 glass text-foreground font-bold text-[14px] rounded-2xl border-foreground/5 hover:bg-foreground/[0.02] transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98]"
