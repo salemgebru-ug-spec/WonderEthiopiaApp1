@@ -68,6 +68,12 @@ export default function BusinessPortalPage() {
       return;
     }
 
+    if (formData.contactPhone.replace(/[^0-9]/g, "").length < 9) {
+  setError("Phone number must contain at least 9 digits.");
+  setLoading(false);
+  return;
+}
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("applicantName", formData.applicantName);
@@ -339,7 +345,11 @@ export default function BusinessPortalPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative group">
                        <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
-                       <input name="contactPhone" type="text" value={formData.contactPhone} onChange={handleChange} required className="w-full pl-14 pr-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl" placeholder="+251 ..." />
+                       <input name="contactPhone" type="text" value={formData.contactPhone} 
+                         onChange={(e) => {
+                          const sanitized = e.target.value.replace(/[^0-9+]/g, "").slice(0, 15);
+                          setFormData({ ...formData, contactPhone: sanitized });
+                        }}required className="w-full pl-14 pr-5 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-2xl" placeholder="+251 ..." />
                     </div>
                     <div className="relative group">
                        <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
