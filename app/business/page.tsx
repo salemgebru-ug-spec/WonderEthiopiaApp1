@@ -256,7 +256,15 @@ export default function BusinessPortalPage() {
                     <h3 className="text-sm font-black uppercase tracking-widest">Global Location</h3>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <input name="region" type="text" value={formData.region} onChange={handleChange} required className={inputClass} placeholder="Region" />
+                   <select name="region" value={formData.region} onChange={handleChange} required className={inputClass}>
+                    <option value="">Select Region</option>
+                    {[
+                      "Addis Ababa", "Amhara", "Oromia", "Tigray", "Afar",
+                      "Sidama", "SNNPR", "Gambela", "Benishangul-Gumuz", "Harari", "Somali",
+                    ].map((r) => (
+                      <option key={r} value={r}>{r}</option>
+                    ))}
+                  </select>
                     <input name="city" type="text" value={formData.city} onChange={handleChange} required className={inputClass} placeholder="City / Town" />
                     <input name="address" type="text" value={formData.address} onChange={handleChange} required className={inputClass} placeholder="Full Address" />
                   </div>
