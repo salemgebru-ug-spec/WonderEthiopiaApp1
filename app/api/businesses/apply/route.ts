@@ -3,7 +3,6 @@ import dbConnect from "@/lib/mongodb";
 import Business from "@/models/Business";
 import AppNotification from "@/models/Notification";
 import { pusherServer } from "@/lib/pusher";
-import { adminStorage } from "@/lib/firebase-admin";
 
 export async function POST(request: Request) {
   try {
@@ -52,27 +51,22 @@ export async function POST(request: Request) {
     // Process files
     const uploadedFilePaths: string[] = [];
     const industryFilesMetadata: any[] = [];
-    const bucket = adminStorage.bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET);
-
+    
+    // Warning: Storing files as Base64 in MongoDB has a hard limit of 16MB per document.
     for (const [key, value] of Array.from(formData.entries())) {
       if (key.startsWith("file_") && value instanceof File) {
         const file = value;
         const buffer = Buffer.from(await file.arrayBuffer());
-        const fileName = `business_uploads/${Date.now()}_${file.name.replace(/\\s+/g, "_")}`;
-
-        const fileRef = bucket.file(fileName);
-        await fileRef.save(buffer, {
-          metadata: { contentType: file.type },
-          public: true,
-        });
-
-        const publicUrl = fileRef.publicUrl();
-
-        uploadedFilePaths.push(publicUrl);
+        
+        // Convert file buffer to Base64 string
+        const base64Data = buffer.toString("base64");
+        const dataUrl = `data:${file.type};base64,${base64Data}`;
+        
+        uploadedFilePaths.push(dataUrl);
         industryFilesMetadata.push({
           fieldName: key.replace("file_", ""),
           fileName: file.name,
-          url: publicUrl
+          url: dataUrl
         });
       }
     }
@@ -129,15 +123,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("Application error:", error);
 
-    // Provide a professional, specific message if storage is misconfigured
-    if (error?.message && error.message.includes("bucket does not exist")) {
-      return NextResponse.json(
-        { error: "Our file storage system is currently undergoing maintenance. Please try submitting your application later." },
-        { status: 503 }
-      );
-    }
-
-    // Send a professional message to the user for other unexpected errors
+    // Provide a professional message to the user for unexpected errors
     return NextResponse.json(
       { error: "An unexpected error occurred while processing your application. Please try again later." },
       { status: 500 }
