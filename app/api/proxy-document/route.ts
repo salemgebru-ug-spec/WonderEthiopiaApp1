@@ -75,7 +75,10 @@ export async function GET(request: Request) {
     const afterUpload = pathParts.slice(uploadIndex + 1);
     const startIndex = afterUpload[0]?.match(/^v\d+$/) ? 1 : 0;
     const publicIdWithExt = afterUpload.slice(startIndex).join("/");
-    const publicId = publicIdWithExt.replace(/\.[^/.]+$/, ""); // strip extension
+    // For raw resources, keep extension as part of public_id (handles legacy uploads)
+const publicId = resourceType === "raw" 
+  ? publicIdWithExt 
+  : publicIdWithExt.replace(/\.[^/.]+$/, "");
 
     // Generate a short-lived signed URL (valid 60s) so Cloudinary serves it
     const signedUrl = cloudinary.url(publicId, {
