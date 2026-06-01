@@ -305,7 +305,7 @@ export default function BusinessPortalPage() {
                        <div className="space-y-6 pt-6 border-t border-foreground/[0.03]">
                         <h4 className="text-sm font-black text-primary uppercase tracking-widest">Car Rental Details</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <input name="fleetSize" type="number" placeholder="Number of Vehicles" onChange={handleIndustryChange} required className={inputClass} />
+                          <input name="fleetSize" type="number" placeholder="Number of Vehicles" min={1} onChange={handleIndustryChange} required className={inputClass} />
                           <input name="vehicleTypes" type="text" placeholder="Vehicle Types (e.g. 4x4, Luxury)" onChange={handleIndustryChange} required className={inputClass} />
                           <div className="md:col-span-2 space-y-2">
                             <label className="text-sm font-bold tracking-widest uppercase text-foreground/30">Transport License</label>
@@ -319,7 +319,7 @@ export default function BusinessPortalPage() {
                        <div className="space-y-6 pt-6 border-t border-foreground/[0.03]">
                         <h4 className="text-sm font-black text-primary uppercase tracking-widest">Event Management Details</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <input name="experienceYears" type="number" placeholder="Years of Experience" onChange={handleIndustryChange} required className={inputClass} />
+                          <input name="experienceYears" type="number" step="any" min={0} placeholder="Years of Experience" onChange={handleIndustryChange} required className={inputClass} />
                           <input name="eventType" type="text" placeholder="Main Event Focus" onChange={handleIndustryChange} required className={inputClass} />
                           <div className="md:col-span-2 space-y-2">
                             <label className="text-sm font-bold tracking-widest uppercase text-foreground/30">Event Organizer Certificate</label>
