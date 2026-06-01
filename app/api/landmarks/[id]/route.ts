@@ -25,27 +25,21 @@ async function getArrayBufferFromItem(item: string): Promise<ArrayBuffer | null>
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } } // Let Next.js handle the internal extraction
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Standardize param retrieval
     const { id } = await params;
-
-    // 1. Validate MongoDB ObjectId format to prevent hard Mongoose crashes
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         { error: `Malformed ID format: '${id}' is not a valid 24-character hex string.` },
         { status: 400 }
       );
     }
-
     await dbConnect();
     const landmark = await Landmark.findById(id);
-
     if (!landmark) {
       return NextResponse.json({ error: "Landmark not found" }, { status: 404 });
     }
-
     return NextResponse.json({ data: landmark });
   } catch (error: any) {
     console.error("GET Landmark Error:", error);
