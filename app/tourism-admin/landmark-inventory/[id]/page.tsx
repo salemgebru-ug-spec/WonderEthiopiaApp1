@@ -77,6 +77,7 @@ export default function LandmarkDetail() {
         setLoading(true);
         const res = await fetch(`/api/landmarks/${id}`);
         const json = await res.json();
+        console.log(json);
         if (json.data) {
           setLandmark(json.data);
           await fetchReviews();
