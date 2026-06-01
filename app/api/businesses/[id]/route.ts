@@ -9,7 +9,7 @@ import AppNotification from "@/models/Notification";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { Types } from "mongoose";
-import { sendApprovalEmail, sendRejectionEmail } from "@/lib/email";
+import { sendApprovalEmail, sendRejectionEmail, sendSuspensionEmail } from "@/lib/email";
 import Service from "@/models/Service";
 
 // GET - Fetch a single business details (Public Access for Discovery)
@@ -20,17 +20,17 @@ export async function GET(
   try {
     const { id } = await params;
     await dbConnect();
-    
+
     const business = await Business.findById(id)
       .select("name description category location contactPhone contactEmail updatedAt status profilePicture");
-    
+
     if (!business) {
       return NextResponse.json({ error: "Business not found" }, { status: 404 });
     }
 
     // Fetch services registered by this business
     const services = await Service.find({ businessId: business._id }).sort({ createdAt: -1 });
-    
+
     return NextResponse.json({ data: business, services, success: true });
   } catch (error) {
     console.error("Single Business Fetch Error:", error);
@@ -98,7 +98,7 @@ export async function PATCH(
           { status: 400 }
         );
       }
-      
+
       if (!["approved", "rejected", "suspended", "unsuspend"].includes(action)) {
         return NextResponse.json(
           { error: "Invalid action. Use: approved, rejected, suspended, or unsuspend" },
@@ -125,7 +125,7 @@ export async function PATCH(
           // Super-admin registers the business (creates the account)
           temporaryPassword = Math.random().toString(36).slice(-8); // Generate random password
           const hashedPassword = await bcrypt.hash(temporaryPassword, 12);
-          
+
           user = await User.create({
             name: business.applicantName,
             email: business.applicantEmail,
@@ -155,6 +155,28 @@ export async function PATCH(
       }
 
       await business.save();
+      // ✅ Send suspension email
+      if (action === "suspended") {
+        const ownerEmail = business.applicantEmail || business.contactEmail;
+        if (ownerEmail) {
+          try {
+            await sendSuspensionEmail(ownerEmail, business.name, note || "No reason provided.");
+          } catch (e) {
+            console.error("Failed to send suspension email:", e);
+          }
+        }
+      }
+      // ✅ Send rejection email
+      if (action === "rejected") {
+        const ownerEmail = business.applicantEmail || business.contactEmail;
+        if (ownerEmail) {
+          try {
+            await sendRejectionEmail(ownerEmail, business.name, note || "No reason provided.");
+          } catch (e) {
+            console.error("Failed to send rejection email:", e);
+          }
+        }
+      }
 
       // Notify Tourism Admin about the final decision
       try {
