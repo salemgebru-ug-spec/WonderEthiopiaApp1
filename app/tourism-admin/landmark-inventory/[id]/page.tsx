@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Star, MapPin, ChevronLeft, User, Calendar, MessageSquare, AlertCircle, Edit3, Trash2 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { NextResponse } from "next/server";
 
 interface Landmark {
   _id: string;
@@ -77,13 +78,32 @@ export default function LandmarkDetail() {
         setLoading(true);
         const res = await fetch(`/api/landmarks/${id}`);
         const json = await res.json();
+
+
+        // Check if response is ok first
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("API Error Status:", res.status);
+          console.error("API Error Response:", text);
+          throw new Error(`API returned ${res.status}: ${text.slice(0, 200)}`);
+        }
+
+        const data = await res.json();
         console.log(json);
         if (json.data) {
           setLandmark(json.data);
           await fetchReviews();
         }
-      } catch (error) {
-        console.error("Failed to fetch landmark:", error);
+      } catch (error: any) {
+        console.error("GET Route Error:", error);
+        return NextResponse.json(
+          {
+            error: error.message || "Server error",
+            name: error.name,
+            stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+          },
+          { status: 500 }
+        );
       } finally {
         setLoading(false);
       }
@@ -202,33 +222,33 @@ export default function LandmarkDetail() {
           <p className="text-base md:text-lg text-muted-foreground leading-relaxed whitespace-pre-line">
             {landmark.description}
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
             <div className="bg-muted/30 p-4 rounded-xl border border-border">
-                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">UNESCO Status</span>
-                <span className="text-foreground font-medium">{landmark.unesco_status || "None"}</span>
+              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">UNESCO Status</span>
+              <span className="text-foreground font-medium">{landmark.unesco_status || "None"}</span>
             </div>
             <div className="bg-muted/30 p-4 rounded-xl border border-border">
-                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Established</span>
-                <span className="text-foreground font-medium">{landmark.date_of_establishment || "Unknown"}</span>
+              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Established</span>
+              <span className="text-foreground font-medium">{landmark.date_of_establishment || "Unknown"}</span>
             </div>
             <div className="bg-muted/30 p-4 rounded-xl border border-border">
-                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Visitor Fee</span>
-                <span className="text-foreground font-medium">{landmark.visitor_info?.fee || "Free"}</span>
+              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Visitor Fee</span>
+              <span className="text-foreground font-medium">{landmark.visitor_info?.fee || "Free"}</span>
             </div>
             <div className="bg-muted/30 p-4 rounded-xl border border-border">
-                <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Opening Hours</span>
-                <span className="text-foreground font-medium">{landmark.visitor_info?.opening_hours || "Always Open"}</span>
+              <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider block mb-1">Opening Hours</span>
+              <span className="text-foreground font-medium">{landmark.visitor_info?.opening_hours || "Always Open"}</span>
             </div>
           </div>
-          
+
           {landmark.significance && (
-              <div className="mt-6">
-                  <h3 className="text-xl font-bold tracking-tight mb-3">Significance</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                      {landmark.significance}
-                  </p>
-              </div>
+            <div className="mt-6">
+              <h3 className="text-xl font-bold tracking-tight mb-3">Significance</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                {landmark.significance}
+              </p>
+            </div>
           )}
 
           {/* Map Canvas Container */}
@@ -285,7 +305,7 @@ export default function LandmarkDetail() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Action Panel & Star Matrix Container */}
                     <div className="flex items-center gap-3">
                       {/* Dynamic Star Badges */}
@@ -293,9 +313,8 @@ export default function LandmarkDetail() {
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-3 h-3 ${
-                              i < review.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"
-                            }`}
+                            className={`w-3 h-3 ${i < review.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"
+                              }`}
                           />
                         ))}
                       </div>
