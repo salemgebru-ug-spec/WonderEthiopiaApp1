@@ -2,6 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["mongoose"],
+  experimental: {
+    serverComponentsExternalPackages: ["@xenova/transformers"],
+  },
+  webpack: (config) => {
+    config.externals = [...(config.externals || []), "@xenova/transformers"];
+    return config;
+  },
 
   async headers() {
     return [
