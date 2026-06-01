@@ -400,7 +400,7 @@ export default function AdminBusinessDetailPage() {
                                         {linkParts.map((s, i) => (
                                         <a key={i}
                                           href={s.href?.startsWith("https://res.cloudinary.com")
-                                            ? /api/proxy-document?url=${encodeURIComponent(s.href)}&fileName=${encodeURIComponent(s.content)}
+                                            ? `/api/proxy-document?url=${encodeURIComponent(s.href)}&fileName=${encodeURIComponent(s.content)}`
                                             : s.href}
                                           target="_blank" rel="noopener noreferrer"
                                           className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-foreground/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm group/doc">
