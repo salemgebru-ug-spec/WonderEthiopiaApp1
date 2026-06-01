@@ -356,11 +356,15 @@ export default function TourismAdminBusinessDetailPage() {
                                     {linkParts.length > 0 && (
                                       <div className="flex flex-wrap gap-3 pt-2">
                                         {linkParts.map((s, i) => (
-                                          <a key={i} href={s.href} target="_blank" rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-foreground/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm group/doc">
-                                            <FileText className="w-3.5 h-3.5" /> {s.content}
-                                          </a>
-                                        ))}
+                                        <a key={i}
+                                          href={s.href?.startsWith("https://res.cloudinary.com")
+                                            ? /api/proxy-document?url=${encodeURIComponent(s.href)}&fileName=${encodeURIComponent(s.content)}
+                                            : s.href}
+                                          target="_blank" rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-foreground/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm group/doc">
+                                          <FileText className="w-3.5 h-3.5" /> {s.content}
+                                        </a>
+                                      ))}
                                       </div>
                                     )}
                                   </>
