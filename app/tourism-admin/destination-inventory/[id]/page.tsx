@@ -48,7 +48,7 @@ export default function DestinationDetail() {
   };
 
   const handleDeleteReview = async (reviewId: string) => {
-    // Add your delete API interaction here
+    // Add your delete API interacti
     console.log("Delete review:", reviewId);
   };
 
