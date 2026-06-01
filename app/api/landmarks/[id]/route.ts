@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Landmark from "@/models/Landmark";
 import { getImageEmbedding } from "../recognize/route";
+import mongoose from "mongoose";
 
 // Helper to convert frontend base64 strings or URLs to an ArrayBuffer
 async function getArrayBufferFromItem(item: string): Promise<ArrayBuffer | null> {
@@ -33,7 +34,7 @@ export async function GET(
     // 1. Validate MongoDB ObjectId format to prevent hard Mongoose crashes
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        { error: Malformed ID format: '${id}' is not a valid 24-character hex string. },
+        { error: `Malformed ID format: '${id}' is not a valid 24-character hex string.` },
         { status: 400 }
       );
     }
