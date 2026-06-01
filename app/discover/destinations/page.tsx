@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, MapPin, Star, Heart, ChevronRight, ChevronLeft, Loader2 } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { Search, MapPin, Star, Heart, ChevronRight, ChevronLeft } from "lucide-react";
 
 interface Destination {
   _id: string;
@@ -18,89 +17,83 @@ interface Destination {
 const ITEMS_PER_PAGE = 6;
 
 export default function DiscoverDestinations() {
-  const { data: session } = useSession();
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [region, setRegion] = useState("all");
-  const [preferences, setPreferences] = useState<any>();
+  // undefined = not yet fetched, null = fetched but no preferences, string[] = has preferences
+  const [preferences, setPreferences] = useState<string[] | null | undefined>(undefined);
 
-  // 1. Fetch user preferences on mount/session change
-  useEffect(()=>{
-  async function fetchUserPreferences(){
-    const res=await fetch('/api/tourist/profile');
-    console.log(res);
-    const data=await res.json();
-    console.log(data);
-    setPreferences(data.profile?.interests)
-  }
-  fetchUserPreferences();
- },[]);
-
-
+  // 1. Fetch user preferences on mount
   useEffect(() => {
+    async function fetchUserPreferences() {
+      try {
+        const res = await fetch("/api/tourist/profile");
+        const data = await res.json();
+        // Use interests array; if empty/missing, set null so we fall back to full list
+        const interests: string[] = data.profile?.interests ?? [];
+        setPreferences(interests.length > 0 ? interests : null);
+      } catch {
+        setPreferences(null); // on error, show full list
+      }
+    }
+    fetchUserPreferences();
+  }, []);
+
+  // 2. Fetch destinations — wait until preferences have been resolved (not undefined)
+  useEffect(() => {
+    if (preferences === undefined) return; // still loading profile, don't fetch yet
+
     async function fetchDestinations() {
       try {
         setLoading(true);
-        let res=null;
-        console.log(preferences);
-        if(preferences!=null){
-          console.log('case1')
-           res=await fetch(`/api/recommendation?preferences=${preferences?.categories}`,{
-            method:'GET'
-          });
-          console.log(res);
-        }
-        else{
-          console.log('case2')
-          let url = `/api/destinations?search=${searchQuery}`;
-        if (region !== "all") url += `&region=${region}`;
 
-         res = await fetch(url);
+        let res: Response;
+
+        if (preferences && preferences.length > 0) {
+          // Has preferences → use recommendation engine
+          res = await fetch(`/api/recommendation?preferences=${preferences.join(",")}`);
+        } else {
+          // No preferences → fetch full list with search/region filters
+          let url = `/api/destinations?search=${searchQuery}`;
+          if (region !== "all") url += `&region=${region}`;
+          res = await fetch(url);
         }
-        
+
         const data = await res.json();
-        console.log(data);
-        setDestinations(Array.isArray(data)?data : []);
+        setDestinations(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Failed to fetch destinations:", error);
+        setDestinations([]);
       } finally {
         setLoading(false);
       }
     }
 
-    const timer = setTimeout(() => {
-      fetchDestinations();
-    }, 500);
-
+    const timer = setTimeout(fetchDestinations, 500);
     return () => clearTimeout(timer);
-  }, [searchQuery, region,preferences]);
+  }, [searchQuery, region, preferences]);
 
-  // 3. Client-side Search and Filter Engine
+  // 3. Client-side filter
   const filteredDestinations = useMemo(() => {
     return destinations.filter((dest) => {
-      // Filter by Region dropdown
-      const matchesRegion = region === "all" || dest.region.toLowerCase() === region.toLowerCase();
-
-      // Filter by Search Query (Checking Name, City, and Description)
+      const matchesRegion =
+        region === "all" || dest.region.toLowerCase() === region.toLowerCase();
       const cleanQuery = searchQuery.toLowerCase().trim();
       const matchesSearch =
         cleanQuery === "" ||
         dest.name.toLowerCase().includes(cleanQuery) ||
         dest.city.toLowerCase().includes(cleanQuery) ||
         dest.description.toLowerCase().includes(cleanQuery);
-
       return matchesRegion && matchesSearch;
     });
   }, [destinations, searchQuery, region]);
 
-  // 4. Reset page to 1 instantly when search query or region changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, region]);
 
-  // 5. Pagination Logic based on dynamic filtered data
   const totalPages = Math.ceil(filteredDestinations.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const visibleDestinations = filteredDestinations.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -108,30 +101,20 @@ export default function DiscoverDestinations() {
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prev) => prev + 1);
-      window.scrollTo({ top: 400, behavior: 'smooth' });
+      window.scrollTo({ top: 400, behavior: "smooth" });
     }
   };
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
-      window.scrollTo({ top: 400, behavior: 'smooth' });
+      window.scrollTo({ top: 400, behavior: "smooth" });
     }
   };
 
   const regions = [
-    "all",
-    "Addis Ababa",
-    "Amhara",
-    "Oromia",
-    "Tigray",
-    "Afar",
-    "Sidama",
-    "SNNPR",
-    "Gambela",
-    "Benishangul-Gumuz",
-    "Harari",
-    "Somali",
+    "all", "Addis Ababa", "Amhara", "Oromia", "Tigray", "Afar",
+    "Sidama", "SNNPR", "Gambela", "Benishangul-Gumuz", "Harari", "Somali",
   ];
 
   return (
@@ -148,7 +131,6 @@ export default function DiscoverDestinations() {
             </h1>
           </div>
 
-          {/* Search Bar */}
           <div className="max-w-4xl mx-auto glass p-3 rounded-2xl flex flex-col sm:flex-row gap-2 shadow-xl shadow-primary/5">
             <div className="flex-1 flex items-center px-4 gap-3 border-r border-foreground/10 mb-2 sm:mb-0">
               <Search className="w-5 h-5 text-primary/60" />
@@ -254,27 +236,24 @@ export default function DiscoverDestinations() {
               ))}
             </div>
 
-            {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="flex items-center justify-center gap-6 mt-16">
                 <button
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
-                  className="group flex items-center justify-center w-12 h-12 rounded-2xl border-2 border-foreground/10 bg-surface hover:border-primary hover:bg-primary/5 disabled:opacity-40 disabled:hover:border-foreground/10 disabled:hover:bg-surface disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-foreground/5"
+                  className="group flex items-center justify-center w-12 h-12 rounded-2xl border-2 border-foreground/10 bg-surface hover:border-primary hover:bg-primary/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
                 >
-                  <ChevronLeft className="w-5 h-5 text-foreground/70 group-hover:text-primary transition-colors group-disabled:text-foreground/40" />
+                  <ChevronLeft className="w-5 h-5 text-foreground/70 group-hover:text-primary transition-colors" />
                 </button>
-
                 <span className="text-sm font-bold text-foreground/60 select-none">
                   Page <span className="text-foreground font-extrabold">{currentPage}</span> of {totalPages}
                 </span>
-
                 <button
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
-                  className="group flex items-center justify-center w-12 h-12 rounded-2xl border-2 border-foreground/10 bg-surface hover:border-primary hover:bg-primary/5 disabled:opacity-40 disabled:hover:border-foreground/10 disabled:hover:bg-surface disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-foreground/5"
+                  className="group flex items-center justify-center w-12 h-12 rounded-2xl border-2 border-foreground/10 bg-surface hover:border-primary hover:bg-primary/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
                 >
-                  <ChevronRight className="w-5 h-5 text-foreground/70 group-hover:text-primary transition-colors group-disabled:text-foreground/40" />
+                  <ChevronRight className="w-5 h-5 text-foreground/70 group-hover:text-primary transition-colors" />
                 </button>
               </div>
             )}
