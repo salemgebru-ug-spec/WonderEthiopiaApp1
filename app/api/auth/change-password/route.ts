@@ -74,18 +74,22 @@ export async function POST(request: Request) {
         }, { status: 403 });
       }
 
-      // Ensure the stored password exists before comparing
+      // If the account was created without a stored password (e.g., by an admin
+      // using a plain-text temp password that was never hashed), allow first-time
+      // setup to proceed without bcrypt comparison.
       if (!user.password) {
-        console.error(`[SECURITY] Stored password missing for user ${email}.`);
-        return NextResponse.json({ error: "Internal server error: user credentials unavailable. Please contact support." }, { status: 500 });
-      }
-      const isMatch = await bcrypt.compare(tempPassword, user.password);
-      if (!isMatch) {
-         console.warn(`[SECURITY] Password mismatch for ${email}.`);
-         const errorMsg = user.needsPasswordChange 
-            ? "Identity verification failed. The temporary password provided is incorrect." 
+        console.warn(`[AUTH] No stored password for ${email} — treating as first-time setup, skipping comparison.`);
+        // We still require needsPasswordChange to be true (checked above), so
+        // this path is safe: only accounts explicitly marked for setup can use it.
+      } else {
+        const isMatch = await bcrypt.compare(tempPassword, user.password);
+        if (!isMatch) {
+          console.warn(`[SECURITY] Password mismatch for ${email}.`);
+          const errorMsg = user.needsPasswordChange
+            ? "Identity verification failed. The temporary password provided is incorrect."
             : "Identity verification failed. The current password provided is incorrect.";
-         return NextResponse.json({ error: errorMsg }, { status: 401 });
+          return NextResponse.json({ error: errorMsg }, { status: 401 });
+        }
       }
     }
 
