@@ -11,13 +11,17 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadToCloudinary = (buffer: Buffer, originalFilename: string): Promise<string> => {
+const uploadToCloudinary = (buffer: Buffer, originalFilename: string, mimeType: string): Promise<string> => {
   return new Promise((resolve, reject) => {
+    let resourceType: "image" | "raw" | "auto" = "auto";
+    if (mimeType.startsWith("image/")) resourceType = "image";
+    else resourceType = "raw";
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: "business_uploads",
-        resource_type: "auto",
-        public_id: `${Date.now()}_${originalFilename.replace(/\\s+/g, "_").split(".")[0]}`
+        resource_type: resourceType,
+        public_id: `${Date.now()}_${originalFilename.replace(/\\s+/g, "_").split(".")[0]}`,
+        allowed_formats: undefined,
       },
       (error, result) => {
         if (error) return reject(error);
@@ -82,7 +86,8 @@ export async function POST(request: Request) {
         const file = value;
         const buffer = Buffer.from(await file.arrayBuffer());
 
-        const publicUrl = await uploadToCloudinary(buffer, file.name);
+        const publicUrl = await uploadToCloudinary(buffer, file.name, file.type);
+
 
         uploadedFilePaths.push(publicUrl);
         industryFilesMetadata.push({
