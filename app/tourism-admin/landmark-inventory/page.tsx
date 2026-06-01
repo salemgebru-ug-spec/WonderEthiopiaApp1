@@ -118,24 +118,32 @@ export default function LandmarkInventory() {
   };
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function fetchLandmarks() {
       try {
         setLoading(true);
-        const res = await fetch(`/api/landmarks`);
+        const res = await fetch(`/api/landmarks`, { signal: controller.signal });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          console.error("Landmarks API error:", err);
+          setLandmarks([]);
+          return;
+        }
         const data = await res.json();
         setLandmarks(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Failed to fetch landmarks:", error);
+      } catch (error: any) {
+        if (error.name !== "AbortError") {
+          console.error("Failed to fetch landmarks:", error);
+        }
       } finally {
         setLoading(false);
       }
     }
 
-    const timer = setTimeout(() => {
-      fetchLandmarks();
-    }, 500);
+    fetchLandmarks();
 
-    return () => clearTimeout(timer);
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
