@@ -31,10 +31,10 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    
-    const { 
-      name, description, region, city, gallery, coordinates, 
-      date_of_establishment, significance, unesco_status, visitor_info 
+
+    const {
+      name, description, region, city, gallery, coordinates,
+      date_of_establishment, significance, unesco_status, visitor_info
     } = body;
 
     const allEmbeddings = [];

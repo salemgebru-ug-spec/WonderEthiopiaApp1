@@ -347,9 +347,9 @@ export default function LandmarkInventory() {
                     <MapPin className="w-3.5 h-3.5 text-foreground/40 shrink-0" />
                     <span className="truncate">{landmark.city}, {landmark.region}</span>
                   </span>
-                  <Link href={`/tourism-admin/landmark-inventory/${landmark._id}`} className="w-11 h-11 rounded-full bg-primary text-background flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+                  <button onClick={() => handleOpenEditModal(landmark)} className="w-11 h-11 rounded-full bg-primary text-background flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                     <ChevronRight className="w-5 h-5" />
-                  </Link>
+                  </button>
                 </div>
               </div>
             ))}

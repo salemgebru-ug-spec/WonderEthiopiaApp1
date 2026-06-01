@@ -5,9 +5,8 @@ import { formatError } from "@/lib/apiError";
 // getImageEmbedding will be imported lazily in POST handler
 
 export async function GET() {
-  await dbConnect();
-
   try {
+    await dbConnect();
     const landmarks = await Landmark.find(); // ✅ FIXED
 
     return NextResponse.json(landmarks);
@@ -18,9 +17,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  await dbConnect();
-
   try {
+    await dbConnect();
     // 1. Read directly as JSON matching your frontend layout setup
     const { getImageEmbedding } = await import("./recognize/route");
     const body = await request.json();
