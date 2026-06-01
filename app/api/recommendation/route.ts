@@ -1,117 +1,84 @@
 import { NextResponse } from "next/server";
-// Use your centralized openai instance
-import hf from '@/lib/huggingface'; 
+import hf from "@/lib/huggingface";
 
 const CATEGORY_NORMALIZER: Record<string, string> = {
-  // Culture
-  "Cultural": "culture",
+  Cultural: "culture",
   "Cultural/Religious": "culture",
-  "Urban": "culture",
-  "City": "culture",
-
-  // Nature
-  "Natural": "nature",
-  "Nature": "nature",
+  Urban: "culture",
+  City: "culture",
+  Natural: "nature",
+  Nature: "nature",
   "National Park": "nature",
-  "Park": "nature",
-  "Landscape": "nature",
-
-  // Adventure
-  "Adventure": "adventure",
-  "Trekking": "adventure",
-  "Hiking": "adventure",
-  "Sport": "adventure",
-
-  // Religious
-  "Religious": "religious",
-  "Spiritual": "religious",
-  "Pilgrimage": "religious",
-
-  // Coffee
-  "Coffee": "coffee",
+  Park: "nature",
+  Landscape: "nature",
+  Adventure: "adventure",
+  Trekking: "adventure",
+  Hiking: "adventure",
+  Sport: "adventure",
+  Religious: "religious",
+  Spiritual: "religious",
+  Pilgrimage: "religious",
+  Coffee: "coffee",
   "Coffee Farm": "coffee",
-  "Plantation": "coffee",
-
-  // Modern
-  "Modern": "modern",
-  "Contemporary": "modern",
-  "Archaeological": "modern", // or remap to a more fitting key
-  "Historical": "modern",     // remove if you want a separate historical bucket
+  Plantation: "coffee",
+  Modern: "modern",
+  Contemporary: "modern",
+  Archaeological: "modern",
+  Historical: "modern",
 };
 
 const USER_PREF_MAP: Record<string, Record<string, number>> = {
-  culture: {
-    culture: 0.25,
-    modern: 0.1,
-  },
-  nature: {
-    nature: 0.25,
-    adventure: 0.1,
-  },
-  adventure: {
-    adventure: 0.25,
-    nature: 0.1,
-  },
-  religious: {
-    religious: 0.25,
-    culture: 0.1,
-  },
-  coffee: {
-    coffee: 0.25,
-    nature: 0.05,
-  },
-  modern: {
-    modern: 0.25,
-    culture: 0.05,
-  },
+  culture:   { culture: 0.25, modern: 0.1 },
+  nature:    { nature: 0.25, adventure: 0.1 },
+  adventure: { adventure: 0.25, nature: 0.1 },
+  religious: { religious: 0.25, culture: 0.1 },
+  coffee:    { coffee: 0.25, nature: 0.05 },
+  modern:    { modern: 0.25, culture: 0.05 },
 };
 
 export async function GET(request: Request) {
   try {
-    // 1. Get preferences from the URL query string
     const { searchParams } = new URL(request.url);
-    const preferences = searchParams.get("preferences");
+    const preferencesParam = searchParams.get("preferences");
 
-    if (!preferences) {
-      return NextResponse.json({ error: "No preferences provided" }, { status: 400 });
+    // Build the base URL for the internal destinations API
+    // Use relative path for same-origin calls in production
+    const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+
+    // --- No preferences: return the full destination list ---
+    if (!preferencesParam || preferencesParam.trim() === "") {
+      const res = await fetch(`${baseUrl}/api/destinations`, { cache: "no-store" });
+      if (!res.ok) {
+        return NextResponse.json({ error: "Failed to fetch destinations" }, { status: res.status });
+      }
+      const destinations = await res.json();
+      return NextResponse.json(destinations);
     }
 
-    const intents = preferences
-  .split(",")
-  .map(p => p.trim().toLowerCase());
+    // --- Has preferences: run recommendation engine ---
+    const intents = preferencesParam
+      .split(",")
+      .map((p) => p.trim().toLowerCase())
+      .filter(Boolean);
 
-    // 2. Fetch destinations
-    const response = await fetch("http://localhost:3000/api/destinations", {
-      cache: 'no-store' // Ensure fresh data
-    });
-
-    if (!response.ok) {
-      return NextResponse.json({ error: "Failed to fetch destinations" }, { status: response.status });
+    const res = await fetch(`${baseUrl}/api/destinations`, { cache: "no-store" });
+    if (!res.ok) {
+      return NextResponse.json({ error: "Failed to fetch destinations" }, { status: res.status });
     }
 
-    const destinations = await response.json(); 
-    for (let place of destinations) {
-  if (!place.embedding) {
-    place.embedding = await getEmbeddings(place.description);
-  }
-}
+    const destinations = await res.json();
 
-    destinations.forEach((p: any, i: number) => {
-  console.log("DEST", i, p.embedding);
-});
+    // Generate embeddings for any destination that doesn't have one yet
+    for (const place of destinations) {
+      if (!place.embedding) {
+        place.embedding = await getEmbeddings(place.description ?? place.name);
+      }
+    }
 
-
-    // 3. Generate embedding for the user's input
-    const userEmbedding = await getEmbeddings(preferences);
-    
-    
-
-    // 4. Calculate similarity and sort
+    const userEmbedding = await getEmbeddings(intents.join(", "));
     const results = recommend(userEmbedding, destinations, intents);
 
-    // 5. Return the top 5
     return NextResponse.json(results.slice(0, 9));
-
   } catch (error: any) {
     console.error("Recommendation Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -123,15 +90,11 @@ async function getEmbeddings(text: string): Promise<number[]> {
     model: "sentence-transformers/all-MiniLM-L6-v2",
     inputs: text,
   });
-  // Return the actual vector (array of numbers)
-  console.log("RAW:", embedding);
-  return (Array.isArray(embedding[0]) ? embedding[0] : embedding) as number[];
+  return Array.isArray(embedding[0]) ? (embedding[0] as number[]) : (embedding as number[]);
 }
 
-function cosineSimilarity(a: number[], b: number[]) {
-  let dot = 0;
-  let magA = 0;
-  let magB = 0;
+function cosineSimilarity(a: number[], b: number[]): number {
+  let dot = 0, magA = 0, magB = 0;
   for (let i = 0; i < a.length; i++) {
     dot += a[i] * b[i];
     magA += a[i] * a[i];
@@ -142,26 +105,17 @@ function cosineSimilarity(a: number[], b: number[]) {
 
 function recommend(userEmbedding: number[], places: any[], intents: string[]) {
   return places
-    .map(place => {
+    .map((place) => {
       const similarity = cosineSimilarity(userEmbedding, place.embedding);
-
       const category = CATEGORY_NORMALIZER[place.category] ?? "other";
 
-      // category boost from user intent
       let categoryBoost = 0;
-
       for (const intent of intents) {
         const weights = USER_PREF_MAP[intent];
-        if (weights?.[category]) {
-          categoryBoost += weights[category];
-        }
+        if (weights?.[category]) categoryBoost += weights[category];
       }
 
-      return {
-        ...place,
-        similarity,
-        score: similarity + categoryBoost,
-      };
+      return { ...place, similarity, score: similarity + categoryBoost };
     })
     .sort((a, b) => b.score - a.score);
 }
