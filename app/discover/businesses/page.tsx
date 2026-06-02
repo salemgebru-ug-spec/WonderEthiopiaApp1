@@ -61,15 +61,17 @@ export default function DiscoverBusinesses() {
     setCurrentPage(1);
   }, [searchQuery, region, category]);
 
+ 
   // 1. Fetch user preferences on mount
   useEffect(() => {
     async function fetchUserPreferences() {
       try {
-        const res = await fetch('/api/tourist/profile');
+        const res = await fetch('/api/user/profile');
         if (!res.ok) throw new Error("Failed to pull preference profile");
         
         const json = await res.json();
-        const profile = json.profile || {};
+        console.log(json);
+        const profile = json.user?.preferences?.categories || {};
 
         const userPreferencesObj = {
           accommodationType: profile.accommodation_type,
