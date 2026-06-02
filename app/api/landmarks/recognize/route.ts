@@ -8,9 +8,13 @@ export const maxDuration = 60;
 export const memory = 1024;    
 
 // lazy ML loader utilizing runtime require
+// lazy ML loader utilizing runtime dynamic imports
 async function getML() {
-  const { getImageEmbedding, getExtractor } = require("./utils");
-  const { RawImage } = require("@xenova/transformers");
+  // 1. Change local utils import to dynamic import
+  const { getImageEmbedding, getExtractor } = await import("./utils");
+  
+  // 2. Change transformers import to dynamic import
+  const { RawImage } = await import("@xenova/transformers");
 
   return { getImageEmbedding, getExtractor, RawImage };
 }
