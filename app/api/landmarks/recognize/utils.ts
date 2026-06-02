@@ -1,5 +1,9 @@
-import { pipeline } from "@xenova/transformers";
+import { pipeline, env } from "@xenova/transformers"; // 1. Import 'env'
 import { loadImage } from 'canvas';
+
+// 2. Configure Hugging Face environments for Serverless
+env.allowLocalModels = false; 
+env.backends.onnx.executionProviders = ['wasm']; // Force WebAssembly instead of native binaries
 
 let extractor: any;
 
