@@ -1,8 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["mongoose"],
- 
+  // Keeps heavy node packages from being bundled into serverless functions
+  serverExternalPackages: ["mongoose", "@xenova/transformers"],
+
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Directs Webpack to treat native binary dependencies as external 
+      // preventing Vercel build compilation crashes
+      config.externals = [...(config.externals || []), {
+        "onnxruntime-node": "commonjs onnxruntime-node",
+        "sharp": "commonjs sharp",
+      }];
+    }
+    return config;
+  },
 
   async headers() {
     return [
@@ -24,34 +36,36 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "share.google",
-        pathname: "**",
+        pathname: "",
       },
       {
         protocol: "https",
         hostname: "images.unsplash.com",
-        pathname: "**",
+        pathname: "",
       },
       {
         protocol: "https",
         hostname: "visitethiopia.et",
-        pathname: "/**"
-      }, {
+        pathname: "/",
+      },
+      {
         protocol: "https",
         hostname: "whc.unesco.org",
-        pathname: "/**"
-      },{
-        protocol:"https",
-        hostname:"res.cloudinary.com",
-        pathname:"/**"
-      }
+        pathname: "/",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
     ],
   },
 
   async rewrites() {
     return [
       {
-        source: '/unesco-assets/:path*',
-        destination: 'https://whc.unesco.org/:path*',
+        source: "/unesco-assets/:path*",
+        destination: "https://whc.unesco.org/:path*",
       },
     ];
   },
