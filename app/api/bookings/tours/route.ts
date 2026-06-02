@@ -34,63 +34,46 @@ if (existingBooking) {
 
 
         // 1.5 Capacity Check
-        const service = await Service.findById(tour_id);
-       if (!service) {
-  return NextResponse.json({ error: "Tour service not found" }, { status: 404 });
+       const service = await Service.findById(tour_id);
+if (!service) {
+    return NextResponse.json({ error: "Tour service not found" }, { status: 404 });
+}
+if (service.availability?.isAvailable === false) {
+    return NextResponse.json({ error: "This tour is currently unavailable." }, { status: 400 });
 }
 
-if (service?.availability?.isAvailable === false) {
-  return NextResponse.json({ error: "This tour is currently unavailable." }, { status: 400 });
+// 3. Capacity check
+const maxCapacity = service.availability?.quantity || service.metadata?.capacity || service.metadata?.maxOccupancy || service.metadata?.eventCapacity || 0;
+if (maxCapacity > 0) {
+    const existingBookings = await TourBooking.find({ tour_id });
+    const totalBooked = existingBookings.reduce((sum, b) => sum + (b.number_of_people || 0), 0);
+    if (totalBooked + number_of_people > maxCapacity) {
+        return NextResponse.json({ error: `Capacity exceeded. Only ${Math.max(0, maxCapacity - totalBooked)} spots available.` }, { status: 400 });
+    }
 }
 
-const quantity = service?.availability?.quantity ?? 0;
-if (quantity > 0 && quantity <= 0) {
-  return NextResponse.json({ error: "This tour is fully booked." }, { status: 400 });
-}
-        const maxCapacity = service.availability?.quantity || service.metadata?.capacity || service.metadata?.maxOccupancy || service.metadata?.eventCapacity || 0;
-        
-        if (maxCapacity > 0) {
-            const existingBookings = await TourBooking.find({ tour_id });
-            const totalBooked = existingBookings.reduce((sum, b) => sum + (b.number_of_people || 0), 0);
-            
-            if (totalBooked + number_of_people > maxCapacity) {
-                return NextResponse.json({ error: `Capacity exceeded. Only ${Math.max(0, maxCapacity - totalBooked)} spots available.` }, { status: 400 });
-            }
-        }
-
-        // 2. Initiate Payment
-        let payment;
-        try {
-            payment = await registerPayment({
-                user_id: user_id,
-                amount: total_price,
-                currency: currency || "ETB"
-            });
-            
-            console.log("Payment registered:", payment);
-        } catch (paymentError: any) {
+// 4. Payment FIRST
+let payment;
+try {
+    payment = await registerPayment({ user_id, amount: total_price, currency: currency || "ETB" });
+} catch (paymentError: any) {
     console.error("Payment registration failed:", paymentError);
-    
-
- const updatedTour = await Service.findOneAndUpdate(
-                { _id: tour_id, "availability.quantity": { $gt: 0 } }, 
-                { $inc: { "availability.quantity": -1 } },
-                { new: true } 
-            );
-    
-            if (!updatedTour) {
-              
-                throw new Error("Tour inventory update failed. Tour might be out of stock.");
-            }
-
     return NextResponse.json({ 
         success: false, 
         message: "Failed to initialize payment gateway.",
-        // If it's an object, stringify it so you can read it in the browser
         error: typeof paymentError === 'object' ? JSON.stringify(paymentError) : paymentError.message
     }, { status: 502 });
 }
 
+// 5. Payment succeeded — NOW decrement
+const updatedTour = await Service.findOneAndUpdate(
+    { _id: tour_id, "availability.quantity": { $gt: 0 } },
+    { $inc: { "availability.quantity": -number_of_people } }, // decrement by actual guest count
+    { new: true }
+);
+if (!updatedTour) {
+    throw new Error("Tour inventory update failed. Tour might be out of stock.");
+}
         // 3. Extract ID safely
         // Ensure you check if payment exists before accessing ._id
         const payment_id = payment?._id || payment?.id; 
