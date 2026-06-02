@@ -1,18 +1,28 @@
 import { env, pipeline, RawImage } from "@xenova/transformers";
 
-// FORCE VERCEL COMPATIBILITY USING DIRECT PROPERTY FLAGS
-env.backends.onnx.wasm.numThreads = 1;
+// Force TypeScript to treat the ONNX config as 'any' to bypass strict compilation checks
+const onnxConfig = env.backends.onnx as any;
 
-// Disable the native C++ CPU/GPU binaries that Vercel blocks (.so files)
-env.backends.onnx.cpu.disabled = true; 
-if ((env.backends.onnx as any).gpu) {
-  (env.backends.onnx as any).gpu.disabled = true;
+if (onnxConfig) {
+  // 1. Tell the engine to use a single thread for WASM execution on Vercel
+  if (onnxConfig.wasm) {
+    onnxConfig.wasm.numThreads = 1;
+  }
+  
+  // 2. Disable the native C++ CPU/GPU binaries that throw the missing .so file error
+  if (onnxConfig.cpu) {
+    onnxConfig.cpu.disabled = true;
+  }
+  if (onnxConfig.gpu) {
+    onnxConfig.gpu.disabled = true;
+  }
 }
 
-// Disable local file caching so it reads directly from cloud storage inside serverless
+// Disable local file caching so it reads strictly from cloud memory structures
 env.allowLocalModels = false;
 
 let extractor: any = null;
+// ... rest of your utils.ts file remains the same
 
 export async function getExtractor() {
   if (!extractor) {
