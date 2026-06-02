@@ -3,14 +3,14 @@ export const runtime = "nodejs";
 let extractor: any = null;
 let envReady = false;
 
-/**
+/
  * Initialize environment BEFORE pipeline loads
- * IMPORTANT: prevents ONNX native runtime from being used
  */
 async function initEnv() {
   if (envReady) return;
 
-  const { env } = await import("@xenova/transformers");
+  // Using standard require hides this block from the Next.js static build workers
+  const { env } = require("@xenova/transformers");
 
   // 🚨 FORCE PURE WASM MODE (CRITICAL FIX)
   env.backends = {
@@ -19,48 +19,55 @@ async function initEnv() {
         numThreads: 1,
       },
     },
-  } as any;
+  };
 
   env.allowLocalModels = false;
   env.useBrowserCache = false;
 
+  // 🚨 VERCEL FIX: Force cache into the only writable directory allocated to serverless functions
+  env.cacheDir = "/tmp/transformers-cache";
+
   envReady = true;
 }
 
-/**
- * Load model lazily (prevents Vercel cold-start crash)
+/
+ * Load model lazily
  */
 export async function getExtractor() {
   if (!extractor) {
     await initEnv();
 
-    const { pipeline } = await import("@xenova/transformers");
+    const { pipeline } = require("@xenova/transformers");
 
     extractor = await pipeline(
-  "feature-extraction",
-  "Xenova/clip-vit-base-patch32"
-);
+      "feature-extraction",
+      "Xenova/all-MiniLM-L6-v2"
+    );
   }
 
   return extractor;
 }
 
-/**
+/
  * Convert image → embedding vector
  */
 export async function getImageEmbedding(buffer: ArrayBuffer): Promise<number[]> {
-  const { RawImage } = await import("@xenova/transformers");
+  const { RawImage } = require("@xenova/transformers");
 
   const model = await getExtractor();
 
-  const image = await RawImage.fromBlob(new Blob([buffer]));
+  const blob = new Blob([buffer]);
+  const image = await RawImage.fromBlob(blob);
 
-  const output = await model(image);
+  const output = await model(image, {
+    pooling: "mean",
+    normalize: true,
+  });
 
   return Array.from(output.data as Float32Array);
 }
 
-/**
+/
  * Cosine similarity
  */
 export function cosineSimilarity(a: number[], b: number[]): number {
