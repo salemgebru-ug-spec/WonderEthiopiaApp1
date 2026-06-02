@@ -1,43 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
-import EventBooking from "@/models/EventBooking";
 import Service from "@/models/Service";
+import EventBooking from "@/models/EventBooking";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { businessId: string } }
-) {
+export async function GET() {
   try {
     await dbConnect();
 
-    // Find all event services belonging to this business
-    const events = await Service.find({
-      businessId: params.businessId,
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const services = await Service.find({
+      businessId: session.user.id,
     }).select("_id");
 
-    const eventIds = events.map((event) => event._id);
+    const serviceIds = services.map((s) => s._id);
 
-    // Find bookings for those events
     const bookings = await EventBooking.find({
-      event_id: { $in: eventIds },
+      event_id: { $in: serviceIds },
     })
       .populate("event_id")
       .lean();
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Event bookings retrieved successfully",
-        data: bookings,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      success: true,
+      data: bookings,
+    });
   } catch (error: any) {
     return NextResponse.json(
-      {
-        success: false,
-        message: error.message || "Something went wrong",
-      },
+      { success: false, message: error.message },
       { status: 500 }
     );
   }
