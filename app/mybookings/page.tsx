@@ -354,18 +354,25 @@ export default function MyBookings() {
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-            {['all', 'tours', 'events', 'cars', 'rooms'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${activeTab === tab
-                    ? 'bg-[#1B263B] text-white shadow-md'
-                    : 'text-[#415A77] hover:bg-gray-50'
-                  } capitalize`}
-              />
-            ))}
-          </div>
+         {/* Tab Navigation */}
+<div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+  {['all', 'tours', 'events', 'cars', 'rooms'].map((tab) => {
+    const isActive = activeTab === tab;
+    return (
+      <button
+        key={tab}
+        onClick={() => setActiveTab(tab)}
+        className={`px-6 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap capitalize z-10 ${
+          isActive
+            ? 'bg-[#1B263B] text-white shadow-md'
+            : 'text-[#415A77] hover:text-[#1B263B] hover:bg-gray-50'
+        }`}
+      >
+        {tab}
+      </button>
+    );
+  })}
+</div>
         </div>
 
         {/* Booking List Container */}
