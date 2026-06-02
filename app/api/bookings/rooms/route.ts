@@ -36,6 +36,7 @@ if (existingBooking) {
                 if (!service || (service.availability?.quantity ?? 0) <= 0) {
                     return NextResponse.json({ error: "This car is currently out of stock/unavailable" }, { status: 400 });
                 }
+        
 
         // 2. Initiate Payment
         let payment;
@@ -50,16 +51,7 @@ if (existingBooking) {
         } catch (paymentError: any) {
     console.error("Payment registration failed:", paymentError);
 
-    const updatedRoom = await Service.findOneAndUpdate(
-                { _id: room_id, "availability.quantity": { $gt: 0 } }, 
-                { $inc: { "availability.quantity": -1 } },
-                { new: true } 
-            );
-    
-            if (!updatedRoom) {
-              
-                throw new Error("Room inventory update failed. Room might be out of stock.");
-            }
+   
     
     return NextResponse.json({ 
         success: false, 
@@ -69,6 +61,16 @@ if (existingBooking) {
     }, { status: 502 });
 }
 
+        const updatedRoom = await Service.findOneAndUpdate(
+    { _id: room_id, "availability.quantity": { $gt: 0 } },
+    { $inc: { "availability.quantity": -1 } },
+    { new: true }
+);
+
+if (!updatedRoom) {
+    throw new Error("Room inventory update failed. Room might be out of stock.");
+}
+        
         // 3. Extract ID safely
         // Ensure you check if payment exists before accessing ._id
         const payment_id = payment?._id || payment?.id; 
