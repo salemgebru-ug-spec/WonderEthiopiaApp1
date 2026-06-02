@@ -21,24 +21,27 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "share.google",
-        pathname: "",
+        pathname: "/**", // ✅ Fixed from ""
       },
       {
         protocol: "https",
         hostname: "images.unsplash.com",
-        pathname: "",
+        pathname: "/**", // ✅ Fixed from ""
       },
       {
-        protocol:"https",
-        hostname:"visitethiopia.et",
-        pathname:"/"
-      },{
-        protocol:"https",
-        hostname:"whc.unesco.org",
-        pathname:"/"
-      },{
+        protocol: "https",
+        hostname: "visitethiopia.et",
+        pathname: "/**", // ✅ Fixed from "/"
+      },
+      {
+        protocol: "https",
+        hostname: "whc.unesco.org",
+        pathname: "/**", // ✅ Fixed from "/"
+      },
+      {
         protocol: "https",
         hostname: "res.cloudinary.com",
+        pathname: "/**", // ✅ Added explicitly to prevent any default matching errors
       }
     ],
   },
