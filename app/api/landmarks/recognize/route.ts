@@ -10,7 +10,7 @@ export async function GET(req: Request) {
   }
 
   await dbConnect();
-  const landmarks = await Landmark.find();
+ const landmarks = await Landmark.find().limit(1);
   const results = { success: 0, failed: 0, skipped: 0 };
 
   for (const landmark of landmarks) {
