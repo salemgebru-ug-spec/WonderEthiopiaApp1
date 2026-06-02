@@ -109,6 +109,7 @@ if (!updatedRoom) {
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
+          console.log("Session:", JSON.stringify(session)); 
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const result = await RoomBooking.find({ user_id: session.user.id }).lean();
