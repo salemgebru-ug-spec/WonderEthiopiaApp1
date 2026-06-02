@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Landmark from "@/models/Landmark";
-import { pipeline, RawImage } from "@xenova/transformers";
-import { getImageEmbedding,cosineSimilarity,getExtractor } from "./utils";
-
-let extractor: any;
-
-
+import { RawImage } from "@xenova/transformers";
+import { getImageEmbedding, cosineSimilarity, getExtractor } from "./utils";
 
 // ── Re-embed all landmarks (call via GET /api/search-by-image/reembed) ────────
 export async function GET(req: Request) {
@@ -35,7 +31,8 @@ export async function GET(req: Request) {
         },
       });
 
-      if (!response.ok) throw new Error(HTTP ${response.status});
+      // FIX: Added backticks for template literal string interpolation
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const buffer = await response.arrayBuffer();
       const blob = new Blob([buffer]);
@@ -45,10 +42,10 @@ export async function GET(req: Request) {
       landmark.embedding = Array.from(output.data as Float32Array);
       await landmark.save();
 
-      console.log(✓ ${landmark.name} — dim: ${landmark.embedding.length});
+      console.log(`✓ ${landmark.name} — dim: ${landmark.embedding.length}`);
       results.success++;
     } catch (e: any) {
-      console.error(✗ ${landmark.name}: ${e.message});
+      console.error(`✗ ${landmark.name}: ${e.message}`);
       results.failed++;
     }
   }
@@ -61,7 +58,7 @@ export async function POST(req: Request) {
   await dbConnect();
 
   try {
-    const contentType = req.headers.get("content-type")  "";
+    const contentType = req.headers.get("content-type") || "";
     if (!contentType.includes("multipart/form-data")) {
       return NextResponse.json(
         { error: `Expected multipart/form-data, got ${contentType}` },
@@ -88,14 +85,14 @@ export async function POST(req: Request) {
 
     const results = landmarks
       .map((l) => {
-        if (!l.embedding  !Array.isArray(l.embedding)) return null;
+        if (!l.embedding || !Array.isArray(l.embedding)) return null;
         const similarity = cosineSimilarity(imageEmbedding, l.embedding);
         return { ...l.toObject(), similarity, score: similarity };
       })
       .filter(Boolean)
       .sort((a, b) => b!.similarity - a!.similarity);
 
-    console.log(Top: ${results[0]?.name} — ${results[0]?.similarity.toFixed(4)});
+    console.log(`Top: ${results[0]?.name} — ${results[0]?.similarity.toFixed(4)}`);
 
     return NextResponse.json(results.slice(0, 5));
   } catch (error: any) {
