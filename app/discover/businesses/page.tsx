@@ -129,9 +129,20 @@ export default function DiscoverBusinesses() {
         }
         
         const data = await res.json();
-        console.log(data);
-        const availableServices = data.filter((d: any) => d.availability.isAvailable === true);
-        setServices(availableServices); 
+
+// Normalize: handle both array and wrapped { services: [] } / { businesses: [] } shapes
+const rawList = Array.isArray(data)
+  ? data
+  : Array.isArray(data.services)
+    ? data.services
+    : Array.isArray(data.businesses)
+      ? data.businesses
+      : [];
+
+const availableServices = rawList.filter(
+  (d: any) => d?.availability?.isAvailable === true
+);
+setServices(availableServices);
       } catch (error) {
         console.error("Failed to fetch services:", error);
       } finally {
