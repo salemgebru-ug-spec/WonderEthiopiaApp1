@@ -9,8 +9,8 @@ import { cosineSimilarity } from "./utils";
 
 // lazy ML loader (prevents Vercel crash)
 async function getML() {
-  const { getImageEmbedding, getExtractor, RawImage } =
-    await import("./utils");
+  const { getImageEmbedding, getExtractor } = await import("./utils");
+  const { RawImage } = await import("@xenova/transformers");
 
   return { getImageEmbedding, getExtractor, RawImage };
 }
