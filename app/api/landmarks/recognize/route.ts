@@ -1,12 +1,8 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Landmark from "@/models/Landmark";
-import { pipeline, RawImage } from "@xenova/transformers";
-import { getImageEmbedding,cosineSimilarity,getExtractor } from "./utils";
-
-let extractor: any;
-
-
+import { RawImage } from "@xenova/transformers";
+import { getImageEmbedding, cosineSimilarity, getExtractor } from "./utils"; // All ML logic lives here now
 
 // ── Re-embed all landmarks (call via GET /api/search-by-image/reembed) ────────
 export async function GET(req: Request) {
@@ -16,7 +12,7 @@ export async function GET(req: Request) {
   }
 
   await dbConnect();
-  const ext = await getExtractor();
+  const ext = await getExtractor(); // This triggers the WASM setup cleanly
   const landmarks = await Landmark.find();
   const results = { success: 0, failed: 0, skipped: 0 };
 
@@ -95,7 +91,8 @@ export async function POST(req: Request) {
       .filter(Boolean)
       .sort((a, b) => b!.similarity - a!.similarity);
 
-    console.log(`Top: ${results[0]?.name} — ${results[0]?.similarity.toFixed(4)}`);
+    // Safe fallback print if no results exist in DB yet
+    console.log(`Top: ${results[0]?.name || "None"} — ${results[0]?.similarity?.toFixed(4) || "0"}`);
 
     return NextResponse.json(results.slice(0, 5));
   } catch (error: any) {
