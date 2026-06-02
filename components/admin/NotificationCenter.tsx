@@ -80,18 +80,20 @@ export default function NotificationCenter() {
     if (type === "category_request") return "Review Expansion";
     return "Review Entity";
   };
-
-  const formatMessage = (msg: string) => {
-    let html = msg
+  
+const formatMessage = (msg: string) => {
+    const html = msg
       .replace(/\n\n/g, '<br/><br/>')
       .replace(/\n/g, '<br/>')
       .replace(/\*\*(.*?)\*\*/g, '<strong class="font-black text-foreground/80">$1</strong>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
-  const proxyUrl = url.startsWith("https://res.cloudinary.com")
-    ? `/api/proxy-document?url=${encodeURIComponent(url)}&fileName=${encodeURIComponent(text)}`
-    : url;
-  return `<a href="${proxyUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-black flex items-center gap-1 inline-flex"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg> ${text}</a>`;
-})
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, url) => {
+        const proxyUrl = url.startsWith("https://res.cloudinary.com")
+          ? `/api/business/sign-document?url=${encodeURIComponent(url)}`
+          : url;
+        return `<a href="${proxyUrl}" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline font-black flex items-center gap-1 inline-flex"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg> ${text}</a>`;
+      });
+    return { __html: html };
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
