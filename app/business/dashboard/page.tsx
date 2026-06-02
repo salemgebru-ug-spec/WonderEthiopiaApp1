@@ -245,14 +245,23 @@ export default function BusinessDashboardPage() {
       console.log("Booking Results:", bookingResults);
       const allBookings: any[] = [];
       // Replace the internal part of your bookingResults.forEach loop with this:
+// Replace the internal part of your bookingResults.forEach loop with this:
 bookingResults.forEach((result, index) => {
   if (result.status === "fulfilled") {
     const data = result.value;
     
-    // 1. Target data directly if it is an array, or pull from expected keys
-    const list = Array.isArray(data) 
-      ? data 
-      : (data.bookings || data.data || data.value || []); // Add data.value here
+    // 1. Target data directly if it is an array, or pull from expected registry keys
+    let list = [];
+    if (Array.isArray(data)) {
+      list = data;
+    } else if (data) {
+      list = data.bookings || data.booking || data.data || data.value || [];
+    }
+
+    // Ensure singular objects returned wrapped in an API response get caught as an array
+    if (!Array.isArray(list) && typeof list === 'object' && list !== null) {
+      list = [list];
+    }
 
     if (Array.isArray(list)) {
       list.forEach((b: any) => {
