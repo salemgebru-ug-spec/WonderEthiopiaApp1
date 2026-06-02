@@ -234,6 +234,15 @@ export default function EventBookingPage() {
             </div>
 
             <form onSubmit={handleEventBooking} className="p-6 md:p-8">
+              {error && (
+    <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl text-sm animate-in fade-in-50 duration-200">
+      <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+      <div className="space-y-1">
+        <p className="font-semibold">Booking Encountered an Issue</p>
+        <p className="text-red-700/90">{error}</p>
+      </div>
+    </div>
+  )}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Left Column */}
                 <div className="space-y-6">
