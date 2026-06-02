@@ -1,16 +1,24 @@
-// app/api/search-by-image/utils.ts
 export async function getImageEmbedding(bytes: ArrayBuffer): Promise<number[]> {
+  // Convert to base64
+  const base64 = Buffer.from(bytes).toString("base64");
+
   const response = await fetch(
-    https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/ai/run/@cf/baai/bge-base-en-v1.5,
+    https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/ai/run/@cf/unum/uform-gen2-qwen-500m,
     {
       method: "POST",
       headers: {
         Authorization: Bearer ${process.env.CF_API_TOKEN},
-        "Content-Type": "application/octet-stream",
+        "Content-Type": "application/json",
       },
-      body: bytes,
+      body: JSON.stringify({ image: base64 }),
     }
   );
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(CF API error: ${response.status} — ${text});
+  }
+
   const data = await response.json();
   return data.result.data[0];
 }
