@@ -16,6 +16,20 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "All fields are required",data:body }, { status: 400 });
         }
 
+        const existingBooking = await RoomBooking.findOne({
+  user_id,
+  room_id,
+  status: { $nin: ["cancelled", "rejected"] }, // allow rebooking if previously cancelled
+});
+
+if (existingBooking) {
+  return NextResponse.json(
+    { error: "You already have an active booking for this room." },
+    { status: 400 }
+  );
+}
+
+
         const service = await Service.findById(room_id);
                 if (!service || (service.availability?.quantity ?? 0) <= 0) {
                     return NextResponse.json({ error: "This car is currently out of stock/unavailable" }, { status: 400 });
