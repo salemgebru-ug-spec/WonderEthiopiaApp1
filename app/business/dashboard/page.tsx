@@ -233,10 +233,10 @@ export default function BusinessDashboardPage() {
       }
       if (svcData.services) setServices(svcData.services);
       const bookingEndpoints = [
-        { url: "/api/bookings/byBusinessId/rooms", type: "room" },
-        { url: "/api/bookings/byBusinessId/cars", type: "car" },
-        { url: "/api/bookings/byBusinessId/tours", type: "tour" },
-        { url: "/api/bookings/byBusinessId/events", type: "event" },
+        { url: "/api/bookings/rooms/byBusinessId", type: "room" },
+        { url: "/api/bookings/cars/byBusinessId", type: "car" },
+        { url: "/api/bookings/tours/byBusinessId", type: "tour" },
+        { url: "/api/bookings/events/byBusinessId", type: "event" },
       ];
 
       const bookingResults = await Promise.allSettled(
