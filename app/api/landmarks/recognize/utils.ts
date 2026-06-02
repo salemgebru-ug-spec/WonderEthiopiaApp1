@@ -7,7 +7,7 @@ export async function getImageEmbedding(bytes: ArrayBuffer): Promise<number[]> {
     {
       method: "POST",
       headers: {
-        Authorization: Bearer ${process.env.CF_API_TOKEN},
+        Authorization: `Bearer ${process.env.CF_API_TOKEN}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ image: base64 }),
@@ -16,7 +16,7 @@ export async function getImageEmbedding(bytes: ArrayBuffer): Promise<number[]> {
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(CF API error: ${response.status} — ${text});
+    throw new Error(`CF API error: ${response.status} — ${text}`);
   }
 
   const data = await response.json();
