@@ -1,5 +1,4 @@
-// app/api/landmarks/recognize/utils.ts
-import { pipeline, RawImage } from "@xenova/transformers";
+import { pipeline } from "@xenova/transformers";
 import loadImage from 'canvas';
 
 let extractor: any;
@@ -27,10 +26,13 @@ export async function getImageEmbedding(image: ArrayBuffer): Promise<number[]> {
 }
 
 export function cosineSimilarity(a: number[], b: number[]): number {
+  // FIX: Added backticks around the template literal string
   if (a.length !== b.length) {
-    console.error(Dimension mismatch: query=${a.length}, db=${b.length});
+    console.error(`Dimension mismatch: query=${a.length}, db=${b.length}`);
     return 0;
   }
+  
+  // FIX: Removed the smashed file comment snippet from the end of this line
   let dot = 0, magA = 0, magB = 0;
   for (let i = 0; i < a.length; i++) {
     dot += a[i] * b[i];
