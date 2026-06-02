@@ -37,7 +37,7 @@ export default function SettingsPage() {
     group_type: "",
   });
 
-  useEffect(() => {
+useEffect(() => {
     async function fetchData() {
       try {
         const [profileRes, tourismRes] = await Promise.all([
@@ -46,7 +46,18 @@ export default function SettingsPage() {
         ]);
 
         const profileData = await profileRes.json();
-        if (profileData.user) setProfile(profileData.user);
+        if (profileData.user) {
+          setProfile({
+            ...profileData.user,
+            // 👉 Safeguard: Ensure nested structures always have safe fallback state values
+            preferences: {
+              categories: profileData.user.preferences?.categories || [],
+              regions: profileData.user.preferences?.regions || [],
+              budget: profileData.user.preferences?.budget || "mid",
+              language: profileData.user.preferences?.language || "english"
+            }
+          });
+        }
 
         if (tourismRes.ok) {
           const tourismData = await tourismRes.json();
@@ -62,34 +73,86 @@ export default function SettingsPage() {
   }, []);
 
   const handleSave = async (): Promise<boolean> => {
-  if (!profile.name || profile.name.trim() === "") {
-    showToast("Validation Error", "Official Name cannot be left empty.", "error");
-    return false;
-  }
-  if (!profile.phoneNumber || profile.phoneNumber.trim() === "") {
-    showToast("Validation Error", "Contact Line cannot be left empty.", "error");
-    return false;
-  }
-  if (profile.name.trim().length < 3) {
-  showToast("Validation Error", "Official Name must be at least 3 characters.", "error");
-  return false;
-}
-  if (profile.phoneNumber.replace(/[^0-9]/g, "").length < 9) {
-    showToast("Validation Error", "Phone number must contain at least 9 digits.", "error");
-    return false;
-  }
+    if (!profile.name || profile.name.trim() === "") {
+      showToast("Validation Error", "Official Name cannot be left empty.", "error");
+      return false;
+    }
+    if (!profile.phoneNumber || profile.phoneNumber.trim() === "") {
+      showToast("Validation Error", "Contact Line cannot be left empty.", "error");
+      return false;
+    }
+    if (profile.name.trim().length < 3) {
+      showToast("Validation Error", "Official Name must be at least 3 characters.", "error");
+      return false;
+    }
+    if (profile.phoneNumber.replace(/[^0-9]/g, "").length < 9) {
+      showToast("Validation Error", "Phone number must contain at least 9 digits.", "error");
+      return false;
+    }
 
-  setSaving(true);
-  try {
-    // ... rest of save logic unchanged ...
-    return true;
-  } catch (e) {
-    showToast("Error", "Synchronization interrupted.", "error");
-    return false;
-  } finally {
-    setSaving(false);
-  }
-};
+    setSaving(true);
+    try {
+      // 👉 FIXED: Flattened the object payload completely to match backend destructuring expectance
+      const userPayload = {
+        name: profile.name,
+        bio: profile.bio || "",
+        phoneNumber: profile.phoneNumber,
+        profileImage: profile.profileImage,
+        preferences: profile.preferences // Passes directly on the top-level
+      };
+
+      const updatePromises = [
+        fetch("/api/user/profile", {
+          method: "PATCH", 
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userPayload), 
+        })
+      ];
+
+      // 2. Synchronize Tourism Archetypes if the user is a tourist
+      if (session?.user?.role === "tourist") {
+        updatePromises.push(
+          fetch("/api/tourist/profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(tourismProfile),
+          })
+        );
+      }
+
+      const responses = await Promise.all(updatePromises);
+      
+      // Check for backend failures
+      for (const res of responses) {
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || "Upstream registry sync failed.");
+        }
+      }
+
+      // 3. Update NextAuth Client Session Cache
+      if (update) {
+        await update({
+          ...session,
+          user: {
+            ...session?.user,
+            name: profile.name,
+            image: profile.profileImage
+          }
+        });
+      }
+
+      showToast("Success", "Intelligence system synchronized successfully.", "success");
+      setIsEditing(false);
+      return true;
+    } catch (e: any) {
+      console.error("Sync error:", e);
+      showToast("Error", e.message || "Synchronization interrupted.", "error");
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -1,14 +1,9 @@
+// app/api/search-by-image/route.ts
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Landmark from "@/models/Landmark";
-import { pipeline, RawImage } from "@xenova/transformers";
-import { getImageEmbedding,cosineSimilarity,getExtractor } from "./utils";
+import { getImageEmbedding, cosineSimilarity } from "./utils";
 
-let extractor: any;
-
-
-
-// ── Re-embed all landmarks (call via GET /api/search-by-image/reembed) ────────
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   if (searchParams.get("action") !== "reembed") {
@@ -16,16 +11,12 @@ export async function GET(req: Request) {
   }
 
   await dbConnect();
-  const ext = await getExtractor();
   const landmarks = await Landmark.find();
   const results = { success: 0, failed: 0, skipped: 0 };
 
   for (const landmark of landmarks) {
     const imageUrl = (landmark as any).gallery?.[0];
-    if (!imageUrl) {
-      results.skipped++;
-      continue;
-    }
+    if (!imageUrl) { results.skipped++; continue; }
 
     try {
       const response = await fetch(imageUrl, {
@@ -34,21 +25,16 @@ export async function GET(req: Request) {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         },
       });
-
-      if (!response.ok) throw new Error(HTTP ${response.status});
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const buffer = await response.arrayBuffer();
-      const blob = new Blob([buffer]);
-      const img = await RawImage.fromBlob(blob);
-      const output = await ext(img, { pooling: "mean", normalize: true });
-
-      landmark.embedding = Array.from(output.data as Float32Array);
+      landmark.embedding = await getImageEmbedding(buffer); // ← no RawImage needed
       await landmark.save();
 
-      console.log(✓ ${landmark.name} — dim: ${landmark.embedding.length});
+      console.log(`✓ ${landmark.name} — dim: ${landmark.embedding.length}`);
       results.success++;
     } catch (e: any) {
-      console.error(✗ ${landmark.name}: ${e.message});
+      console.error(`✗ ${landmark.name}: ${e.message}`);
       results.failed++;
     }
   }
@@ -56,12 +42,10 @@ export async function GET(req: Request) {
   return NextResponse.json({ done: true, ...results });
 }
 
-// ── Image search ──────────────────────────────────────────────────────────────
 export async function POST(req: Request) {
   await dbConnect();
-
   try {
-    const contentType = req.headers.get("content-type")  "";
+    const contentType = req.headers.get("content-type") || "";
     if (!contentType.includes("multipart/form-data")) {
       return NextResponse.json(
         { error: `Expected multipart/form-data, got ${contentType}` },
@@ -76,7 +60,6 @@ export async function POST(req: Request) {
     }
 
     console.log(`Processing: ${file.name}, ${file.size} bytes`);
-
     const bytes = await file.arrayBuffer();
     const imageEmbedding = await getImageEmbedding(bytes);
     console.log(`Image embedding dim: ${imageEmbedding.length}`);
@@ -88,15 +71,14 @@ export async function POST(req: Request) {
 
     const results = landmarks
       .map((l) => {
-        if (!l.embedding  !Array.isArray(l.embedding)) return null;
+        if (!l.embedding || !Array.isArray(l.embedding)) return null;
         const similarity = cosineSimilarity(imageEmbedding, l.embedding);
         return { ...l.toObject(), similarity, score: similarity };
       })
       .filter(Boolean)
       .sort((a, b) => b!.similarity - a!.similarity);
 
-    console.log(Top: ${results[0]?.name} — ${results[0]?.similarity.toFixed(4)});
-
+    console.log(`Top: ${results[0]?.name} — ${results[0]?.similarity.toFixed(4)}`);
     return NextResponse.json(results.slice(0, 5));
   } catch (error: any) {
     console.error("Search error:", error);

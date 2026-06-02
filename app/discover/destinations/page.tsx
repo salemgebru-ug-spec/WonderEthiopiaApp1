@@ -29,10 +29,11 @@ export default function DiscoverDestinations() {
   useEffect(() => {
     async function fetchUserPreferences() {
       try {
-        const res = await fetch("/api/tourist/profile");
+        const res = await fetch("/api/user/profile");
         const data = await res.json();
+        console.log(data);
         // Use interests array; if empty/missing, set null so we fall back to full list
-        const interests: string[] = data.profile?.interests ?? [];
+        const interests: string[] = data.user?.preferences?.categories ?? [];
         setPreferences(interests.length > 0 ? interests : null);
       } catch {
         setPreferences(null); // on error, show full list

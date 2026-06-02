@@ -1,42 +1,34 @@
-// app/api/landmarks/recognize/utils.ts
-import { pipeline, RawImage } from "@xenova/transformers";
-import loadImage from 'canvas';
+// app/api/search-by-image/utils.ts
+export async function getImageEmbedding(bytes: ArrayBuffer): Promise<number[]> {
+  const response = await fetch(
+    "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch32",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.HUGGING_FACE_API_KEY}`,
+        "Content-Type": "application/octet-stream",
+      },
+      body: bytes,
+    }
+  );
 
-let extractor: any;
-
-export async function getExtractor() {
-  if (!extractor) {
-    console.log("Loading CLIP model...");
-    extractor = await pipeline(
-      "image-feature-extraction",
-      "Xenova/clip-vit-base-patch32"
-    );
-    console.log("CLIP model loaded");
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`HF API error: ${response.status} — ${text}`);
   }
-  return extractor;
-}
 
-xport async function getImageEmbedding(image: ArrayBuffer): Promise<number[]> {
-  const ext = await getExtractor();
-
-  const buffer = Buffer.from(image); // Convert ArrayBuffer to Buffer
-  const img = await loadImage(buffer); // Load image using 'canvas'
-
-  const output = await ext(img, { pooling: "mean", normalize: true });
-  return Array.from(output.data as Float32Array);
+  const data = await response.json();
+  // HF returns { embeddings: number[][] } for feature-extraction
+  return data.embeddings?.[0] ?? data;
 }
 
 export function cosineSimilarity(a: number[], b: number[]): number {
-  if (a.length !== b.length) {
-    console.error(Dimension mismatch: query=${a.length}, db=${b.length});
-    return 0;
-  }
-  let dot = 0, magA = 0, magB = 0;
+  if (a.length !== b.length) return 0;
+  let dot = 0, normA = 0, normB = 0;
   for (let i = 0; i < a.length; i++) {
     dot += a[i] * b[i];
-    magA += a[i] * a[i];
-    magB += b[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
   }
-  const denom = Math.sqrt(magA) * Math.sqrt(magB);
-  return denom === 0 ? 0 : dot / denom;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }

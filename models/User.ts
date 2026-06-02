@@ -10,6 +10,12 @@ export interface IUser extends Document {
   profileImage?: string;
   needsPasswordChange?: boolean;
   tempPasswordExpiresAt?: Date;
+  preferences?: {
+    categories: string[];
+    regions: string[];
+    budget: string;
+    language: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,6 +47,14 @@ const UserSchema = new Schema<IUser>(
     phoneNumber: { type: String, default: "" },
     bio: { type: String, default: "" },
     profileImage: { type: String, default: "" },
+
+    // 👉 FIXED: Added the explicit runtime schema fields down here!
+    preferences: {
+      categories: { type: [String], default: [] },
+      regions: { type: [String], default: [] },
+      budget: { type: String, default: "mid" },
+      language: { type: String, default: "english" }
+    },
 
     needsPasswordChange: {
       type: Boolean,

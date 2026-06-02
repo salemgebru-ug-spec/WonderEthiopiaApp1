@@ -32,7 +32,7 @@ export async function PATCH(request: Request) {
     }
 
     const body = await request.json();
-    const { name, bio, phoneNumber, profileImage } = body;
+    const { name, bio, phoneNumber, profileImage, preferences } = body;
 
     await dbConnect();
     const user = await User.findByIdAndUpdate(
@@ -41,9 +41,11 @@ export async function PATCH(request: Request) {
         name,
         bio,
         phoneNumber,
-        profileImage 
+        profileImage,
+        // 👉 FIXED: Pass preferences straight into your Mongoose update query
+        preferences 
       },
-      { new: true }
+      { new: true, runValidators: true }
     ).select("-password");
 
     return NextResponse.json({ user });
