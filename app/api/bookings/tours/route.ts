@@ -3,6 +3,9 @@ import dbConnect from "@/lib/mongodb";
 import { registerPayment } from "../../payments/route";
 import TourBooking from "@/models/TourBooking";
 import Service from "@/models/Service";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
 export async function POST(request: Request) {
     try {
         await dbConnect(); 
@@ -123,7 +126,10 @@ if (quantity > 0 && quantity <= 0) {
 
 export async function GET() {
     try {
-        const result = await TourBooking.find();
+     const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const result = await TourBooking.find({ user_id: session.user.id }).lean();
         return NextResponse.json(
       {
         message: "Bookings retrieved successfully",
