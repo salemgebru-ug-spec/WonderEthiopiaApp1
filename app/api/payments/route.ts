@@ -67,6 +67,9 @@ export async function registerPayment(data: { user_id: string; amount: number; c
 
         const chapaResponse = await initializePayment({ amount, currency }, user, txRef);
 
+        console.log("CHECKOUT URL:", chapaResponse?.data?.checkout_url);
+console.log("STATUS:", chapaResponse?.status);
+
         if (chapaResponse.status !== "success") {
             // Include the actual Chapa error message in the throw
             const errorMsg = chapaResponse.message || "Chapa rejected the transaction";
