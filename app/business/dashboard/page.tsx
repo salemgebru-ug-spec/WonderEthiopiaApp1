@@ -659,7 +659,7 @@ export default function BusinessDashboardPage() {
             {[
               { id: "profile", label: "Registry Identity", icon: <FileText className="w-4 h-4" /> },
               { id: "services", label: "Service Inventory", icon: <Box className="w-4 h-4" /> },
-              { id: "bookings", label: "Mission Registry", icon: <Calendar className="w-4 h-4" /> },
+              // { id: "bookings", label: "Mission Registry", icon: <Calendar className="w-4 h-4" /> },
             ].map(tab => (
               <button
                 key={tab.id}
